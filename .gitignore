@@ -1,0 +1,31 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Logs
+*.log
+logs/
+
+# Dependency directories
+jspm_packages/
+
+# Environment variables
+.env
+.env.* # For multiple environment files
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE and editor folders
+.vscode/
+.idea/
+*.swp
+
+# npm package lock files
+package-lock.json
+yarn.lock
+
