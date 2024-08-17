@@ -12,12 +12,13 @@ const DB = process.env.DB_CONNECTION_STRING.replace(
   process.env.DB_PASSWORD
 );
 const userRouter = require("./routes/userRouter");
+const homeRouter = require("./routes/homeRouter");
 const errorController = require("./controllers/errorController");
 const app = express(); //app is an instance of express
 app.use(
   cors(
     {
-      origin: ["http://localhost:5173"], // Your frontend origin
+      origin: ["http://localhost:5174"], // Your frontend origin
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Allowed methods
       credentials: true,
     } // Allows credentials (cookies) to be sent
@@ -36,6 +37,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/users", userRouter);
+app.use("/api/home", homeRouter);
 app.use("*", (req, res) => {
   res.status(404).json({
     message: "Not Found",

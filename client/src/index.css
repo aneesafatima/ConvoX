@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+.form-item input:valid ~ .check,
+.auth-form input:invalid ~ .cross {
+  display: block;
+}
+.form-item input:valid ~ .cross,
+.auth-form input:invalid ~ .check {
+  display: none;
+}
+.form-item input:placeholder-shown ~ .cross,
+.form-item input:placeholder-shown ~ .check {
+  display: none !important;
+}
+
+.form-item {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-item:focus-within {
+  border-color: #3b82f6; /* Blue border color */
+  box-shadow: 0 0 6px 2px rgba(44, 121, 246, 0.6); /* Glowing effect */
+}
+
+.loader {
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  border: 2px solid #fff;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
