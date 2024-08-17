@@ -12,6 +12,7 @@ export function GlobalProvider({ children }) {
   const [passwordDetails, setPasswordDetails] = useState({});
   const [showLoader, setShowLoader] = useState(false);
   const [showErr, setShowErr] = useState(false);
+  const [selectUser, setSelectUser] = useState(false);
 
   return (
     <GlobalState.Provider
@@ -33,7 +34,8 @@ export function GlobalProvider({ children }) {
         showLoader,
         setShowLoader,
         showErr,
-        setShowErr
+        setShowErr,
+        selectUser, setSelectUser
       }}
     >
       {children}

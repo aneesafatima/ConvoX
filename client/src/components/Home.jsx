@@ -1,8 +1,9 @@
 import React, {useEffect, useContext} from 'react'
 
 import axios from "axios";
-import { ErrComponent } from ".";
+import { ErrComponent, UserMessages } from ".";
 import { GlobalState } from "../context/GlobalState";
+import SelectUser from './SelectUser';
 
 function Home() {
   const {
@@ -48,8 +49,9 @@ function Home() {
   return (
     giveAccess &&
     !refetch && (
-      <div className="text-3xl text-blue-500">
-    Hello from home
+      <div className="w-full">
+    <UserMessages/>
+    <SelectUser/>
       </div>
     )
   );
