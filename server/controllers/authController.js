@@ -81,7 +81,6 @@ exports.protect = catchAsync(async (req, res, next) => {
   if (!currentUser)
     return next(new ErrorHandler("There is no user belonging to this Id", 400));
 
-  console.log(currentUser);
 
   //check if token was issued before the password was changed
 
@@ -97,15 +96,15 @@ exports.protect = catchAsync(async (req, res, next) => {
 
 exports.updateMyPassword = catchAsync(async (req, res, next) => {
   const { password, passwordConfirm, newPassword } = req.body;
-  console.log(req.body);
+
   const user = await User.findOne({ _id: req.user._id }).select("+password");
-  console.log(user);
+ 
 
   if (!password || !(await user.comparePasswords(password, user.password)))
     return next(new ErrorHandler("Invalid password", 400));
   //add a middleware to set a passwordChangedAt date
 
-  console.log("correct");
+ 
   user.password = newPassword;
   user.passwordConfirm = passwordConfirm;
   await user.save(); //validators for all the fields are run
@@ -147,7 +146,7 @@ exports.logOut = (req, res) => {
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
   const { userId } = req.params;
-  console.log(userId);
+
   await User.findByIdAndDelete(userId);
   res.status(204).json({
     status: "success",

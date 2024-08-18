@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import coverPng from "/assets/cover.jpg";
@@ -25,7 +25,7 @@ function auth() {
     setShowLoader,
     seTGiveAccess,
     setShowErr,
-    setUser,
+    setCurrentUser,
   } = useContext(GlobalState);
 
   const navigate = useNavigate();
@@ -41,19 +41,17 @@ function auth() {
           : `${import.meta.env.VITE_URL}/api/users/login`,
         { ...userDetails, ...passwordDetails },
         {
-          withCredentials: true // Include credentials in the request
+          withCredentials: true, // Include credentials in the request
         }
       );
+
       if (res.data?.status === "success") {
         setShowLoader(false);
         seTGiveAccess(true);
         setShowErr(false);
-        setUser(res.data.user);
-
         navigate("/home", { replace: true });
       }
     } catch (err) {
-      console.log(err)
       setErrMessage(err.response?.data.message);
       setTimeout(() => setErrMessage(""), 2000);
       setShowLoader(false);
@@ -85,7 +83,7 @@ function auth() {
         >
           {authStatus === "signup" && (
             <div className="form-item border-[1px] border-[#e2e2e2] focus:border-2 focus:border-blue-500 rounded-lg  flex items-center py-2 px-3 sm:px-5 sm:py-3 space-x-3  text-xs sm:text-sm ">
-              <CiUser size={18}  className="thick-stroke text-priority-color" />
+              <CiUser size={18} className="thick-stroke text-priority-color" />
               <input
                 type="name"
                 name="name"
@@ -102,7 +100,7 @@ function auth() {
             </div>
           )}
           <div className="form-item border-[1px] border-[#e2e2e2] focus:border-2 focus:border-blue-500 rounded-lg  flex items-center py-2 px-3 sm:px-5 sm:py-3 space-x-3 text-xs sm:text-sm ">
-            <IoMailOutline size={18}  className="text-priority-color" />
+            <IoMailOutline size={18} className="text-priority-color" />
             <input
               type="email"
               name="email"
@@ -118,7 +116,10 @@ function auth() {
           </div>
 
           <div className="form-item border-[1px] border-[#e2e2e2] rounded-lg focus:border-2 focus:border-blue-500  flex items-center py-2 px-3 sm:px-5 sm:py-3 3 space-x-3 text-xs sm:text-sm">
-            <PiPasswordLight size={18}  className="thick-stroke text-priority-color" />
+            <PiPasswordLight
+              size={18}
+              className="thick-stroke text-priority-color"
+            />
             <input
               type="password"
               name="password"
@@ -138,7 +139,7 @@ function auth() {
           </div>
           {authStatus === "signup" && (
             <div className="form-item border-[1px] border-[#e2e2e2] focus:border-2 focus:border-blue-500 rounded-lg  flex items-center py-2 px-3 sm:px-5 sm:py-3  space-x-3 text-xs sm:text-sm">
-              <CiLock size={18}  className="thick-stroke text-priority-color" />
+              <CiLock size={18} className="thick-stroke text-priority-color" />
               <input
                 type="password"
                 name="passwordConfirm"

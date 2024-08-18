@@ -7,12 +7,14 @@ export function GlobalProvider({ children }) {
   const [authStatus, setAuthStatus] = useState("signup");
   const [errMessage, setErrMessage] = useState("");
   const [giveAccess, seTGiveAccess] = useState(false);
-  const [user, setUser] = useState("");
+  const [currentUser, setCurrentUser] = useState();
   const [refetch, setRefetch] = useState(true);
   const [passwordDetails, setPasswordDetails] = useState({});
   const [showLoader, setShowLoader] = useState(false);
   const [showErr, setShowErr] = useState(false);
   const [selectUser, setSelectUser] = useState(false);
+  const [allUsers, setAllUsers] = useState();
+  const [userContacts, setUserContacts] = useState();
 
   return (
     <GlobalState.Provider
@@ -21,8 +23,8 @@ export function GlobalProvider({ children }) {
         seTGiveAccess,
         errMessage,
         setErrMessage,
-        user,
-        setUser,
+        currentUser,
+        setCurrentUser,
         refetch,
         setRefetch,
         authStatus,
@@ -35,7 +37,12 @@ export function GlobalProvider({ children }) {
         setShowLoader,
         showErr,
         setShowErr,
-        selectUser, setSelectUser
+        selectUser,
+        setSelectUser,
+        allUsers,
+        setAllUsers,
+        userContacts,
+        setUserContacts,
       }}
     >
       {children}

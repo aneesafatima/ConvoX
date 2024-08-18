@@ -1,21 +1,37 @@
-import React, {useEffect, useContext} from 'react'
-
+import React, { useEffect, useContext, useMemo, useState } from "react";
+import { io } from "socket.io-client";
 import axios from "axios";
-import { ErrComponent, UserMessages } from ".";
+import { Chats, ErrComponent, UserMessages } from ".";
 import { GlobalState } from "../context/GlobalState";
-import SelectUser from './SelectUser';
+import SelectUser from "./SelectUser";
 
 function Home() {
   const {
     giveAccess,
     seTGiveAccess,
-    setUser,
+    setCurrentUser,
     refetch,
     setRefetch,
     setShowErr,
     showErr,
+    currentUser,
   } = useContext(GlobalState);
 
+  const [isConnected, setIsConnected] = useState(false);
+
+  const socket = useMemo(
+    () => {
+      if (isConnected && currentUser) {
+        return io(`${import.meta.env.VITE_URL}`, {
+          query: {
+            userId: currentUser._id,
+          },
+          withCredentials: true,
+        });
+      }
+    },
+    [isConnected, currentUser] // the io method returns a socket instance; this instance then helps in connecting to the server, listening for events emitted by server, sending/receiving messages and emitting events to server
+  );
   useEffect(() => {
     if (refetch) {
       async function fetchData() {
@@ -26,7 +42,8 @@ function Home() {
 
           if (res.data?.status === "success") {
             seTGiveAccess(true);
-            setUser(res.data.user);
+            setCurrentUser(res.data.user);
+            setIsConnected(true);
             setShowErr(false);
           }
         } catch (err) {
@@ -36,25 +53,41 @@ function Home() {
       }
       fetchData();
     }
-  },[refetch] );
+  }, [refetch]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("connect", () => {
+        console.log("Connected to the server with id : ", socket.id);
+      });
+    }
+
+    return () => {
+      if (socket) {
+        console.log("User disconnected: ", socket.id);
+        socket.disconnect(); //server removes this socket from the list of connected sockets
+      }
+    };
+  }, [isConnected]);
 
   if (showErr.status) return <ErrComponent message={showErr.message} />;
 
   if (refetch) {
-    return (
-      <p> Loading... </p>
-    );
+    return <p> Loading... </p>;
   }
 
   return (
     giveAccess &&
     !refetch && (
-      <div className="w-full">
-    <UserMessages/>
-    <SelectUser/>
+      <div className="w-full flex">
+        <div className="w-full">
+          <UserMessages />
+          <SelectUser />
+        </div>
+        <Chats />
       </div>
     )
   );
 }
 
-export default Home
+export default Home;

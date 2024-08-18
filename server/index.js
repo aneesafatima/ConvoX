@@ -6,6 +6,7 @@ const http = require("http");
 dotenv.config({ path: "./.env" });
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const { Server } = require("socket.io");
 
 const DB = process.env.DB_CONNECTION_STRING.replace(
   "<password>",
@@ -14,12 +15,20 @@ const DB = process.env.DB_CONNECTION_STRING.replace(
 const userRouter = require("./routes/userRouter");
 const homeRouter = require("./routes/homeRouter");
 const errorController = require("./controllers/errorController");
+const User = require("./models/userModel");
 const app = express(); //app is an instance of express
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173", // Frontend URL
+    methods: ["GET", "POST"], // Allowed methods
+    credentials: true, // Allow credentials such as cookies
+  },
+});
 app.use(
   cors(
     {
-      origin: ["http://localhost:5174"], // Your frontend origin
-      methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Allowed methods
+      origin: ["http://localhost:5173"], // Your frontend origin
       credentials: true,
     } // Allows credentials (cookies) to be sent
   )
@@ -51,7 +60,6 @@ mongoose
     console.log("Mongodb connected");
 
     if (process.env.NODE_ENV === "development") {
-      const server = http.createServer(app);
       server.listen(process.env.PORT, () => {
         console.log(`Server is listening on port ${process.env.PORT}`);
       });
@@ -61,5 +69,18 @@ mongoose
     console.error("DATABASE CONNECTION ERROR:", err);
     process.exit(1); //appication halting with an error
   });
+
+io.on("connection", async (socket) => {
+  await User.findByIdAndUpdate(socket.handshake.query.userId, { active: true });
+
+  console.log("User connected on server: ", socket.id);
+
+  socket.on("disconnect", async () => {
+    console.log("User disconnected:", socket.id);
+    await User.findByIdAndUpdate(socket.handshake.query.userId, {
+      active: false,
+    });
+  });
+});
 
 module.exports = app;

@@ -26,7 +26,7 @@ const UserSchema = new mongoose.Schema({
   },
   passwordConfirm: {
     type: String,
-    required: [true, "A user must confirm their password"],
+    // required: [true, "A user must confirm their password"],
     validate: {
       validator: function (value) {
         return value === this.password;
@@ -35,6 +35,10 @@ const UserSchema = new mongoose.Schema({
     },
   },
   passwordChangedAt: Date,
+  active: Boolean,
+  contacts: {
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Users" }],
+  },
 });
 
 UserSchema.pre("save", async function (next) {
