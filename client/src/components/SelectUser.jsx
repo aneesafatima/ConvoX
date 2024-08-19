@@ -1,11 +1,17 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { FaUserCircle } from "react-icons/fa";
 
 import { GlobalState } from "../context/GlobalState";
 function SelectUser() {
-  const { selectUser, setAllUsers, allUsers, currentUser , setSelectUser} =
-    useContext(GlobalState);
+  const {
+    selectUser,
+    setAllUsers,
+    allUsers,
+    currentUser,
+    setSelectUser,
+    setSelectedUser,
+  } = useContext(GlobalState);
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -22,19 +28,21 @@ function SelectUser() {
     fetchUser();
   }, []);
 
-
-  const handleUserSelction = async(selectedUser) => {
-  
-  const res = await axios.post(`${import.meta.env.VITE_URL}/api/users/addUserContact`, {
-    userContacted: selectedUser._id
-  }, {
-    withCredentials: true
-  })
-  if(res.data?.status === "success"){
-    setSelectUser(false);
-    console.log("Successfully addeds new contact")
-  }
-
+  const handleUserSelction = async (selectedUser) => {
+    const res = await axios.post(
+      `${import.meta.env.VITE_URL}/api/users/addUserContact`,
+      {
+        userContacted: selectedUser._id,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+    if (res.data?.status === "success") {
+      setSelectUser(false);
+      setSelectedUser(selectedUser);
+      console.log("Successfully addeds new contact");
+    }
   };
   return (
     selectUser && (
@@ -65,7 +73,11 @@ function SelectUser() {
                     <FaUserCircle size={35} className="mr-3" />
                     {user.name}
                   </span>
-                  <span className={`${user.active ? "bg-green-700" : "bg-red-700"} w-2 h-2 rounded-full`}></span>
+                  <span
+                    className={`${
+                      user.active ? "bg-green-700" : "bg-red-700"
+                    } w-2 h-2 rounded-full`}
+                  ></span>
                 </li>
               )
           )}

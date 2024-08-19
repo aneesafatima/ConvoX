@@ -3,10 +3,12 @@ import React, { useContext, useEffect, useState } from "react";
 import { GlobalState } from "../context/GlobalState";
 import { RiPencilFill } from "react-icons/ri";
 import { FaUserCircle } from "react-icons/fa";
+
 import axios from "axios";
 
 function UserMessages() {
-  const { setSelectUser, currentUser, selectUser } = useContext(GlobalState);
+  const { setSelectUser, currentUser, selectUser, setSelectedUser } =
+    useContext(GlobalState);
   const [contacts, setContacts] = useState([]);
 
   useEffect(() => {
@@ -22,8 +24,12 @@ function UserMessages() {
     if (!selectUser) fetchUserContacts();
   }, [selectUser]);
 
+  const handleUserChat = (contact) => {
+    console.log(contact)
+    setSelectedUser(contact);
+  };
   return (
-    <aside className="border-r-2 h-svh w-1/4 md:w-1/5 rounded-e-lg pt-3 flex flex-col p-2  ">
+    <aside className="border-r-2 h-svh  rounded-e-lg pt-3 flex flex-col p-2  ">
       <button
         className="w-full sm:w-[50%] text-xs  px-1 py-2 flex justify-center items-center  rounded-lg bg-[#2c2c2c] hover:bg-black text-white font-lato"
         onClick={() => setSelectUser(true)}
@@ -41,8 +47,11 @@ function UserMessages() {
 
         <ul>
           {contacts?.map((contact) => (
-            <li className="text-xs flex items-center  font-semibold cursor-pointer hover:bg-[#e2e2e2] py-1 rounded-lg ">
-              <FaUserCircle size={30} className="mx-1" />
+            <li className="text-xs flex items-center  font-semibold cursor-pointer hover:bg-[#e2e2e2] py-1 rounded-lg " onClick={() => handleUserChat(contact)}>
+              <FaUserCircle
+                size={30}
+                className="mx-1"
+              />
               {contact?.name}
             </li>
           ))}

@@ -15,23 +15,29 @@ function Home() {
     setShowErr,
     showErr,
     currentUser,
+    socket,
+    setSocket,
   } = useContext(GlobalState);
 
   const [isConnected, setIsConnected] = useState(false);
 
-  const socket = useMemo(
-    () => {
-      if (isConnected && currentUser) {
-        return io(`${import.meta.env.VITE_URL}`, {
+  useEffect(() => {
+    if (isConnected && currentUser && !socket) {
+      console.log("RUNNING !!!!!")
+      setSocket(
+        io(`${import.meta.env.VITE_URL}`, {
           query: {
             userId: currentUser._id,
           },
           withCredentials: true,
-        });
-      }
-    },
-    [isConnected, currentUser] // the io method returns a socket instance; this instance then helps in connecting to the server, listening for events emitted by server, sending/receiving messages and emitting events to server
-  );
+        })
+      );
+      setIsConnected(false);
+    }
+  }, [currentUser]);
+
+ 
+
   useEffect(() => {
     if (refetch) {
       async function fetchData() {
@@ -56,19 +62,16 @@ function Home() {
   }, [refetch]);
 
   useEffect(() => {
-    if (socket) {
+    if (socket && currentUser) {
       socket.on("connect", () => {
         console.log("Connected to the server with id : ", socket.id);
       });
-    }
-
-    return () => {
-      if (socket) {
+      return () => {
         console.log("User disconnected: ", socket.id);
         socket.disconnect(); //server removes this socket from the list of connected sockets
-      }
-    };
-  }, [isConnected]);
+      };
+    }
+  }, [socket]);
 
   if (showErr.status) return <ErrComponent message={showErr.message} />;
 
@@ -79,8 +82,8 @@ function Home() {
   return (
     giveAccess &&
     !refetch && (
-      <div className="w-full flex">
-        <div className="w-full">
+      <div className="w-screen flex space-x-10">
+        <div className="w-1/4 md:w-1/5 ">
           <UserMessages />
           <SelectUser />
         </div>

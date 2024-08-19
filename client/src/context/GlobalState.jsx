@@ -15,6 +15,8 @@ export function GlobalProvider({ children }) {
   const [selectUser, setSelectUser] = useState(false);
   const [allUsers, setAllUsers] = useState();
   const [userContacts, setUserContacts] = useState();
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [socket, setSocket] = useState(undefined);
 
   return (
     <GlobalState.Provider
@@ -43,6 +45,10 @@ export function GlobalProvider({ children }) {
         setAllUsers,
         userContacts,
         setUserContacts,
+        selectedUser,
+        setSelectedUser,
+        socket,
+        setSocket,
       }}
     >
       {children}

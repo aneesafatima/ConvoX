@@ -7,6 +7,7 @@ dotenv.config({ path: "./.env" });
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const { Server } = require("socket.io");
+const Message = require("./models/messageModel");
 
 const DB = process.env.DB_CONNECTION_STRING.replace(
   "<password>",
@@ -69,17 +70,28 @@ mongoose
     console.error("DATABASE CONNECTION ERROR:", err);
     process.exit(1); //appication halting with an error
   });
-
+const connectedUsers = [];
 io.on("connection", async (socket) => {
-  await User.findByIdAndUpdate(socket.handshake.query.userId, { active: true });
-
-  console.log("User connected on server: ", socket.id);
-
+  const userId = socket.handshake.query.userId; //user's mongo db id
+  await User.findByIdAndUpdate(userId, { active: true });
+  connectedUsers.push({ userId, socketId: socket.id });
+  console.log(connectedUsers);
+  socket.on("send-message", async (data) => {
+    await Message.create({
+      sender: userId,
+      receiver: data.to,
+      message: data.message,
+    });
+  });
   socket.on("disconnect", async () => {
-    console.log("User disconnected:", socket.id);
-    await User.findByIdAndUpdate(socket.handshake.query.userId, {
+    await User.findByIdAndUpdate(userId, {
       active: false,
     });
+    connectedUsers.splice(
+      connectedUsers.findIndex((user) => user.userId === socket.id),
+      1
+    );
+    console.log("Disconnect");
   });
 });
 
