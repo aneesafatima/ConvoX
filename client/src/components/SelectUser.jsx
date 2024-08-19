@@ -4,7 +4,7 @@ import { FaUserCircle } from "react-icons/fa";
 
 import { GlobalState } from "../context/GlobalState";
 function SelectUser() {
-  const { selectUser, setAllUsers, allUsers, currentUser } =
+  const { selectUser, setAllUsers, allUsers, currentUser , setSelectUser} =
     useContext(GlobalState);
   useEffect(() => {
     const fetchUser = async () => {
@@ -22,9 +22,6 @@ function SelectUser() {
     fetchUser();
   }, []);
 
-  useEffect(() => {
-    console.log(allUsers)
-  }, [allUsers])
 
   const handleUserSelction = async(selectedUser) => {
   
@@ -34,7 +31,7 @@ function SelectUser() {
     withCredentials: true
   })
   if(res.data?.status === "success"){
-
+    setSelectUser(false);
     console.log("Successfully addeds new contact")
   }
 

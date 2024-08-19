@@ -6,8 +6,8 @@ import { FaUserCircle } from "react-icons/fa";
 import axios from "axios";
 
 function UserMessages() {
-  const { setSelectUser, currentUser } = useContext(GlobalState);
-  const [contacts, setContacts] = useState([])
+  const { setSelectUser, currentUser, selectUser } = useContext(GlobalState);
+  const [contacts, setContacts] = useState([]);
 
   useEffect(() => {
     const fetchUserContacts = async () => {
@@ -17,14 +17,10 @@ function UserMessages() {
           withCredentials: true,
         }
       );
-      if(res.data?.status === "success")
-     setContacts(res.data.contactUsers)
-
+      if (res.data?.status === "success") setContacts(res.data.contactUsers);
     };
-    fetchUserContacts();
-  }, [])
-
- 
+    if (!selectUser) fetchUserContacts();
+  }, [selectUser]);
 
   return (
     <aside className="border-r-2 h-svh w-1/4 md:w-1/5 rounded-e-lg pt-3 flex flex-col p-2  ">
@@ -44,11 +40,12 @@ function UserMessages() {
         </span>
 
         <ul>
-          {contacts?.map(contact => (  <li className="text-xs flex items-center  font-semibold cursor-pointer hover:bg-[#e2e2e2] py-1 rounded-lg ">
-        <FaUserCircle size={30} className="mx-1" />
-        {contact?.name}
-      </li>))}
-         
+          {contacts?.map((contact) => (
+            <li className="text-xs flex items-center  font-semibold cursor-pointer hover:bg-[#e2e2e2] py-1 rounded-lg ">
+              <FaUserCircle size={30} className="mx-1" />
+              {contact?.name}
+            </li>
+          ))}
         </ul>
       </div>
     </aside>
