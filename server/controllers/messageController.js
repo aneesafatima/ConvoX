@@ -1,6 +1,6 @@
 const Message = require("../models/messageModel");
 exports.getMessagesForContact = catchAsync(async (req, res, next) => {
-const contactId = req.query.contactId;
+const {contactId} = req.params;
 const messages = await Message.find({
     $or: [
       { sender: req.user._id, receiver: contactId },

@@ -10,7 +10,6 @@ function UserMessages() {
   const { setSelectUser, currentUser, selectUser, setSelectedUser } =
     useContext(GlobalState);
   const [contacts, setContacts] = useState([]);
-
   useEffect(() => {
     const fetchUserContacts = async () => {
       const res = await axios.get(
@@ -25,7 +24,6 @@ function UserMessages() {
   }, [selectUser]);
 
   const handleUserChat = (contact) => {
-    console.log(contact)
     setSelectedUser(contact);
   };
   return (

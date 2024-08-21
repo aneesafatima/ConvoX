@@ -17,6 +17,7 @@ function Home() {
     currentUser,
     socket,
     setSocket,
+    setFetchMessages
   } = useContext(GlobalState);
 
   const [isConnected, setIsConnected] = useState(false);
@@ -65,6 +66,10 @@ function Home() {
     if (socket && currentUser) {
       socket.on("connect", () => {
         console.log("Connected to the server with id : ", socket.id);
+        socket.on("new-message", () => {
+          console.log("New message received");
+          setFetchMessages(true);
+        });
       });
       return () => {
         console.log("User disconnected: ", socket.id);

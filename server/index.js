@@ -3,20 +3,21 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const http = require("http");
-dotenv.config({ path: "./.env" });
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const { Server } = require("socket.io");
 const Message = require("./models/messageModel");
+const userRouter = require("./routes/userRouter");
+const homeRouter = require("./routes/homeRouter");
+const messageRouter = require("./routes/messageRouter");
+const errorController = require("./controllers/errorController");
+const User = require("./models/userModel");
+dotenv.config({ path: "./.env" });
 
 const DB = process.env.DB_CONNECTION_STRING.replace(
   "<password>",
   process.env.DB_PASSWORD
 );
-const userRouter = require("./routes/userRouter");
-const homeRouter = require("./routes/homeRouter");
-const errorController = require("./controllers/errorController");
-const User = require("./models/userModel");
 const app = express(); //app is an instance of express
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -48,6 +49,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/users", userRouter);
 app.use("/api/home", homeRouter);
+app.use("/api/messages", messageRouter);
 app.use("*", (req, res) => {
   res.status(404).json({
     message: "Not Found",
@@ -82,6 +84,10 @@ io.on("connection", async (socket) => {
       receiver: data.to,
       message: data.message,
     });
+
+    const receiver = connectedUsers.find((user) => user.userId === data.to);
+    console.log(receiver);
+    receiver && io.to(receiver.socketId).emit("new-message");
   });
   socket.on("disconnect", async () => {
     await User.findByIdAndUpdate(userId, {
