@@ -7,24 +7,27 @@ import { FaUserCircle } from "react-icons/fa";
 import axios from "axios";
 
 function UserMessages() {
-  const { setSelectUser, currentUser, selectUser, setSelectedUser } =
+
+  const { setSelectUser, currentUser, selectUser, setSelectedChat } =
     useContext(GlobalState);
   const [contacts, setContacts] = useState([]);
+  const [groups, setGroups] = useState([]);
   useEffect(() => {
     const fetchUserContacts = async () => {
+      console.log("fetching contacts");
       const res = await axios.get(
         `${import.meta.env.VITE_URL}/api/users/userContacts`,
         {
           withCredentials: true,
         }
       );
-      if (res.data?.status === "success") setContacts(res.data.contactUsers);
+      if (res.data?.status === "success"){ setContacts(res.data.contactUsers); setGroups(res.data.groups);}
     };
     if (!selectUser) fetchUserContacts();
   }, [selectUser]);
 
-  const handleUserChat = (contact) => {
-    setSelectedUser(contact);
+  const handleUserChat = (selectedChat) => {
+    setSelectedChat(selectedChat);
   };
   return (
     <aside className="border-r-2 h-svh  rounded-e-lg pt-3 flex flex-col p-2  ">
@@ -44,13 +47,22 @@ function UserMessages() {
         </span>
 
         <ul>
-          {contacts?.map((contact) => (
-            <li className="text-xs flex items-center  font-semibold cursor-pointer hover:bg-[#e2e2e2] py-1 rounded-lg " onClick={() => handleUserChat(contact)}>
+          {contacts?.map((contact,i) => (
+            <li className="text-xs flex items-center  font-semibold cursor-pointer hover:bg-[#e2e2e2] py-1 rounded-lg " onClick={() => handleUserChat({info:contact, type: 'individual'})} key={'contact' + i}>
               <FaUserCircle
                 size={30}
                 className="mx-1"
               />
               {contact?.name}
+            </li>
+          ))}
+          {groups?.map((group, i) => (
+            <li className="text-xs flex items-center  font-semibold cursor-pointer hover:bg-[#e2e2e2] py-1 rounded-lg " key={'group' + i} onClick={() => handleUserChat({info:group, type: group})}>
+              <FaUserCircle
+                size={30}
+                className="mx-1"
+              />
+              {group?.name}
             </li>
           ))}
         </ul>

@@ -12,9 +12,12 @@ exports.addUserContact = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user._id);
   if(user.contacts.includes(req.body.userContacted)){
    return next(new ErrorHandler("User is already in your contacts", 400));}
-
-  user.contacts.push(req.body.userContacted);
-  await user.save();
+  await User.findByIdAndUpdate(req.user._id, {
+    $push: { contacts: req.body.userContacted },
+  });
+  await User.findByIdAndUpdate(req.body.userContacted, {
+    $push: { contacts: req.user._id },
+  });
   res.status(200).json({
     status: "success"
   })
@@ -22,9 +25,10 @@ exports.addUserContact = catchAsync(async (req, res, next) => {
 
 
 exports.getUserContacts = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.user._id).populate("contacts");
+  const user = await User.findById(req.user._id).populate([{path: "contacts"}, {path: "groupIds"}]);
   res.status(200).json({
     status: "success",
-    contactUsers : user.contacts
+    contactUsers : user.contacts,
+    groups: user.groupIds
   });
 });

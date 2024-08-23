@@ -26,7 +26,7 @@ const UserSchema = new mongoose.Schema({
   },
   passwordConfirm: {
     type: String,
-    // required: [true, "A user must confirm their password"],
+    required: [true, "A user must confirm their password"],
     validate: {
       validator: function (value) {
         return value === this.password;
@@ -37,8 +37,9 @@ const UserSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   active: Boolean,
   contacts: {
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Users" }],
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
+  groupIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Group" }],
 });
 
 UserSchema.pre("save", async function (next) {
@@ -72,6 +73,6 @@ UserSchema.methods.passwordChangedAfter = function (jwtTimeStamp) {
   return false;
 };
 
-const User = new mongoose.model("Users", UserSchema);
+const User = new mongoose.model("User", UserSchema);
 
 module.exports = User;

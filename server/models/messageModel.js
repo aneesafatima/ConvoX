@@ -15,6 +15,7 @@ const MessageSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  groupId: { type: mongoose.Schema.Types.ObjectId, ref: "Group" },
 });
 
 const Message = new mongoose.model("Message", MessageSchema);

@@ -12,6 +12,7 @@ const homeRouter = require("./routes/homeRouter");
 const messageRouter = require("./routes/messageRouter");
 const errorController = require("./controllers/errorController");
 const User = require("./models/userModel");
+const groupRouter = require("./routes/groupRouter");
 dotenv.config({ path: "./.env" });
 
 const DB = process.env.DB_CONNECTION_STRING.replace(
@@ -50,6 +51,7 @@ app.get("/", (req, res) => {
 app.use("/api/users", userRouter);
 app.use("/api/home", homeRouter);
 app.use("/api/messages", messageRouter);
+app.use("/api/groups", groupRouter);
 app.use("*", (req, res) => {
   res.status(404).json({
     message: "Not Found",
@@ -77,18 +79,50 @@ io.on("connection", async (socket) => {
   const userId = socket.handshake.query.userId; //user's mongo db id
   await User.findByIdAndUpdate(userId, { active: true });
   connectedUsers.push({ userId, socketId: socket.id });
-  console.log(connectedUsers);
+
   socket.on("send-message", async (data) => {
+
+    if(data.type === 'individual'){
     await Message.create({
       sender: userId,
       receiver: data.to,
       message: data.message,
     });
+  } else {
+    await Message.create({
+      sender: userId,
+      groupId: data.to,
+      message: data.message,
+      isGroupMessage : true
+    });
+  }
 
+  if(data.type === 'individual'){
     const receiver = connectedUsers.find((user) => user.userId === data.to);
-    console.log(receiver);
     receiver && io.to(receiver.socketId).emit("new-message");
+  }
+  else{
+    const {adminId} = await User.findById(data.to).select('admin');
+    io.to(`${adminId}-1`).emit("new-message");
+  }
   });
+
+  socket.on("added-new-user", ({ selectedUserId, userName }) => {
+    const selectedUser = connectedUsers.find(
+      (user) => user.userId === selectedUserId
+    );
+
+    selectedUser &&
+      socket.to(selectedUser.socketId).emit("added-as-contact", userName);
+  });
+
+  socket.on("group-creation", ({ user , groupMembers}) => {
+    socket.join(user._id + "-1");
+    socket.broadcast.emit("added-to-group", user);
+  });
+  socket.on("join-room", ({ roomId }) => {
+    socket.join(roomId);
+  })
   socket.on("disconnect", async () => {
     await User.findByIdAndUpdate(userId, {
       active: false,

@@ -4,6 +4,7 @@ import axios from "axios";
 import { Chats, ErrComponent, UserMessages } from ".";
 import { GlobalState } from "../context/GlobalState";
 import SelectUser from "./SelectUser";
+import { showAlert } from "../utils/showAlert";
 
 function Home() {
   const {
@@ -17,6 +18,7 @@ function Home() {
     currentUser,
     socket,
     setSocket,
+    setSelectUser,
     setFetchMessages
   } = useContext(GlobalState);
 
@@ -24,7 +26,7 @@ function Home() {
 
   useEffect(() => {
     if (isConnected && currentUser && !socket) {
-      console.log("RUNNING !!!!!")
+      console.log("RUNNING !!!!!");
       setSocket(
         io(`${import.meta.env.VITE_URL}`, {
           query: {
@@ -36,8 +38,6 @@ function Home() {
       setIsConnected(false);
     }
   }, [currentUser]);
-
- 
 
   useEffect(() => {
     if (refetch) {
@@ -67,8 +67,17 @@ function Home() {
       socket.on("connect", () => {
         console.log("Connected to the server with id : ", socket.id);
         socket.on("new-message", () => {
-          console.log("New message received");
           setFetchMessages(true);
+        });
+
+        socket.on("added-to-group", (user) => {
+          showAlert(`${user.name} added you to the group`, "home");
+          socket.emit("join-room", {roomId: `${user._id}-1`});
+          setSelectUser(false);
+        });
+        socket.on("added-as-contact", (user) => {
+          showAlert(`${user} added you as a contact`, "home");
+          setSelectUser(false);
         });
       });
       return () => {
@@ -87,7 +96,7 @@ function Home() {
   return (
     giveAccess &&
     !refetch && (
-      <div className="w-screen flex space-x-10">
+      <div className="w-screen flex space-x-10" id="home">
         <div className="w-1/4 md:w-1/5 ">
           <UserMessages />
           <SelectUser />

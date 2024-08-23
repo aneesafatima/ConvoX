@@ -4,7 +4,7 @@ import axios from "axios";
 
 function Chats() {
   const {
-    selectedUser,
+    selectedChat,
     socket,
     messages,
     setMessages,
@@ -15,7 +15,7 @@ function Chats() {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_URL}/api/messages/${selectedUser._id}`,
+          `${import.meta.env.VITE_URL}/api/messages/${selectedChat.type}/${selectedChat.info._id}`,
           { withCredentials: true }
         );
         if (res.data?.status === "success") {
@@ -26,37 +26,38 @@ function Chats() {
         console.log(err);
       }
     };
-    if (selectedUser || fetchMessages) fetchData();
-  }, [selectedUser, fetchMessages]);
+    if (selectedChat || fetchMessages) fetchData();
+  }, [selectedChat, fetchMessages]);
 
   const handeSendingMessage = () => {
     const message = document.getElementById("message");
     setFetchMessages(true);
     socket.emit("send-message", {
       message: message.value,
-      to: selectedUser._id,
+      to: selectedChat.info._id,
+      type: selectedChat.type,
     });
     message.value = "";
   };
   return (
-    selectedUser && (
+    selectedChat && (
       <div className="flex font-lato flex-col space-y-5 p-3 px-5 pb-4 flex-grow relative ">
         <h2 className="text-2xl font-roboto font-semibold ">
-          Chats with {selectedUser.name}
+          Chats with {selectedChat.info.name}
         </h2>
         <div className="border rounded-lg w-full h-full overflow-auto flex flex-col pb-12">
           <ul className="p-4 px-10 space-y-6 flex flex-col">
             {messages?.map((message) => (
               <li
                 className={`text-sm flex flex-col ${
-                  message.receiver !== selectedUser._id
+                  message.receiver !== selectedChat.info._id
                     ? "self-start "
                     : "self-end "
                 } `}
               >
                 <span
                   className={`pointer-events-none ${
-                    message.receiver !== selectedUser._id
+                    message.receiver !== selectedChat.info._id
                       ? "bg-[#E8F5E9] self-start rounded-bl-none"
                       : "bg-[#E0F7FA] self-end rounded-br-none"
                   } p-3 rounded-lg`}
@@ -64,8 +65,8 @@ function Chats() {
                   {message.message}
                 </span>
                 <span className="text-[10px] pl-2 text-[#414141] font-nunito font-semibold">
-                  {message.receiver !== selectedUser._id
-                    ? selectedUser.name
+                  {message.receiver !== selectedChat.info._id
+                    ? selectedChat.info.name
                     : null}
                   <span className="mx-2 text-[#b2b2b2] text-[8px] ">
                     {new Date(message.timestamp).toLocaleDateString("en-US") ===
