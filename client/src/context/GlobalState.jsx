@@ -57,6 +57,7 @@ export function GlobalProvider({ children }) {
         setFetchMessages,
         isGroup,
         setIsGroup,
+        
       }}
     >
       {children}

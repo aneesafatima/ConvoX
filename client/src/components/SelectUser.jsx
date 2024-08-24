@@ -15,7 +15,6 @@ function SelectUser() {
     allUsers,
     currentUser,
     setSelectUser,
-    setSelectedUser,
     isGroup,
     setIsGroup,
     socket,
@@ -55,11 +54,9 @@ function SelectUser() {
         }
       );
       if (res.data?.status === "success") {
-        setSelectUser(false);
         socket.emit("added-new-user",{selectedUserId: selectedUser._id, userName: currentUser.name} );
-        setSelectedUser(selectedUser);
         showAlert("User added successfully", "home");
-        setIsGroup(false)
+        
       }
     }
   };
@@ -67,7 +64,7 @@ function SelectUser() {
   const handleUsers = async () => {}; //filter users
 
   const handleGroupCreation = async () => {
-    console.log("groupMembers", groupMembers);
+   
     if (groupMembers.length > 1) {
       groupMembers.push(currentUser);
       try {
@@ -83,8 +80,10 @@ function SelectUser() {
         });
         if (res.data.status === "success") {
           showAlert("Group created successfully", "home");
-          socket.emit("group-creation", { user: currentUser, groupMembers });
+          socket.emit("group-creation", {user: currentUser.name, groupId: res.status.group._id});
+          setGroupMembers([])
           setSelectUser(false);
+          setIsGroup(false);
         }
       } catch (err) {
         showAlert("Group creation failed", "home");
@@ -168,11 +167,7 @@ function SelectUser() {
             (user, i) =>
               user._id !== currentUser?._id && (
                 <li
-                  className={`text-sm flex items-center justify-between font-semibold ${
-                    user.active
-                      ? "cursor-pointer"
-                      : "cursor-not-allowed opacity-50"
-                  } hover:bg-[#e2e2e2] py-1 rounded-lg pl-1 px-6 `}
+                  className={`text-sm flex items-center justify-between font-semibold  cursor-pointer hover:bg-[#e2e2e2] py-1 rounded-lg pl-1 px-6 `}
                   onClick={() => handleUserSelction(user)}
                   key={i}
                 >

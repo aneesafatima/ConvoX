@@ -12,6 +12,7 @@ const homeRouter = require("./routes/homeRouter");
 const messageRouter = require("./routes/messageRouter");
 const errorController = require("./controllers/errorController");
 const User = require("./models/userModel");
+const Group = require("./models/groupModel");
 const groupRouter = require("./routes/groupRouter");
 dotenv.config({ path: "./.env" });
 
@@ -76,35 +77,34 @@ mongoose
   });
 const connectedUsers = [];
 io.on("connection", async (socket) => {
+  console.log("Connected to the server with id : ", socket.id);
   const userId = socket.handshake.query.userId; //user's mongo db id
-  await User.findByIdAndUpdate(userId, { active: true });
+  const user = await User.findByIdAndUpdate(userId, { $set: { active: true } });
+  user.groupIds?.map((groupId) => {
+    socket.join(groupId);
+  });
   connectedUsers.push({ userId, socketId: socket.id });
 
   socket.on("send-message", async (data) => {
+    if (data.type === "individual") {
+      await Message.create({
+        sender: userId,
+        receiver: data.to,
+        message: data.message,
+      });
 
-    if(data.type === 'individual'){
-    await Message.create({
-      sender: userId,
-      receiver: data.to,
-      message: data.message,
-    });
-  } else {
-    await Message.create({
-      sender: userId,
-      groupId: data.to,
-      message: data.message,
-      isGroupMessage : true
-    });
-  }
-
-  if(data.type === 'individual'){
-    const receiver = connectedUsers.find((user) => user.userId === data.to);
-    receiver && io.to(receiver.socketId).emit("new-message");
-  }
-  else{
-    const {adminId} = await User.findById(data.to).select('admin');
-    io.to(`${adminId}-1`).emit("new-message");
-  }
+      const receiver = connectedUsers.find((user) => user.userId === data.to);
+      receiver && socket.to(receiver.socketId).emit("new-message");
+    } else {
+      await Message.create({
+        sender: userId,
+        groupId: data.to,
+        message: data.message,
+        isGroupMessage: true,
+      });
+      const group = await Group.findById(data.to).select("admin");
+      socket.to(`${group.admin}-1`).emit("new-message"); //change the hardcoded value
+    }
   });
 
   socket.on("added-new-user", ({ selectedUserId, userName }) => {
@@ -116,19 +116,19 @@ io.on("connection", async (socket) => {
       socket.to(selectedUser.socketId).emit("added-as-contact", userName);
   });
 
-  socket.on("group-creation", ({ user , groupMembers}) => {
-    socket.join(user._id + "-1");
-    socket.broadcast.emit("added-to-group", user);
+  socket.on("group-creation", ({ user, groupId }) => {
+    socket.join(groupId);
+    socket.broadcast.emit("added-to-group", { user, groupId });
   });
   socket.on("join-room", ({ roomId }) => {
     socket.join(roomId);
-  })
+  });
   socket.on("disconnect", async () => {
     await User.findByIdAndUpdate(userId, {
-      active: false,
+      $set: { active: false },
     });
     connectedUsers.splice(
-      connectedUsers.findIndex((user) => user.userId === socket.id),
+      connectedUsers.findIndex((user) => user.socketId === socket.id),
       1
     );
     console.log("Disconnect");

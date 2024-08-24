@@ -3,6 +3,7 @@ import { GlobalState } from "../context/GlobalState";
 import axios from "axios";
 
 function Chats() {
+  //fix time issue in messages
   const {
     selectedChat,
     socket,
@@ -10,34 +11,40 @@ function Chats() {
     setMessages,
     fetchMessages,
     setFetchMessages,
+    currentUser,
   } = useContext(GlobalState);
   useEffect(() => {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_URL}/api/messages/${selectedChat.type}/${selectedChat.info._id}`,
+          `${import.meta.env.VITE_URL}/api/messages/${selectedChat.type}/${
+            selectedChat.info._id
+          }`,
           { withCredentials: true }
         );
         if (res.data?.status === "success") {
           setMessages(res.data.messages);
           setFetchMessages(false);
+          const scrollContainer = document.getElementById("scroll-container");
+          scrollContainer.scrollTop = scrollContainer.scrollHeight;
         }
       } catch (err) {
         console.log(err);
       }
     };
+
     if (selectedChat || fetchMessages) fetchData();
   }, [selectedChat, fetchMessages]);
 
   const handeSendingMessage = () => {
     const message = document.getElementById("message");
-    setFetchMessages(true);
     socket.emit("send-message", {
       message: message.value,
       to: selectedChat.info._id,
       type: selectedChat.type,
     });
     message.value = "";
+    setFetchMessages(true);
   };
   return (
     selectedChat && (
@@ -45,19 +52,22 @@ function Chats() {
         <h2 className="text-2xl font-roboto font-semibold ">
           Chats with {selectedChat.info.name}
         </h2>
-        <div className="border rounded-lg w-full h-full overflow-auto flex flex-col pb-12">
+        <div
+          className="border rounded-lg w-full h-full overflow-auto flex flex-col pb-12"
+          id="scroll-container"
+        >
           <ul className="p-4 px-10 space-y-6 flex flex-col">
             {messages?.map((message) => (
               <li
                 className={`text-sm flex flex-col ${
-                  message.receiver !== selectedChat.info._id
-                    ? "self-start "
-                    : "self-end "
+                  message.sender === currentUser._id
+                    ? "self-end"
+                    : "self-start "
                 } `}
               >
                 <span
                   className={`pointer-events-none ${
-                    message.receiver !== selectedChat.info._id
+                    message.sender !== currentUser._id
                       ? "bg-[#E8F5E9] self-start rounded-bl-none"
                       : "bg-[#E0F7FA] self-end rounded-br-none"
                   } p-3 rounded-lg`}
@@ -73,7 +83,7 @@ function Chats() {
                     new Date(Date.now()).toLocaleDateString("en-US")
                       ? new Date(message.timestamp).toLocaleTimeString(
                           "en-US",
-                          { hour: "2-digit",minute:'2-digit', hour12: true }
+                          { hour: "2-digit", minute: "2-digit", hour12: true }
                         )
                       : new Date(message.timestamp).toLocaleDateString("en-US")}
                   </span>

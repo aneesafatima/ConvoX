@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useMemo, useState } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { io } from "socket.io-client";
 import axios from "axios";
 import { Chats, ErrComponent, UserMessages } from ".";
@@ -19,10 +19,13 @@ function Home() {
     socket,
     setSocket,
     setSelectUser,
-    setFetchMessages
+    setFetchMessages,
+    selectUser,
   } = useContext(GlobalState);
 
   const [isConnected, setIsConnected] = useState(false);
+  const [contacts, setContacts] = useState([]);
+  const [groups, setGroups] = useState([]);
 
   useEffect(() => {
     if (isConnected && currentUser && !socket) {
@@ -67,14 +70,17 @@ function Home() {
       socket.on("connect", () => {
         console.log("Connected to the server with id : ", socket.id);
         socket.on("new-message", () => {
+          console.log("Socket triggered!!");
           setFetchMessages(true);
+         
         });
 
-        socket.on("added-to-group", (user) => {
-          showAlert(`${user.name} added you to the group`, "home");
-          socket.emit("join-room", {roomId: `${user._id}-1`});
+        socket.on("added-to-group", ({ user, groupId }) => {
+          showAlert(`${user} added you to the group`, "home");
+          socket.emit("join-room", { roomId: groupId });
           setSelectUser(false);
         });
+
         socket.on("added-as-contact", (user) => {
           showAlert(`${user} added you as a contact`, "home");
           setSelectUser(false);
@@ -87,6 +93,24 @@ function Home() {
     }
   }, [socket]);
 
+  useEffect(() => {
+    console.log("selectUser :", selectUser);
+    const fetchUserContacts = async () => {
+      console.log("fetching contacts");
+      const res = await axios.get(
+        `${import.meta.env.VITE_URL}/api/users/userContacts`,
+        {
+          withCredentials: true,
+        }
+      );
+      if (res.data?.status === "success") {
+        setContacts(res.data.contactUsers);
+        setGroups(res.data.groups);
+      }
+    };
+    if (!selectUser) fetchUserContacts();
+  }, [selectUser]);
+
   if (showErr.status) return <ErrComponent message={showErr.message} />;
 
   if (refetch) {
@@ -98,7 +122,7 @@ function Home() {
     !refetch && (
       <div className="w-screen flex space-x-10" id="home">
         <div className="w-1/4 md:w-1/5 ">
-          <UserMessages />
+          <UserMessages contacts={contacts} groups={groups} />
           <SelectUser />
         </div>
         <Chats />

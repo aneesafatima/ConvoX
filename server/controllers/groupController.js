@@ -8,8 +8,8 @@ exports.createGroup = catchAsync(async (req, res, next) => {
     description: req.body.description,
     admin: req.user._id,
   });
+ 
   const groupMembers = req.body.groupMembers;
-  console.log(groupMembers);
   groupMembers.map(async (member) => {
     await User.findByIdAndUpdate(member, { $push: { groupIds: group._id } });
   });
