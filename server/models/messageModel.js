@@ -9,7 +9,7 @@ const MessageSchema = new mongoose.Schema({
   },
   timestamp: {
     type: Date,
-    default: new Date(),
+    default: () => new Date(),
   },
   isGroupMessage: {
     type: Boolean,

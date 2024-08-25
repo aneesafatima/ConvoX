@@ -19,6 +19,7 @@ exports.createGroup = catchAsync(async (req, res, next) => {
     group,
   });
 });
+
 exports.getGroupMessages = catchAsync(async (req, res, next) => {
   // const groupMessages = Message
 

@@ -11,7 +11,6 @@ import { showAlert } from "../utils/showAlert";
 function SelectUser() {
   const {
     selectUser,
-    setAllUsers,
     allUsers,
     currentUser,
     setSelectUser,
@@ -20,21 +19,7 @@ function SelectUser() {
     socket,
   } = useContext(GlobalState);
   const [groupMembers, setGroupMembers] = useState([]);
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await axios.get(`${import.meta.env.VITE_URL}/api/users`, {
-          withCredentials: true,
-        });
-        if (res.data?.status === "success") {
-          setAllUsers(res.data.users);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchUser();
-  }, []);
+
 
   const handleUserSelction = async (selectedUser) => {
     if (isGroup) {
@@ -54,9 +39,11 @@ function SelectUser() {
         }
       );
       if (res.data?.status === "success") {
-        socket.emit("added-new-user",{selectedUserId: selectedUser._id, userName: currentUser.name} );
+        socket.emit("added-new-user", {
+          selectedUserId: selectedUser._id,
+          userName: currentUser.name,
+        });
         showAlert("User added successfully", "home");
-        
       }
     }
   };
@@ -64,24 +51,28 @@ function SelectUser() {
   const handleUsers = async () => {}; //filter users
 
   const handleGroupCreation = async () => {
-   
     if (groupMembers.length > 1) {
       groupMembers.push(currentUser);
       try {
+        const groupMembersIds =  groupMembers.map((member) => member._id);
         const res = await axios({
           url: `${import.meta.env.VITE_URL}/api/groups`,
           data: {
             name: document.getElementById("group-name").value,
             description: document.getElementById("group-description").value,
-            groupMembers: groupMembers.map((member) => member._id),
+            groupMembers: groupMembersIds,
           },
           method: "POST",
           withCredentials: true,
         });
         if (res.data.status === "success") {
           showAlert("Group created successfully", "home");
-          socket.emit("group-creation", {user: currentUser.name, groupId: res.status.group._id});
-          setGroupMembers([])
+          socket.emit("group-creation", {
+            userName: currentUser.name,
+            groupId: res.data.group._id,
+            groupMembersIds
+          });
+          setGroupMembers([]);
           setSelectUser(false);
           setIsGroup(false);
         }

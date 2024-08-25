@@ -58,7 +58,16 @@
   transform: translateX(-50%);
   z-index: 9999;
 }
+#scroll-container {
+  margin-bottom: 50px;
+  scroll-behavior: smooth;
+}
 
 #scroll-container::-webkit-scrollbar{
 width: 0;
+}
+
+.tooltip {
+ background-color: #3b82f6 !important;
+ padding: 5px 10px !important;
 }

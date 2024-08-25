@@ -3,7 +3,7 @@ import { Auth, Home } from "./components";
 import { useContext, useEffect, useState } from "react";
 import { NotFound } from "./components";
 import { GlobalState } from "./context/GlobalState";
-import axios from "axios";
+// import 'react-tooltip/dist/react-tooltip.css'
 
 function App() {
   const location = useLocation();

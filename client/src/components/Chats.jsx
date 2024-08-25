@@ -1,6 +1,8 @@
 import React, { useContext, useEffect } from "react";
 import { GlobalState } from "../context/GlobalState";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 import axios from "axios";
+import { ImExit } from "react-icons/im";
 
 function Chats() {
   //fix time issue in messages
@@ -12,6 +14,7 @@ function Chats() {
     fetchMessages,
     setFetchMessages,
     currentUser,
+    allUsers,
   } = useContext(GlobalState);
   useEffect(() => {
     const fetchData = async () => {
@@ -23,10 +26,14 @@ function Chats() {
           { withCredentials: true }
         );
         if (res.data?.status === "success") {
+          setTimeout(() => {
+            const scrollContainer = document.getElementById("scroll-container");
+            scrollContainer.scrollTop = scrollContainer.scrollHeight;
+          }, 100);
+
           setMessages(res.data.messages);
+
           setFetchMessages(false);
-          const scrollContainer = document.getElementById("scroll-container");
-          scrollContainer.scrollTop = scrollContainer.scrollHeight;
         }
       } catch (err) {
         console.log(err);
@@ -46,12 +53,28 @@ function Chats() {
     message.value = "";
     setFetchMessages(true);
   };
+
+  const handleGroupExit = async (userId, groupId) => { 
+   
+   }
   return (
     selectedChat && (
       <div className="flex font-lato flex-col space-y-5 p-3 px-5 pb-4 flex-grow relative ">
-        <h2 className="text-2xl font-roboto font-semibold ">
-          Chats with {selectedChat.info.name}
-        </h2>
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-roboto font-semibold ">
+            Chats with {selectedChat.info.name}
+          </h2>
+          {selectedChat.type === "group" && (
+            <ImExit
+              size={20}
+              color="#3b82f6"
+              className="cursor-pointer"
+              data-tooltip-id="exit-group"
+              data-tooltip-content="exit group"
+              onClick={() => handleGroupExit(currentUser._id, selectedChat.info._id)}
+            />
+          )}
+        </div>
         <div
           className="border rounded-lg w-full h-full overflow-auto flex flex-col pb-12"
           id="scroll-container"
@@ -75,8 +98,11 @@ function Chats() {
                   {message.message}
                 </span>
                 <span className="text-[10px] pl-2 text-[#414141] font-nunito font-semibold">
-                  {message.receiver !== selectedChat.info._id
-                    ? selectedChat.info.name
+                  {message.sender !== currentUser._id
+                    ? message.isGroupMessage
+                      ? allUsers.find((user) => user._id === message.sender)
+                          .name
+                      : selectedChat.info.name
                     : null}
                   <span className="mx-2 text-[#b2b2b2] text-[8px] ">
                     {new Date(message.timestamp).toLocaleDateString("en-US") ===
@@ -104,6 +130,7 @@ function Chats() {
             >
               send
             </button>
+            <ReactTooltip className="tooltip" id="exit-group" />
           </div>
         </div>
       </div>

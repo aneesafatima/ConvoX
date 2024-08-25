@@ -21,6 +21,7 @@ function Home() {
     setSelectUser,
     setFetchMessages,
     selectUser,
+    setAllUsers
   } = useContext(GlobalState);
 
   const [isConnected, setIsConnected] = useState(false);
@@ -72,11 +73,11 @@ function Home() {
         socket.on("new-message", () => {
           console.log("Socket triggered!!");
           setFetchMessages(true);
-         
         });
 
-        socket.on("added-to-group", ({ user, groupId }) => {
-          showAlert(`${user} added you to the group`, "home");
+        socket.on("added-to-group", ({ userName, groupId }) => {
+          showAlert(`${userName} added you to the group`, "home");
+          console.log(groupId)
           socket.emit("join-room", { roomId: groupId });
           setSelectUser(false);
         });
@@ -110,6 +111,22 @@ function Home() {
     };
     if (!selectUser) fetchUserContacts();
   }, [selectUser]);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_URL}/api/users`, {
+          withCredentials: true,
+        });
+        if (res.data?.status === "success") {
+          setAllUsers(res.data.users);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchUser();
+  }, []);
 
   if (showErr.status) return <ErrComponent message={showErr.message} />;
 
