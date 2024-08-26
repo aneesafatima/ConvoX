@@ -5,3 +5,5 @@ export { default as Home } from "./Home.jsx";
 export { default as UserMessages } from "./UserMessages.jsx";
 export { default as User } from "./User.jsx";
 export { default as Chats } from "./Chats.jsx";
+export { default as GroupSettings } from "./GroupSettings.jsx";
+export { Tooltip as ReactTooltip } from "react-tooltip";

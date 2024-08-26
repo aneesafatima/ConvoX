@@ -1,7 +1,7 @@
 export const showAlert = (message, id) => {
     const container = document.getElementById(id);
     const alert = `<div class="alert">${
-      message.includes(":") ? message.split(":")[2] : message
+      message?.includes(":") ? message.split(":")[2] : message
     }</div>`;
     container.insertAdjacentHTML("afterbegin", alert);
     const alertEl = container.querySelector(".alert");

@@ -12,7 +12,7 @@ const homeRouter = require("./routes/homeRouter");
 const messageRouter = require("./routes/messageRouter");
 const errorController = require("./controllers/errorController");
 const User = require("./models/userModel");
-const Group = require("./models/groupModel");
+
 const groupRouter = require("./routes/groupRouter");
 dotenv.config({ path: "./.env" });
 
@@ -78,17 +78,18 @@ mongoose
 const connectedUsers = [];
 io.on("connection", async (socket) => {
   console.log("Connected to the server with id : ", socket.id);
+  socket.broadcast.emit("new-connection");
+
   const userId = socket.handshake.query.userId; //user's mongo db id
   const user = await User.findByIdAndUpdate(userId, { $set: { active: true } });
-  console.log(user.groupIds);
+
   user.groupIds?.map((groupId) => {
     socket.join(groupId.toString());
   });
-  console.log(socket.rooms);
+
   connectedUsers.push({ userId, socketId: socket.id });
 
   socket.on("send-message", async (data) => {
-    console.log(data);
     if (data.type === "individual") {
       await Message.create({
         sender: userId,
@@ -119,19 +120,23 @@ io.on("connection", async (socket) => {
       socket.to(selectedUser.socketId).emit("added-as-contact", userName);
   });
 
-  socket.on("group-creation", ({ userName, groupId, groupMembersIds }) => {
-    socket.join(groupId);
-    let user;
-    groupMembersIds.forEach((member) => {
-      user = connectedUsers.find((user) => user.userId === member);
-      user &&
-        socket.to(user.socketId).emit("added-to-group", { userName, groupId });
-    });
-  });
+  socket.on(
+    "group-creation",
+    ({ userName, groupId, groupMembersIds, groupName }) => {
+      socket.join(groupId);
+      let user;
+      groupMembersIds.forEach((member) => {
+        user = connectedUsers.find((user) => user.userId === member);
+        user &&
+          socket
+            .to(user.socketId)
+            .emit("added-to-group", { userName, groupId, groupName });
+      });
+    }
+  );
 
   socket.on("join-room", ({ roomId }) => {
-    console.log("roomId value:", roomId);
-    console.log("roomId type:", typeof roomId);
+    socket.join(roomId);
   });
   socket.on("disconnect", async () => {
     await User.findByIdAndUpdate(userId, {

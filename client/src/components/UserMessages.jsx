@@ -3,15 +3,19 @@ import React, { useContext } from "react";
 import { GlobalState } from "../context/GlobalState";
 import { RiPencilFill } from "react-icons/ri";
 import { FaUserCircle } from "react-icons/fa";
+import { RiGroup2Fill } from "react-icons/ri";
 
 function UserMessages({ contacts, groups }) {
-  const { setSelectUser, currentUser, setSelectedChat } =
+  const { setShowUsers, currentUser, setSelectedChat, setFetchUsers } =
     useContext(GlobalState);
   return (
     <aside className="border-r-2 h-svh  rounded-e-lg pt-3 flex flex-col p-2  ">
       <button
         className="w-full sm:w-[50%] text-xs  px-1 py-2 flex justify-center items-center  rounded-lg bg-[#2c2c2c] hover:bg-black text-white font-lato"
-        onClick={() => setSelectUser(true)}
+        onClick={() => {
+          setFetchUsers(true);
+          setShowUsers(true);
+        }}
       >
         <RiPencilFill className="inline mr-1" size={19} /> New Message
       </button>
@@ -43,7 +47,7 @@ function UserMessages({ contacts, groups }) {
               key={"group" + i}
               onClick={() => setSelectedChat({ info: group, type: "group" })}
             >
-              <FaUserCircle size={30} className="mx-1" />
+              <RiGroup2Fill size={30} className="mx-1" />
               {group?.name}
             </li>
           ))}

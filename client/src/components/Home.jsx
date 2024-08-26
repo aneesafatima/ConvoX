@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState } from "react";
 import { io } from "socket.io-client";
 import axios from "axios";
-import { Chats, ErrComponent, UserMessages } from ".";
+import { Chats, ErrComponent, UserMessages, GroupSettings } from ".";
 import { GlobalState } from "../context/GlobalState";
 import SelectUser from "./SelectUser";
 import { showAlert } from "../utils/showAlert";
@@ -18,10 +18,13 @@ function Home() {
     currentUser,
     socket,
     setSocket,
-    setSelectUser,
+    fetchUserChats,
     setFetchMessages,
-    selectUser,
-    setAllUsers
+    setFetchUserChats,
+    setAllUsers,
+    showGroupSettings,
+    fetchUsers,
+    setFetchUsers,
   } = useContext(GlobalState);
 
   const [isConnected, setIsConnected] = useState(false);
@@ -71,22 +74,23 @@ function Home() {
       socket.on("connect", () => {
         console.log("Connected to the server with id : ", socket.id);
         socket.on("new-message", () => {
-          console.log("Socket triggered!!");
           setFetchMessages(true);
         });
 
-        socket.on("added-to-group", ({ userName, groupId }) => {
-          showAlert(`${userName} added you to the group`, "home");
-          console.log(groupId)
+        socket.on("added-to-group", ({ userName, groupId, groupName }) => {
+          showAlert(`${userName} added you to the group ${groupName}`, "home");
           socket.emit("join-room", { roomId: groupId });
-          setSelectUser(false);
+          setFetchUserChats(true);
         });
 
         socket.on("added-as-contact", (user) => {
           showAlert(`${user} added you as a contact`, "home");
-          setSelectUser(false);
+          setFetchUserChats(true);
         });
+
+
       });
+
       return () => {
         console.log("User disconnected: ", socket.id);
         socket.disconnect(); //server removes this socket from the list of connected sockets
@@ -95,38 +99,42 @@ function Home() {
   }, [socket]);
 
   useEffect(() => {
-    console.log("selectUser :", selectUser);
-    const fetchUserContacts = async () => {
-      console.log("fetching contacts");
-      const res = await axios.get(
-        `${import.meta.env.VITE_URL}/api/users/userContacts`,
-        {
-          withCredentials: true,
+    if (fetchUserChats) {
+      (async () => {
+        console.log("fetching contacts");
+        const res = await axios.get(
+          `${import.meta.env.VITE_URL}/api/users/userContacts`,
+          {
+            withCredentials: true,
+          }
+        );
+        if (res.data?.status === "success") {
+          setContacts(res.data.contactUsers);
+          setGroups(res.data.groups);
+          setFetchUserChats(false);
         }
-      );
-      if (res.data?.status === "success") {
-        setContacts(res.data.contactUsers);
-        setGroups(res.data.groups);
-      }
-    };
-    if (!selectUser) fetchUserContacts();
-  }, [selectUser]);
+      })();
+    }
+  }, [fetchUserChats]);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await axios.get(`${import.meta.env.VITE_URL}/api/users`, {
-          withCredentials: true,
-        });
-        if (res.data?.status === "success") {
-          setAllUsers(res.data.users);
+    if (fetchUsers) {
+      (async () => {
+        console.log("Fetching");
+        try {
+          const res = await axios.get(`${import.meta.env.VITE_URL}/api/users`, {
+            withCredentials: true,
+          });
+          if (res.data?.status === "success") {
+            setAllUsers(res.data.users);
+            setFetchUsers(false)
+          }
+        } catch (err) {
+          console.log(err);
         }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-    fetchUser();
-  }, []);
+      })();
+    }
+  }, [fetchUsers]);
 
   if (showErr.status) return <ErrComponent message={showErr.message} />;
 
@@ -143,6 +151,7 @@ function Home() {
           <SelectUser />
         </div>
         <Chats />
+        {showGroupSettings && <GroupSettings />}
       </div>
     )
   );

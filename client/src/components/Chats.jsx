@@ -1,11 +1,13 @@
 import React, { useContext, useEffect } from "react";
 import { GlobalState } from "../context/GlobalState";
-import { Tooltip as ReactTooltip } from "react-tooltip";
+// import { Tooltip as ReactTooltip } from "react-tooltip";
 import axios from "axios";
 import { ImExit } from "react-icons/im";
+import { showAlert } from "../utils/showAlert";
+import { IoMdSettings  } from "react-icons/io";
+import { ReactTooltip } from ".";
 
 function Chats() {
-  //fix time issue in messages
   const {
     selectedChat,
     socket,
@@ -15,6 +17,9 @@ function Chats() {
     setFetchMessages,
     currentUser,
     allUsers,
+    setSelectedChat,
+    setFetchUserChats,
+    setShowGroupSettings
   } = useContext(GlobalState);
   useEffect(() => {
     const fetchData = async () => {
@@ -32,7 +37,6 @@ function Chats() {
           }, 100);
 
           setMessages(res.data.messages);
-
           setFetchMessages(false);
         }
       } catch (err) {
@@ -54,9 +58,32 @@ function Chats() {
     setFetchMessages(true);
   };
 
-  const handleGroupExit = async (userId, groupId) => { 
-   
-   }
+  const handleGroupExit = async (userId, groupId) => {
+    const res = await axios.post(
+      `${import.meta.env.VITE_URL}/api/groups/exit-group`,
+      {
+        userId,
+        groupId,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+    if (res.data?.status === "success") {
+      setTimeout(() => {
+        setSelectedChat(null);
+        setFetchUserChats(true);
+        showAlert(
+          `You have exited the group ${selectedChat.info.name}`,
+          "home"
+        );
+      }, 500);
+    }
+  };
+
+
+
+
   return (
     selectedChat && (
       <div className="flex font-lato flex-col space-y-5 p-3 px-5 pb-4 flex-grow relative ">
@@ -65,14 +92,26 @@ function Chats() {
             Chats with {selectedChat.info.name}
           </h2>
           {selectedChat.type === "group" && (
-            <ImExit
-              size={20}
-              color="#3b82f6"
-              className="cursor-pointer"
-              data-tooltip-id="exit-group"
-              data-tooltip-content="exit group"
-              onClick={() => handleGroupExit(currentUser._id, selectedChat.info._id)}
-            />
+            <span className="flex items-center space-x-3">
+              <IoMdSettings 
+                size={24}
+                color="#3b82f6"
+                className="cursor-pointer outline-none border-none"
+                data-tooltip-id="settings-of-group"
+                data-tooltip-content="settings"
+                onClick={() => setShowGroupSettings(true)}
+              />
+              <ImExit
+                size={20}
+                color="#3b82f6"
+                className="cursor-pointer outline-none border-none"
+                data-tooltip-id="exit-group"
+                data-tooltip-content="exit group"
+                onClick={() =>
+                  handleGroupExit(currentUser._id, selectedChat.info._id)
+                }
+              />
+            </span>
           )}
         </div>
         <div
@@ -130,13 +169,14 @@ function Chats() {
             >
               send
             </button>
-            <ReactTooltip className="tooltip" id="exit-group" />
+            <ReactTooltip className="tooltip" id="exit-group" style={{backgroundColor: "#3b82f6"}} />
+            <ReactTooltip className="tooltip" id="settings-of-group" style={{backgroundColor: "#3b82f6"}}  />
           </div>
         </div>
       </div>
     )
   );
 }
-//#E8F5E9
+
 
 export default Chats;

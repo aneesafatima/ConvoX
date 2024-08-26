@@ -20,11 +20,25 @@ exports.createGroup = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getGroupMessages = catchAsync(async (req, res, next) => {
-  // const groupMessages = Message
-
+exports.exitGroup = catchAsync(async (req, res, next) => {
+   const {userId, groupId} = req.body;
+   await User.findByIdAndUpdate(userId, { $pull: { groupIds: groupId } }); 
   res.status(201).json({
-    status: "success",
-    group,
+    status: "success"
   });
 });
+exports.removeGroupMember = catchAsync(async (req, res, next) => {
+const {groupId, userId} = req.params;
+await User.findByIdAndUpdate(userId, {$pull : {groupIds: groupId}});
+res.status(201).json({
+  status: "success"
+})
+});
+
+exports.deleteGroup = catchAsync(async (req, res, next) => {
+  const {groupId} = req.params;
+  await Group.findByIdAndDelete(groupId);
+  res.status(201).json({
+    status: "success"
+  })
+})

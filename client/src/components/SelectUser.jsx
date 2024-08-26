@@ -4,23 +4,29 @@ import { FaUserCircle } from "react-icons/fa";
 import { MdOutlineGroups } from "react-icons/md";
 import { IoCheckmarkDoneCircle } from "react-icons/io5";
 import { RxCross1 } from "react-icons/rx";
-
 import { GlobalState } from "../context/GlobalState";
 import { showAlert } from "../utils/showAlert";
 
 function SelectUser() {
   const {
-    selectUser,
     allUsers,
     currentUser,
-    setSelectUser,
+    setFetchUserChats,
+    showUsers,
+    setShowUsers,
     isGroup,
     setIsGroup,
     socket,
   } = useContext(GlobalState);
+
   const [groupMembers, setGroupMembers] = useState([]);
-
-
+  console.log("group members: ", groupMembers);
+  console.log("all users: ", allUsers);
+  const userArray =
+    showUsers?.type === "addingGroupMembers"
+      ? allUsers.filter((user) => !groupMembers.includes(user))
+      : allUsers;
+  console.log("user array: ", userArray);
   const handleUserSelction = async (selectedUser) => {
     if (isGroup) {
       if (groupMembers.includes(selectedUser)) {
@@ -43,6 +49,8 @@ function SelectUser() {
           selectedUserId: selectedUser._id,
           userName: currentUser.name,
         });
+        setFetchUserChats(true);
+        setShowUsers(false);
         showAlert("User added successfully", "home");
       }
     }
@@ -54,7 +62,7 @@ function SelectUser() {
     if (groupMembers.length > 1) {
       groupMembers.push(currentUser);
       try {
-        const groupMembersIds =  groupMembers.map((member) => member._id);
+        const groupMembersIds = groupMembers.map((member) => member._id);
         const res = await axios({
           url: `${import.meta.env.VITE_URL}/api/groups`,
           data: {
@@ -70,10 +78,12 @@ function SelectUser() {
           socket.emit("group-creation", {
             userName: currentUser.name,
             groupId: res.data.group._id,
-            groupMembersIds
+            groupName: res.data.group.name,
+            groupMembersIds,
           });
           setGroupMembers([]);
-          setSelectUser(false);
+          setFetchUserChats(true);
+          setShowUsers(false);
           setIsGroup(false);
         }
       } catch (err) {
@@ -88,8 +98,13 @@ function SelectUser() {
     setGroupMembers(newGroupMembers);
   };
   return (
-    selectUser && (
+    showUsers && (
       <div className="bg-blue-100 absolute z-40 w-[500px] h-[600px]  rounded-lg -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 py-4 px-10 space-y-4">
+        <RxCross1
+          className="absolute right-6 top-6 cursor-pointer"
+          size={10}
+          onClick={() => setShowUsers(false)}
+        />
         <div className=" flex-col pt-6 space-y-3">
           <div className="flex">
             <input
@@ -154,7 +169,7 @@ function SelectUser() {
           )}
         </div>
         <ul className=" flex flex-col space-y-3">
-          {allUsers?.map(
+          {userArray?.map(
             (user, i) =>
               user._id !== currentUser?._id && (
                 <li

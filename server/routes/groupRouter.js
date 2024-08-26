@@ -1,11 +1,18 @@
 const express = require("express");
 const { protect } = require("../controllers/authController");
-const { createGroup } = require("../controllers/groupController");
+const {
+  createGroup,
+  exitGroup,
+  removeGroupMember,
+  deleteGroup
+} = require("../controllers/groupController");
 const groupRouter = express.Router();
-groupRouter.use(protect)
-groupRouter.post("/", createGroup);
+groupRouter.use(protect);
+groupRouter.post("/", createGroup)
+groupRouter.delete("/:groupId", deleteGroup)
+groupRouter.post("/exit-group", exitGroup);
+groupRouter.delete("/removeGroupMember/:groupId/:userId", removeGroupMember);
 
-//delete group functioanlity by admins
-
+//http://localhost:5000/api/groups/removeGroupMember/66cb3c5180db5545aee911b4/66c5e9d9e00e710a48cd079c
 
 module.exports = groupRouter;
