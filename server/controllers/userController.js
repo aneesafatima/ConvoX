@@ -32,3 +32,12 @@ exports.getUserContacts = catchAsync(async (req, res, next) => {
     groups: user.groupIds
   });
 });
+exports.removeContactFromChats = catchAsync(async (req, res, next) => { 
+  const {id, type} = req.params;
+  await User.findByIdAndUpdate(req.user._id, {
+    $pull: { [type]: id},
+  });
+  res.status(200).json({
+    status: "success"
+  })
+})

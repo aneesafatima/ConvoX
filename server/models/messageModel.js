@@ -16,6 +16,10 @@ const MessageSchema = new mongoose.Schema({
     default: false,
   },
   groupId: { type: mongoose.Schema.Types.ObjectId, ref: "Group" },
+  deletedBy: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  }]
 });
 
 const Message = new mongoose.model("Message", MessageSchema);

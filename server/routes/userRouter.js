@@ -11,7 +11,8 @@ const {
 const {
   getAllUsers,
   addUserContact,
-  getUserContacts
+  getUserContacts,
+  removeContactFromChats
 } = require("../controllers/userController");
 const userRouter = express.Router();
 
@@ -25,5 +26,6 @@ userRouter.route("/updateMe").patch(updateMe);
 userRouter.route("/deleteMe/:userId").delete(deleteMe);
 userRouter.post("/addUserContact", addUserContact)
 userRouter.get("/userContacts", getUserContacts)
+userRouter.delete("/removeContact/:type/:id", removeContactFromChats)
 
 module.exports = userRouter;

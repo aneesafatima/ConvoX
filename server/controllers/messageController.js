@@ -19,3 +19,19 @@ exports.getMessagesForContact = catchAsync(async (req, res, next) => {
     messages,
   });
 });
+
+exports.deleteChatMessages = catchAsync(async (req, res, next) => {
+  const { userId, receiverId } = req.body;
+  await Message.updateMany({
+    $or: [
+      { sender: userId, receiver: receiverId },
+      { sender: receiverId, receiver: userId },
+    ],
+  }, {
+    $push: {
+      deletedBy: userId}
+  });
+  res.status(200).json({
+    status: "success",
+  });
+});

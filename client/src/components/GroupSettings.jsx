@@ -87,7 +87,7 @@ function GroupSettings() {
     <div className="absolute bg-[#f0f0f0] flex flex-col justify-between z-50 w-56 min-h-[35vh]  max-h-[80vh] overflow-auto rounded-lg  shadow-xl pt-2 pb-2 px-2  right-10 top-12">
       <RxCross1
         size={10}
-        className="absolute top-3 right-6 cursor-pointer"
+        className="absolute top-3 right-4 cursor-pointer"
         onClick={() => setShowGroupSettings(false)}
       />
       <div>
