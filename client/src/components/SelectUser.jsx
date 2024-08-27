@@ -20,13 +20,12 @@ function SelectUser() {
   } = useContext(GlobalState);
 
   const [groupMembers, setGroupMembers] = useState([]);
-  console.log("group members: ", groupMembers);
-  console.log("all users: ", allUsers);
+
   const userArray =
     showUsers?.type === "addingGroupMembers"
       ? allUsers.filter((user) => !groupMembers.includes(user))
       : allUsers;
-  console.log("user array: ", userArray);
+
   const handleUserSelction = async (selectedUser) => {
     if (isGroup) {
       if (groupMembers.includes(selectedUser)) {
@@ -155,6 +154,7 @@ function SelectUser() {
                   <li
                     className="font-nunito  font-medium h-fit px-3 py-1 text-sm rounded-full bg-[#e3e3e3]"
                     key={i}
+                  
                   >
                     {member.name}{" "}
                     <RxCross1

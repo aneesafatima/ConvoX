@@ -1,6 +1,5 @@
 import React, { useContext, useEffect } from "react";
 import { GlobalState } from "../context/GlobalState";
-// import { Tooltip as ReactTooltip } from "react-tooltip";
 import axios from "axios";
 import { ImExit } from "react-icons/im";
 import { showAlert } from "../utils/showAlert";
@@ -88,14 +87,14 @@ function Chats() {
     selectedChat && (
       <div className="flex font-lato flex-col space-y-5 p-3 px-5 pb-4 flex-grow relative ">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-roboto font-semibold ">
+          <h2 className="text-2xl font-roboto font-semibold text-[#333333] ">
             Chats with {selectedChat.info.name}
           </h2>
           {selectedChat.type === "group" && (
             <span className="flex items-center space-x-3">
               <IoMdSettings 
                 size={24}
-                color="#3b82f6"
+                color="#333333 "
                 className="cursor-pointer outline-none border-none"
                 data-tooltip-id="settings-of-group"
                 data-tooltip-content="settings"
@@ -103,7 +102,7 @@ function Chats() {
               />
               <ImExit
                 size={20}
-                color="#3b82f6"
+                color="#333333 "
                 className="cursor-pointer outline-none border-none"
                 data-tooltip-id="exit-group"
                 data-tooltip-content="exit group"
@@ -160,17 +159,18 @@ function Chats() {
             <input
               type="text"
               placeholder="type a message"
-              className="w-full bg-[#f4f2f2] p-2 rounded-s-lg text-sm outline-0 border-0"
+              className={`w-full bg-[#f4f2f2] p-2 rounded-s-lg text-sm outline-0 border-0 ${selectedChat.type === "group" && !selectedChat.info.active ? "cursor-not-allowed" : null}`}
               id="message"
+              disabled={selectedChat.type === "group" && !selectedChat.info.active}
             />
             <button
-              className="text-white font-roboto bg-[#2c2c2c] hover:bg-black rounded-e-lg px-2 text-sm"
+              className="text-white font-roboto bg-[#333333] hover:bg-black rounded-e-lg px-2 text-sm"
               onClick={handeSendingMessage}
             >
               send
             </button>
-            <ReactTooltip className="tooltip" id="exit-group" style={{backgroundColor: "#3b82f6"}} />
-            <ReactTooltip className="tooltip" id="settings-of-group" style={{backgroundColor: "#3b82f6"}}  />
+            <ReactTooltip className="tooltip" id="exit-group" style={{backgroundColor: "#333333 "}} />
+            <ReactTooltip className="tooltip" id="settings-of-group" style={{backgroundColor: "#333333 "}}  />
           </div>
         </div>
       </div>

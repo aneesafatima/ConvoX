@@ -7,6 +7,15 @@ import SelectUser from "./SelectUser";
 import { showAlert } from "../utils/showAlert";
 
 function Home() {
+  //fix add members functionality
+  //add clear user chats from chats columns
+  //fix group delete functionality
+  //add group name change functionality
+  //add unread messages functionality
+  //add notification bar for storing notifications when the user is not active
+  //add search functionality for users and groups
+  //add profile picture change feature
+  //logout + delete account functionality
   const {
     giveAccess,
     seTGiveAccess,
@@ -74,10 +83,12 @@ function Home() {
       socket.on("connect", () => {
         console.log("Connected to the server with id : ", socket.id);
         socket.on("new-message", () => {
+          console.log("Message Received !");
           setFetchMessages(true);
         });
 
         socket.on("added-to-group", ({ userName, groupId, groupName }) => {
+         
           showAlert(`${userName} added you to the group ${groupName}`, "home");
           socket.emit("join-room", { roomId: groupId });
           setFetchUserChats(true);
@@ -87,8 +98,15 @@ function Home() {
           showAlert(`${user} added you as a contact`, "home");
           setFetchUserChats(true);
         });
-
-
+        socket.on("removed-from-group", ( groupName) => {
+          showAlert(
+            `You have been removed from the group ${groupName}`,
+            "home"
+          );
+        });
+        socket.on("group-deleted", (groupId) => {
+          setFetchUserChats(true);
+        });
       });
 
       return () => {
@@ -127,7 +145,7 @@ function Home() {
           });
           if (res.data?.status === "success") {
             setAllUsers(res.data.users);
-            setFetchUsers(false)
+            setFetchUsers(false);
           }
         } catch (err) {
           console.log(err);

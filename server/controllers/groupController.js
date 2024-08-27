@@ -37,8 +37,16 @@ res.status(201).json({
 
 exports.deleteGroup = catchAsync(async (req, res, next) => {
   const {groupId} = req.params;
-  await Group.findByIdAndDelete(groupId);
+  await Group.findByIdAndUpdate(groupId, {active: false});
   res.status(201).json({
     status: "success"
+  })
+})
+exports.getGroupMembers = catchAsync(async (req, res, next) => {
+  const {groupId} = req.params;
+  const groupMembers = await User.find({groupIds : {$in : [groupId]}}).select("name _id")
+  res.status(201).json({
+    status: "success",
+    groupMembers
   })
 })

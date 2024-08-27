@@ -125,18 +125,34 @@ io.on("connection", async (socket) => {
     ({ userName, groupId, groupMembersIds, groupName }) => {
       socket.join(groupId);
       let user;
-      groupMembersIds.forEach((member) => {
+      groupMembersIds.forEach(async (member) => {
         user = connectedUsers.find((user) => user.userId === member);
-        user &&
+        if(user)
           socket
             .to(user.socketId)
             .emit("added-to-group", { userName, groupId, groupName });
+            else{
+              await User.findByIdAndUpdate(member, {$push : {groupIds : groupId}})
+            }
       });
+
     }
   );
 
   socket.on("join-room", ({ roomId }) => {
     socket.join(roomId);
+  });
+  socket.on("group-member-removed", ({ groupId, groupName, userId }) => {
+    const user = connectedUsers.find((user) => user.userId === userId);
+    const socketInstance = io.sockets.sockets.get(user?.socketId);
+    if (socketInstance) {
+      socketInstance.leave(groupId);
+      socketInstance.emit("removed-from-group", groupName);
+    }
+  });
+
+  socket.on("group-deleted", (groupId) => {
+    socket.to(groupId).emit("group-deleted");
   });
   socket.on("disconnect", async () => {
     await User.findByIdAndUpdate(userId, {

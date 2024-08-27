@@ -18,6 +18,10 @@ const groupSchema = new mongoose.Schema({
     type: Date,
     default: () => Date.now(),
   },
+  active: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const Group = new mongoose.model("Group", groupSchema);
