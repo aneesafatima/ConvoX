@@ -10,6 +10,8 @@ const Message = require("./models/messageModel");
 const userRouter = require("./routes/userRouter");
 const homeRouter = require("./routes/homeRouter");
 const messageRouter = require("./routes/messageRouter");
+const notificationRouter = require("./routes/notificationRouter");
+const Notification = require("./models/notificationModel");
 const errorController = require("./controllers/errorController");
 const User = require("./models/userModel");
 
@@ -53,6 +55,7 @@ app.use("/api/users", userRouter);
 app.use("/api/home", homeRouter);
 app.use("/api/messages", messageRouter);
 app.use("/api/groups", groupRouter);
+app.use("/api/notifications", notificationRouter);
 app.use("*", (req, res) => {
   res.status(404).json({
     message: "Not Found",
@@ -111,13 +114,19 @@ io.on("connection", async (socket) => {
     }
   });
 
-  socket.on("added-new-user", ({ selectedUserId, userName }) => {
+  socket.on("added-new-user", async ({ selectedUserId, userName }) => {
     const selectedUser = connectedUsers.find(
       (user) => user.userId === selectedUserId
     );
 
-    selectedUser &&
+    if (selectedUser)
       socket.to(selectedUser.socketId).emit("added-as-contact", userName);
+    else {
+      await Notification.create({
+        message: `${userName} added you as a contact`,
+        userId: selectedUserId,
+      });
+    }
   });
 
   socket.on(
@@ -127,32 +136,52 @@ io.on("connection", async (socket) => {
       let user;
       groupMembersIds.forEach(async (member) => {
         user = connectedUsers.find((user) => user.userId === member);
-        if(user)
+        if (user)
           socket
             .to(user.socketId)
             .emit("added-to-group", { userName, groupId, groupName });
-            else{
-              await User.findByIdAndUpdate(member, {$push : {groupIds : groupId}})
-            }
+        else {
+          console.log("User not connected");
+          await User.findByIdAndUpdate(member, {
+            $push: { groupIds: groupId },
+          });
+          await Notification.create({
+            message: `${userName} added you to a group`,
+            userId: member,
+          });
+        }
       });
-
     }
   );
 
   socket.on("join-room", ({ roomId }) => {
     socket.join(roomId);
   });
-  socket.on("group-member-removed", ({ groupId, groupName, userId }) => {
+  socket.on("group-member-removed", async ({ groupId, groupName, userId }) => {
     const user = connectedUsers.find((user) => user.userId === userId);
     const socketInstance = io.sockets.sockets.get(user?.socketId);
     if (socketInstance) {
       socketInstance.leave(groupId);
       socketInstance.emit("removed-from-group", groupName);
+    } else {
+      await User.findByIdAndUpdate(userId, { $pull: { groupIds: groupId } });
+      await Notification.create({
+        message: `You were removed from ${groupName} group`,
+        userId,
+      });
     }
   });
 
-  socket.on("group-deleted", (groupId) => {
+  socket.on("group-deleted", async ({ groupId, groupName }) => {
     socket.to(groupId).emit("group-deleted");
+    const users = await User.find({ groupIds: groupId });
+    users?.map(async (user) => {
+      // await User.findByIdAndUpdate(user._id, {$pull : {groupIds : groupId}})
+      await Notification.create({
+        message: `Group ${groupName} has been deleted`,
+        userId: user._id,
+      });
+    });
   });
   socket.on("disconnect", async () => {
     await User.findByIdAndUpdate(userId, {

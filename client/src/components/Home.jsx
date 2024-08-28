@@ -8,7 +8,6 @@ import { showAlert } from "../utils/showAlert";
 
 function Home() {
   //fix add members functionality
-  //add clear user chats from chats columns
   //fix group delete functionality
   //add group name change functionality
   //add unread messages functionality
@@ -16,6 +15,7 @@ function Home() {
   //add search functionality for users and groups
   //add profile picture change feature
   //logout + delete account functionality
+  //add loader
   const {
     giveAccess,
     seTGiveAccess,
@@ -138,7 +138,6 @@ function Home() {
   useEffect(() => {
     if (fetchUsers) {
       (async () => {
-        console.log("Fetching");
         try {
           const res = await axios.get(`${import.meta.env.VITE_URL}/api/users`, {
             withCredentials: true,

@@ -1,4 +1,5 @@
 const Message = require("../models/messageModel");
+const catchAsync = require("../utils/catchAsync");
 exports.getMessagesForContact = catchAsync(async (req, res, next) => {
   let messages;
   const { chatId, type } = req.params;

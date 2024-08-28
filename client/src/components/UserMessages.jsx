@@ -1,9 +1,11 @@
 import React, { useContext } from "react";
 import { AiFillMinusCircle   } from "react-icons/ai";
 import { GlobalState } from "../context/GlobalState";
-import { RiPencilFill } from "react-icons/ri";
+import { RiPencilFill, RiGroup2Fill } from "react-icons/ri";
 import { FaUserCircle } from "react-icons/fa";
-import { RiGroup2Fill } from "react-icons/ri";
+import { Notification } from ".";
+
+
 import axios from "axios";
 
 
@@ -79,6 +81,7 @@ function UserMessages({ contacts, groups }) {
           ))}
         </ul>
       </div>
+      <Notification/>
     </aside>
   );
 }

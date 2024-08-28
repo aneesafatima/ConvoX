@@ -6,6 +6,7 @@ import { showAlert } from "../utils/showAlert";
 import { IoMdSettings } from "react-icons/io";
 import { MdDeleteForever } from "react-icons/md";
 import { ReactTooltip } from ".";
+import { getFormattedDate } from "../utils/helpers";
 
 function Chats() {
   const {
@@ -33,7 +34,7 @@ function Chats() {
         if (res.data?.status === "success") {
           setTimeout(() => {
             const scrollContainer = document.getElementById("scroll-container");
-            scrollContainer.scrollTop = scrollContainer.scrollHeight;
+            scrollContainer.scrollTop = scrollContainer?.scrollHeight;
           }, 100);
 
           setMessages(res.data.messages);
@@ -169,16 +170,7 @@ function Chats() {
                         : selectedChat.info.name
                       : null}
                     <span className="mx-2 text-[#b2b2b2] text-[8px] ">
-                      {new Date(message.timestamp).toLocaleDateString(
-                        "en-US"
-                      ) === new Date(Date.now()).toLocaleDateString("en-US")
-                        ? new Date(message.timestamp).toLocaleTimeString(
-                            "en-US",
-                            { hour: "2-digit", minute: "2-digit", hour12: true }
-                          )
-                        : new Date(message.timestamp).toLocaleDateString(
-                            "en-US"
-                          )}
+                      {getFormattedDate(message.timestamp)}
                     </span>
                   </span>
                 </li>

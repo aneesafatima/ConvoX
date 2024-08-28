@@ -15,25 +15,27 @@ function GroupSettings() {
     currentUser,
     setShowUsers,
     setSelectedChat,
+    setFetchUserChats,
     socket,
   } = useContext(GlobalState);
   const [groupMembers, setGroupMembers] = useState();
   useEffect(() => {
-    (() => {
-      axios
-        .get(
-          `${import.meta.env.VITE_URL}/api/groups/${
-            selectedChat.info._id
-          }/members`,
-          {
-            withCredentials: true,
-          }
-        )
-        .then((res) => setGroupMembers(res.data.groupMembers))
-        .catch((err) => console.log(err));
-    })();
-  }, []);
-
+    if (selectedChat.type === "group") {
+      (() => {
+        axios
+          .get(
+            `${import.meta.env.VITE_URL}/api/groups/${
+              selectedChat.info._id
+            }/members`,
+            {
+              withCredentials: true,
+            }
+          )
+          .then((res) => setGroupMembers(res.data.groupMembers))
+          .catch((err) => console.log(err));
+      })();
+    }
+  }, [selectedChat]);
 
   const handleRemoveGroupMember = async (group, userId) => {
     try {
@@ -72,10 +74,14 @@ function GroupSettings() {
       )
       .then((res) => {
         if (res.data.status === "success") {
-          socket.emit("group-deleted", selectedChat.info._id);
+          socket.emit("group-deleted", {
+            groupId: selectedChat.info._id,
+            groupName: selectedChat.info.name,
+          });
           showAlert("Group Deleted Successfully", "home");
           setShowGroupSettings(false);
           setSelectedChat(null);
+          setFetchUserChats(true); 
         }
       })
       .catch((err) => {
