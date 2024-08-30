@@ -21,14 +21,13 @@ function Notification() {
           if (res.data.status === "success") {
             console.log(res.data.notifications);
             setNotifications(res.data.notifications);
+            initialRender.current = false;
           }
         } catch (err) {
           console.log(err);
         }
       })();
-      initialRender.current = false;
     } else if (!initialRender.current && !showNotificationBar) {
-      console.log(initialRender.current);
       (async () => {
         try {
           const res = await axios.patch(
@@ -37,6 +36,7 @@ function Notification() {
             { withCredentials: true }
           );
           if (res.data.status === "success") {
+            console.log("Cleared notifs");
             setNotifications([]);
           }
         } catch (err) {
@@ -45,10 +45,6 @@ function Notification() {
       })();
     }
   }, [showNotificationBar]);
-
-  // useEffect(() => {
-  //   console.log(showNotificationBar);
-  // }, [showNotificationBar]);
 
   return (
     <div className="absolute h-fit top-[95%] ">

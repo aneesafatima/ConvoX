@@ -1,8 +1,12 @@
 const catchAsync = require("../utils/catchAsync");
 const Notification = require("../models/notificationModel");
 exports.getNotifications = catchAsync(async (req, res, next) => {
-    const {userId} = req.params;
-    const notifications = await Notification.find({userId, read: false}).sort({createdAt: -1});
+  const { userId } = req.params;
+  const notifications = await Notification.find({
+    userIds: userId,
+    read: { $nin: [userId] },
+  }).sort({ createdAt: -1 });
+
   res.status(200).json({
     status: "success",
     notifications,
@@ -10,8 +14,12 @@ exports.getNotifications = catchAsync(async (req, res, next) => {
 });
 
 exports.readAllNotifications = catchAsync(async (req, res, next) => {
-  await Notification.updateMany({userId: req.body.userId}, {read: true});
+  console.log("Entered reading controller")
+  await Notification.updateMany(
+    { userIds: req.body.userId },
+    { $push: { read: req.body.userId } }
+  );
   res.status(200).json({
     status: "success",
   });
-})
+});

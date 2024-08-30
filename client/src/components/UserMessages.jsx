@@ -66,6 +66,7 @@ function UserMessages({ contacts, groups }) {
             </li>
           ))}
           {groups?.map((group, i) => (
+            group.active &&
             <li
               className="text-xs flex px-2 items-center justify-between font-semibold cursor-pointer hover:bg-[#eaeaea] py-1 rounded-lg "
               key={"group" + i} id="user"

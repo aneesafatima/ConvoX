@@ -124,33 +124,33 @@ io.on("connection", async (socket) => {
     else {
       await Notification.create({
         message: `${userName} added you as a contact`,
-        userId: selectedUserId,
+        userIds: [selectedUserId],
       });
     }
   });
 
   socket.on(
     "group-creation",
-    ({ userName, groupId, groupMembersIds, groupName }) => {
+    async ({ userName, groupId, groupMembersIds, groupName }) => {
       socket.join(groupId);
       let user;
-      groupMembersIds.forEach(async (member) => {
+      let disconnectedUsers = [];
+      groupMembersIds.forEach((member) => {
         user = connectedUsers.find((user) => user.userId === member);
         if (user)
           socket
             .to(user.socketId)
             .emit("added-to-group", { userName, groupId, groupName });
         else {
-          console.log("User not connected");
-          await User.findByIdAndUpdate(member, {
-            $push: { groupIds: groupId },
-          });
-          await Notification.create({
-            message: `${userName} added you to a group`,
-            userId: member,
-          });
+          disconnectedUsers.push(member);
         }
       });
+      if (disconnectedUsers.length > 0) {
+        await Notification.create({
+          message: `${userName} added you to a group ${groupName}`,
+          userIds: disconnectedUsers,
+        });
+      }
     }
   );
 
@@ -164,23 +164,23 @@ io.on("connection", async (socket) => {
       socketInstance.leave(groupId);
       socketInstance.emit("removed-from-group", groupName);
     } else {
-      await User.findByIdAndUpdate(userId, { $pull: { groupIds: groupId } });
+      console.log("Removing you!!");
       await Notification.create({
         message: `You were removed from ${groupName} group`,
-        userId,
+        userIds: [userId],
       });
     }
   });
 
   socket.on("group-deleted", async ({ groupId, groupName }) => {
     socket.to(groupId).emit("group-deleted");
-    const users = await User.find({ groupIds: groupId });
-    users?.map(async (user) => {
-      // await User.findByIdAndUpdate(user._id, {$pull : {groupIds : groupId}})
-      await Notification.create({
-        message: `Group ${groupName} has been deleted`,
-        userId: user._id,
-      });
+    const userIds = (await User.find({ groupIds: groupId }).select("_id")).map(
+      (el) => el._id
+    );
+    console.log("users", userIds);
+    await Notification.create({
+      message: `Group ${groupName} has been deleted by admin`,
+      userIds,
     });
   });
   socket.on("disconnect", async () => {
