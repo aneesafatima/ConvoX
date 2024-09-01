@@ -21,6 +21,8 @@ function Chats() {
     setSelectedChat,
     setFetchUserChats,
     setShowGroupSettings,
+    unreadMessages,
+    setUnreadMessages,
   } = useContext(GlobalState);
   useEffect(() => {
     const fetchData = async () => {
@@ -36,9 +38,41 @@ function Chats() {
             const scrollContainer = document.getElementById("scroll-container");
             scrollContainer.scrollTop = scrollContainer?.scrollHeight;
           }, 100);
-
           setMessages(res.data.messages);
           setFetchMessages(false);
+
+          if (
+            currentUser.unreadMessages.find(
+              (msg) => msg.from === selectedChat.info._id
+            ) &&
+            !fetchMessages
+          ) {
+            const response = await axios.patch(
+              `${import.meta.env.VITE_URL}/api/messages/read-unread-messages`,
+              {
+                userId: currentUser._id,
+                senderId: selectedChat.info._id,
+              },
+              {
+                withCredentials: true,
+              }
+            );
+
+            if (response.data?.status === "success") {
+              const index = unreadMessages?.findIndex(
+                (msg) => msg.from === selectedChat.info._id
+              );
+              console.log("index", index);
+              if (index !== -1) {
+                setUnreadMessages((prev) => {
+                  const newArray = [...prev];
+                  newArray.splice(index, 1);
+                  console.log(newArray)
+                  return newArray;
+                });
+              }
+            }
+          }
         }
       } catch (err) {
         console.log(err);
@@ -48,15 +82,21 @@ function Chats() {
     if (selectedChat || fetchMessages) fetchData();
   }, [selectedChat, fetchMessages]);
 
+  useEffect(() => {
+    console.log("unreadMessages", unreadMessages);
+  }, [unreadMessages]);
+
   const handeSendingMessage = () => {
     const message = document.getElementById("message");
-    socket.emit("send-message", {
-      message: message.value,
-      to: selectedChat.info._id,
-      type: selectedChat.type,
-    });
-    message.value = "";
-    setFetchMessages(true);
+    if (message !== "") {
+      socket.emit("send-message", {
+        message: message.value,
+        to: selectedChat.info._id,
+        type: selectedChat.type,
+      });
+      message.value = "";
+      setFetchMessages(true);
+    }
   };
 
   const handleGroupExit = async (userId, groupId) => {
@@ -83,7 +123,13 @@ function Chats() {
   };
 
   const handleDeleteChats = async () => {
+    let fetch = false;
+    messages.forEach((message) => {
+      if (!message.deletedBy.includes(currentUser._id)) fetch = true;
+    });
+    if (messages.length === 0 || !fetch) return;
     try {
+      console.log("deleting chats");
       const res = await axios({
         url: `${import.meta.env.VITE_URL}/api/messages/delete-chat-messages`,
         data: {
@@ -95,6 +141,8 @@ function Chats() {
       });
       if (res.data.status === "success") {
         setFetchMessages(true);
+        setMessages([]);
+        showAlert("Chats Deleted Successfully", "home");
       }
     } catch (err) {
       console.log(err);
@@ -143,7 +191,7 @@ function Chats() {
           className="border rounded-lg w-full h-full overflow-auto flex flex-col pb-12"
           id="scroll-container"
         >
-          <ul className="p-4 px-10 space-y-6 flex flex-col">
+          <ul className="p-4 px-10 space-y-6 flex flex-col text-sm font-nunito">
             {messages?.map((message) =>
               message?.deletedBy.includes(currentUser._id) ? null : (
                 <li

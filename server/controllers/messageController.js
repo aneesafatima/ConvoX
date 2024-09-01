@@ -1,5 +1,6 @@
 const Message = require("../models/messageModel");
 const catchAsync = require("../utils/catchAsync");
+const User = require("../models/userModel")
 exports.getMessagesForContact = catchAsync(async (req, res, next) => {
   let messages;
   const { chatId, type } = req.params;
@@ -36,3 +37,14 @@ exports.deleteChatMessages = catchAsync(async (req, res, next) => {
     status: "success",
   });
 });
+
+exports.readUnreadMessages = catchAsync(async (req, res, next) => {
+  const { userId, senderId } = req.body;
+ const user = await User.findByIdAndUpdate(userId, {
+  $pull : {unreadMessages: {from: senderId}}
+}, {new: true});
+console.log(user)
+  res.status(200).json({
+    status: "success",
+  });
+})

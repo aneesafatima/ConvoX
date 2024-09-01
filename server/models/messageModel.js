@@ -5,7 +5,7 @@ const MessageSchema = new mongoose.Schema({
   receiver: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
   message: {
     type: String,
-    required: [true, "Message is required"],
+    // required: [true, "Message is required"],
   },
   timestamp: {
     type: Date,

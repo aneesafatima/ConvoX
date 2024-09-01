@@ -40,6 +40,15 @@ const UserSchema = new mongoose.Schema({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
   groupIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Group" }],
+  unreadMessages: [
+    {
+      from: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Group",
+      },
+      count: Number,
+    },
+  ],
 });
 
 UserSchema.pre("save", async function (next) {

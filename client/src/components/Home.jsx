@@ -8,10 +8,8 @@ import { showAlert } from "../utils/showAlert";
 
 function Home() {
   //fix add members functionality
-  //fix group delete functionality
   //add group name change functionality
   //add unread messages functionality
-  //add notification bar for storing notifications when the user is not active
   //add search functionality for users and groups
   //add profile picture change feature
   //logout + delete account functionality
@@ -34,6 +32,7 @@ function Home() {
     showGroupSettings,
     fetchUsers,
     setFetchUsers,
+  setUnreadMessages
   } = useContext(GlobalState);
 
   const [isConnected, setIsConnected] = useState(false);
@@ -68,6 +67,8 @@ function Home() {
             setCurrentUser(res.data.user);
             setIsConnected(true);
             setShowErr(false);
+            console.log(res.data)
+            setUnreadMessages(res.data.user.unreadMessages);
           }
         } catch (err) {
           setShowErr({ status: true, message: err.message });
@@ -130,6 +131,7 @@ function Home() {
           setContacts(res.data.contactUsers);
           setGroups(res.data.groups);
           setFetchUserChats(false);
+          console.log("Contacts fetched");
         }
       })();
     }

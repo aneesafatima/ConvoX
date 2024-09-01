@@ -16,13 +16,14 @@ export function GlobalProvider({ children }) {
   const [allUsers, setAllUsers] = useState();
   const [userContacts, setUserContacts] = useState();
   const [selectedChat, setSelectedChat] = useState(null);
-  const [messages, setMessages] = useState(null);
+  const [messages, setMessages] = useState([]);
   const [socket, setSocket] = useState(undefined);
   const [fetchMessages, setFetchMessages] = useState(false);
   const [isGroup, setIsGroup] = useState(false);
   const [showUsers, setShowUsers] = useState();
   const [showGroupSettings, setShowGroupSettings] = useState();
   const [fetchUsers, setFetchUsers] = useState(true);
+  const [unreadMessages, setUnreadMessages] = useState();
 
   return (
     <GlobalState.Provider
@@ -65,7 +66,10 @@ export function GlobalProvider({ children }) {
         setShowUsers,
         showGroupSettings,
         setShowGroupSettings,
-        fetchUsers, setFetchUsers
+        fetchUsers,
+        setFetchUsers,
+        unreadMessages,
+        setUnreadMessages,
       }}
     >
       {children}

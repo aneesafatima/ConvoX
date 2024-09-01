@@ -101,13 +101,51 @@ io.on("connection", async (socket) => {
       });
 
       const receiver = connectedUsers.find((user) => user.userId === data.to);
-      receiver && socket.to(receiver.socketId).emit("new-message");
+      if (receiver) {
+        socket.to(receiver.socketId).emit("new-message");
+      } else {
+        const receiverUser = await User.findById(data.to);
+        if (
+          receiverUser.unreadMessages?.find(
+            (el) => el.from.toString() === userId
+          )
+        ) {
+          await User.updateOne(
+            { _id: data.to, "unreadMessages.from": userId }, //return a user document
+            { $inc: { "unreadMessages.$.count": 1 } } // the $ refers to that object inside the unreadMessage that satified the criteria
+          );
+        } else
+          await User.findByIdAndUpdate(data.to, {
+            $push: { unreadMessages: { from: userId, count: 1 } },
+          });
+      }
     } else {
       await Message.create({
         sender: userId,
         groupId: data.to,
         message: data.message,
         isGroupMessage: true,
+      });
+      const groupMemberIds = await User.find({ groupIds: data.to }).select(
+        "_id unreadMessages"
+      );
+      console.log(groupMemberIds)
+      const disconnectedUsers = groupMemberIds.filter(
+        (member) => !connectedUsers.find((user) => user.userId === member._id.toString())
+      );
+      console.log("disconnectedUsers", disconnectedUsers);
+      disconnectedUsers?.forEach(async (user) => {
+        console.log("not active");
+
+        if (user.unreadMessages?.find((el) => el.from.toString() === data.to)) {
+          await User.updateOne(
+            { _id: user._id, "unreadMessages.from": data.to },
+            { $inc: { "unreadMessages.$.count": 1 } }
+          );
+        } else
+          await User.findByIdAndUpdate(user._id, {
+            $push: { unreadMessages: { from: data.to, count: 1 } },
+          });
       });
 
       socket.to(data.to).emit("new-message");

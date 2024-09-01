@@ -1,31 +1,36 @@
 import React, { useContext } from "react";
-import { AiFillMinusCircle   } from "react-icons/ai";
+import { AiFillMinusCircle } from "react-icons/ai";
 import { GlobalState } from "../context/GlobalState";
 import { RiPencilFill, RiGroup2Fill } from "react-icons/ri";
 import { FaUserCircle } from "react-icons/fa";
 import { Notification } from ".";
 
-
 import axios from "axios";
 
-
 function UserMessages({ contacts, groups }) {
-  const { setShowUsers, currentUser, setSelectedChat,selectedChat,  setFetchUsers, setFetchUserChats } =
-    useContext(GlobalState);
+  const {
+    setShowUsers,
+    currentUser,
+    setSelectedChat,
+    selectedChat,
+    setFetchUsers,
+    setFetchUserChats,
+    unreadMessages,
+  } = useContext(GlobalState);
 
-    const handleUserRemovalFromChats = async (id, type) => {
-      const res = await axios({
+  const handleUserRemovalFromChats = async (id, type) => {
+    const res = await axios({
       url: `${import.meta.env.VITE_URL}/api/users/removeContact/${type}/${id}`,
-      method: 'DELETE',
+      method: "DELETE",
       withCredentials: true,
-      });
-      if(res.data.status === "success"){
-        setFetchUserChats(true);
-        if(selectedChat?.info._id === id){
-          setSelectedChat(null);
-        }
+    });
+    if (res.data.status === "success") {
+      setFetchUserChats(true);
+      if (selectedChat?.info._id === id) {
+        setSelectedChat(null);
+      }
     }
-  }
+  };
   return (
     <aside className="border-r-2 h-svh  rounded-e-lg pt-3 flex flex-col p-2  ">
       <button
@@ -57,32 +62,54 @@ function UserMessages({ contacts, groups }) {
               key={"contact" + i}
             >
               <span className="flex items-center">
-
-              <FaUserCircle size={30} className="mx-1" />
-              {contact?.name}
+                <FaUserCircle size={30} className="mx-1" />
+                {contact?.name}
               </span>
-
-              <AiFillMinusCircle  size={12} className="text-red-700 user-remove-icon hidden" onClick={() => handleUserRemovalFromChats(contact._id, "contacts")}/>
+              <div className="bg-blue-500 min-w-3 max-w-fit rounded-full leading-3 text-center text-white font-nunito text-[7px]">
+                {
+                 unreadMessages?.find(
+                    (el) => el.from === contact._id
+                  )?.count
+                }
+              </div>
+              {/* <AiFillMinusCircle  size={12} className="text-red-700 user-remove-icon hidden" onClick={() => handleUserRemovalFromChats(contact._id, "contacts")}/> */}
             </li>
           ))}
-          {groups?.map((group, i) => (
-            group.active &&
-            <li
-              className="text-xs flex px-2 items-center justify-between font-semibold cursor-pointer hover:bg-[#eaeaea] py-1 rounded-lg "
-              key={"group" + i} id="user"
-              onClick={() => setSelectedChat({ info: group, type: "group" })}
-            >
-              <span className="flex items-center">
-
-              <RiGroup2Fill size={30} className="mx-1" />
-              {group?.name}
-              </span>
-              <AiFillMinusCircle  size={12} className="text-red-700 user-remove-icon hidden" onClick={() => handleUserRemovalFromChats(group._id, "groupIds")}/>
-            </li>
-          ))}
+          {groups?.map(
+            (group, i) =>
+              group.active && (
+                <li
+                  className="text-xs flex px-2 items-center justify-between font-semibold cursor-pointer hover:bg-[#eaeaea] py-1 rounded-lg "
+                  key={"group" + i}
+                  id="user"
+                  onClick={() =>
+                    setSelectedChat({ info: group, type: "group" })
+                  }
+                >
+                  <span className="flex items-center">
+                    <RiGroup2Fill size={30} className="mx-1" />
+                    {group?.name}
+                  </span>
+                  <div className="bg-blue-500 min-w-3 max-w-fit rounded-full leading-3 text-center text-white font-nunito text-[7px]">
+                {
+                 unreadMessages?.find(
+                    (el) => el.from === group._id
+                  )?.count
+                }
+              </div>
+                  {/* <AiFillMinusCircle
+                    size={12}
+                    className="text-red-700 user-remove-icon hidden"
+                    onClick={() =>
+                      handleUserRemovalFromChats(group._id, "groupIds")
+                    }
+                  /> */}
+                </li>
+              )
+          )}
         </ul>
       </div>
-      <Notification/>
+      <Notification />
     </aside>
   );
 }
