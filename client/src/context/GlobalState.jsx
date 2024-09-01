@@ -24,6 +24,7 @@ export function GlobalProvider({ children }) {
   const [showGroupSettings, setShowGroupSettings] = useState();
   const [fetchUsers, setFetchUsers] = useState(true);
   const [unreadMessages, setUnreadMessages] = useState();
+  const [groupMembers, setGroupMembers] = useState();
 
   return (
     <GlobalState.Provider
@@ -70,6 +71,8 @@ export function GlobalProvider({ children }) {
         setFetchUsers,
         unreadMessages,
         setUnreadMessages,
+        groupMembers,
+        setGroupMembers,
       }}
     >
       {children}

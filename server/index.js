@@ -129,14 +129,13 @@ io.on("connection", async (socket) => {
       const groupMemberIds = await User.find({ groupIds: data.to }).select(
         "_id unreadMessages"
       );
-      console.log(groupMemberIds)
-      const disconnectedUsers = groupMemberIds.filter(
-        (member) => !connectedUsers.find((user) => user.userId === member._id.toString())
-      );
-      console.log("disconnectedUsers", disconnectedUsers);
-      disconnectedUsers?.forEach(async (user) => {
-        console.log("not active");
 
+      const disconnectedUsers = groupMemberIds.filter(
+        (member) =>
+          !connectedUsers.find((user) => user.userId === member._id.toString())
+      );
+
+      disconnectedUsers?.forEach(async (user) => {
         if (user.unreadMessages?.find((el) => el.from.toString() === data.to)) {
           await User.updateOne(
             { _id: user._id, "unreadMessages.from": data.to },
@@ -202,7 +201,6 @@ io.on("connection", async (socket) => {
       socketInstance.leave(groupId);
       socketInstance.emit("removed-from-group", groupName);
     } else {
-      console.log("Removing you!!");
       await Notification.create({
         message: `You were removed from ${groupName} group`,
         userIds: [userId],
@@ -215,7 +213,7 @@ io.on("connection", async (socket) => {
     const userIds = (await User.find({ groupIds: groupId }).select("_id")).map(
       (el) => el._id
     );
-    console.log("users", userIds);
+
     await Notification.create({
       message: `Group ${groupName} has been deleted by admin`,
       userIds,

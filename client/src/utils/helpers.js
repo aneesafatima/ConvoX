@@ -1,5 +1,5 @@
 export const getFormattedDate = (date) => {
-  new Date(date).toLocaleDateString("en-US") ===
+  return new Date(date).toLocaleDateString("en-US") ===
   new Date(Date.now()).toLocaleDateString("en-US")
     ? new Date(date).toLocaleTimeString("en-US", {
         hour: "2-digit",

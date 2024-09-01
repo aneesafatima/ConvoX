@@ -67,7 +67,7 @@ function Chats() {
                 setUnreadMessages((prev) => {
                   const newArray = [...prev];
                   newArray.splice(index, 1);
-                  console.log(newArray)
+                  console.log(newArray);
                   return newArray;
                 });
               }
@@ -87,15 +87,28 @@ function Chats() {
   }, [unreadMessages]);
 
   const handeSendingMessage = () => {
-    const message = document.getElementById("message");
-    if (message !== "") {
+    let message = document.getElementById("message");
+    const messageText = message.value.trim();
+
+    if (messageText !== "") {
       socket.emit("send-message", {
-        message: message.value,
+        message: messageText,
         to: selectedChat.info._id,
         type: selectedChat.type,
       });
+      setMessages((prev) => [
+        ...prev,
+        {
+          message: messageText,
+          sender: currentUser._id,
+          receiver: selectedChat.info._id,
+        },
+      ]);
+      setTimeout(() => {
+        const scrollContainer = document.getElementById("scroll-container");
+        scrollContainer.scrollTop = scrollContainer?.scrollHeight;
+      }, 100);
       message.value = "";
-      setFetchMessages(true);
     }
   };
 
@@ -129,7 +142,6 @@ function Chats() {
     });
     if (messages.length === 0 || !fetch) return;
     try {
-      console.log("deleting chats");
       const res = await axios({
         url: `${import.meta.env.VITE_URL}/api/messages/delete-chat-messages`,
         data: {
@@ -191,9 +203,9 @@ function Chats() {
           className="border rounded-lg w-full h-full overflow-auto flex flex-col pb-12"
           id="scroll-container"
         >
-          <ul className="p-4 px-10 space-y-6 flex flex-col text-sm font-nunito">
+          <ul className="p-4 px-10 space-y-6 flex flex-col text-sm font-nunito font-medium">
             {messages?.map((message) =>
-              message?.deletedBy.includes(currentUser._id) ? null : (
+              message?.deletedBy?.includes(currentUser._id) ? null : (
                 <li
                   className={`text-sm flex flex-col ${
                     message.sender === currentUser._id
@@ -216,8 +228,9 @@ function Chats() {
                         ? allUsers.find((user) => user._id === message.sender)
                             .name
                         : selectedChat.info.name
-                      : null}
-                    <span className="mx-2 text-[#b2b2b2] text-[8px] ">
+                      : null}{" "}
+                    {/*remove all users*/}
+                    <span className="mx-1 text-[#b2b2b2] text-[8px] ">
                       {getFormattedDate(message.timestamp)}
                     </span>
                   </span>

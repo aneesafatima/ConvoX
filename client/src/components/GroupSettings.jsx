@@ -16,9 +16,10 @@ function GroupSettings() {
     setShowUsers,
     setSelectedChat,
     setFetchUserChats,
+    groupMembers, setGroupMembers,
     socket,
   } = useContext(GlobalState);
-  const [groupMembers, setGroupMembers] = useState();
+
   useEffect(() => {
     if (selectedChat.type === "group") {
       (() => {
@@ -81,7 +82,7 @@ function GroupSettings() {
           showAlert("Group Deleted Successfully", "home");
           setShowGroupSettings(false);
           setSelectedChat(null);
-          setFetchUserChats(true); 
+          setFetchUserChats(true);
         }
       })
       .catch((err) => {
@@ -151,24 +152,26 @@ function GroupSettings() {
             }
           </span>
         </div>
-        <div className="flex space-x-1">
-          <MdAddCircle
-            className="cursor-pointer text-[#28a745] hover:text-green-700 outline-none border-none"
-            data-tooltip-id="add-user"
-            data-tooltip-content="add user"
-            onClick={() => {
-              setShowUsers({ type: "addingGroupMembers" });
-              setShowGroupSettings(false);
-            }}
-          />
+        {selectedChat.info.admin === currentUser._id && (
+          <div className="flex space-x-1">
+            <MdAddCircle
+              className="cursor-pointer text-[#28a745] hover:text-green-700 outline-none border-none"
+              data-tooltip-id="add-user"
+              data-tooltip-content="add user"
+              onClick={() => {
+                setShowUsers({ type: "addingGroupMembers" });
+                setShowGroupSettings(false);
+              }}
+            />
 
-          <AiFillDelete
-            className="text-[#dc3545] cursor-pointer hover:text-red-700 outline-none border-none"
-            data-tooltip-id="delete-group"
-            data-tooltip-content="delete group"
-            onClick={handleGroupDelete}
-          />
-        </div>
+            <AiFillDelete
+              className="text-[#dc3545] cursor-pointer hover:text-red-700 outline-none border-none"
+              data-tooltip-id="delete-group"
+              data-tooltip-content="delete group"
+              onClick={handleGroupDelete}
+            />
+          </div>
+        )}
       </div>
       <ReactTooltip
         className="tooltip"

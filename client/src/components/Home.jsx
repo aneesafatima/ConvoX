@@ -9,7 +9,6 @@ import { showAlert } from "../utils/showAlert";
 function Home() {
   //fix add members functionality
   //add group name change functionality
-  //add unread messages functionality
   //add search functionality for users and groups
   //add profile picture change feature
   //logout + delete account functionality
@@ -84,7 +83,6 @@ function Home() {
       socket.on("connect", () => {
         console.log("Connected to the server with id : ", socket.id);
         socket.on("new-message", () => {
-          console.log("Message Received !");
           setFetchMessages(true);
         });
 

@@ -9,35 +9,47 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
   });
 });
 exports.addUserContact = catchAsync(async (req, res, next) => {
+  const { selectedUserId, type } = req.params;
+  console.log(req.body);
   const user = await User.findById(req.user._id);
-  if(user.contacts.includes(req.body.userContacted)){
-   return next(new ErrorHandler("User is already in your contacts", 400));}
-  await User.findByIdAndUpdate(req.user._id, {
-    $push: { contacts: req.body.userContacted },
-  });
-  await User.findByIdAndUpdate(req.body.userContacted, {
-    $push: { contacts: req.user._id },
-  });
-  res.status(200).json({
-    status: "success"
-  })
-});
+  if (type === "personal") {
+    if (user.contacts.includes(selectedUserId))
+      return next(new ErrorHandler("User is already in your contacts", 400));
 
+    await User.findByIdAndUpdate(req.user._id, {
+      $push: { contacts: selectedUserId },
+    });
 
-exports.getUserContacts = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.user._id).populate([{path: "contacts"}, {path: "groupIds"}]);
+    await User.findByIdAndUpdate(selectedUserId, {
+      $push: { contacts: req.user._id },
+    });
+  } else {
+    await User.findByIdAndUpdate(selectedUserId, {
+      $push: { groupIds: req.body.groupId },
+    });
+  }
   res.status(200).json({
     status: "success",
-    contactUsers : user.contacts,
-    groups: user.groupIds
   });
 });
-exports.removeContactFromChats = catchAsync(async (req, res, next) => { 
-  const {id, type} = req.params;
+
+exports.getUserContacts = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user._id).populate([
+    { path: "contacts" },
+    { path: "groupIds" },
+  ]);
+  res.status(200).json({
+    status: "success",
+    contactUsers: user.contacts,
+    groups: user.groupIds,
+  });
+});
+exports.removeContactFromChats = catchAsync(async (req, res, next) => {
+  const { id, type } = req.params;
   await User.findByIdAndUpdate(req.user._id, {
-    $pull: { [type]: id},
+    $pull: { [type]: id },
   });
   res.status(200).json({
-    status: "success"
-  })
-})
+    status: "success",
+  });
+});
