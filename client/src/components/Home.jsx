@@ -7,9 +7,7 @@ import SelectUser from "./SelectUser";
 import { showAlert } from "../utils/showAlert";
 
 function Home() {
-  //fix add members functionality
   //add group name change functionality
-  //add search functionality for users and groups
   //add profile picture change feature
   //logout + delete account functionality
   //add loader

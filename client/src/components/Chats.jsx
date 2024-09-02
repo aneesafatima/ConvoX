@@ -102,6 +102,7 @@ function Chats() {
           message: messageText,
           sender: currentUser._id,
           receiver: selectedChat.info._id,
+          timestamp: Date.now()
         },
       ]);
       setTimeout(() => {

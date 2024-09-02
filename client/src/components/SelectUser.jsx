@@ -7,6 +7,7 @@ import { RxCross1 } from "react-icons/rx";
 import { GlobalState } from "../context/GlobalState";
 import { showAlert } from "../utils/showAlert";
 
+
 function SelectUser() {
   const {
     allUsers,
@@ -21,6 +22,7 @@ function SelectUser() {
     selectedChat,
     socket,
   } = useContext(GlobalState);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const userArray =
     showUsers?.type === "addingGroupMembers"
@@ -29,18 +31,16 @@ function SelectUser() {
         )
       : allUsers;
 
-
-
   const handleUserSelction = async (selectedUser) => {
     if (isGroup) {
       if (groupMembers?.includes(selectedUser)) {
         showAlert("User already added", "home");
         return;
       }
-      setGroupMembers((prev) =>{
-       const groupArray =  prev ? [...prev, selectedUser] : [selectedUser];
-       return groupArray;
-         });
+      setGroupMembers((prev) => {
+        const groupArray = prev ? [...prev, selectedUser] : [selectedUser];
+        return groupArray;
+      });
     } else {
       const res = await axios.patch(
         `${import.meta.env.VITE_URL}/api/users/${
@@ -127,17 +127,11 @@ function SelectUser() {
           <div className="flex">
             <input
               type="text"
-              className="w-[90%] h-8 rounded-s-lg bg-white block text-sm font-lato px-3 outline-none border-0"
+              className="w-[90%] h-8 rounded-lg font-roboto bg-white block text-sm font-lato px-3 outline-none border-0"
               placeholder="search user"
               id="user-name"
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
-
-            <button
-              className="w-14 bg-blue-400 rounded-e-lg text-xs font-lato  text-white hover:bg-blue-500"
-              onClick={handleUsers}
-            >
-              GO
-            </button>
             {isGroup ? (
               <IoCheckmarkDoneCircle
                 size={30}
@@ -189,15 +183,20 @@ function SelectUser() {
         <ul className=" flex flex-col space-y-3">
           {userArray?.map(
             (user, i) =>
-              user._id !== currentUser?._id && (
+              user._id !== currentUser?._id && user.name.includes(searchTerm) && (
                 <li
-                  className={`text-sm flex items-center justify-between font-semibold  cursor-pointer hover:bg-[#e2e2e2] py-1 rounded-lg pl-1 px-6 `}
+                  className={`text-sm flex items-center justify-between font-semibold font-roboto cursor-pointer hover:bg-[#e2e2e2] py-1 rounded-lg pl-1 px-6 `}
                   onClick={() => handleUserSelction(user)}
                   key={i}
                 >
-                  <span className="flex items-center">
+                  <span className="flex text-xs">
                     <FaUserCircle size={35} className="mr-3" />
-                    {user.name}
+                    <span className="flex flex-col">
+                      <span className="">{user.name}</span>
+                      <span className="text-[9px] font-normal">
+                        {user.email}
+                      </span>
+                    </span>
                   </span>
                   <span
                     className={`${
