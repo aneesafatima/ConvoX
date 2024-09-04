@@ -35,6 +35,10 @@ const UserSchema = new mongoose.Schema({
     },
   },
   passwordChangedAt: Date,
+  photo: {
+    type: String,
+    default: "default.png",
+  },
   active: Boolean,
   contacts: {
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],

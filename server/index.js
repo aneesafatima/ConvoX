@@ -14,6 +14,7 @@ const notificationRouter = require("./routes/notificationRouter");
 const Notification = require("./models/notificationModel");
 const errorController = require("./controllers/errorController");
 const User = require("./models/userModel");
+const path = require("path")
 
 const groupRouter = require("./routes/groupRouter");
 dotenv.config({ path: "./.env" });
@@ -39,18 +40,12 @@ app.use(
     } // Allows credentials (cookies) to be sent
   )
 );
-
+// app.use((req,res,next) => {console.log(req.url); next()})
 app.use(express.json());
 app.use(cookieParser());
 // Middleware to parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.get("/", (req, res) => {
-  res.status(200).json({
-    status: "success",
-  });
-});
-
+app.use('/public/img/users', express.static(path.join(__dirname, '/public/img/users')));
 app.use("/api/users", userRouter);
 app.use("/api/home", homeRouter);
 app.use("/api/messages", messageRouter);

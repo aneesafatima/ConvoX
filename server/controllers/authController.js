@@ -3,7 +3,7 @@ const User = require("../models/userModel");
 const ErrorHandler = require("../utils/ErrorHandler");
 const { promisify } = require("util");
 const catchAsync = require("../utils/catchAsync");
-const Group = require( "../models/groupModel" );
+
 
 const sendToken = (user, statusCode, res) => {
   const token = createSendToken(user._id);
@@ -154,9 +154,3 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   });
 });
 
-// exports.restrictTo = async (...roles) => {
-// const group = await Group.findById(req.params.groupId);
-// if(group.admin !== req.user._id)
-//   return next(new ErrorHandler("You are "))
-
-// }
