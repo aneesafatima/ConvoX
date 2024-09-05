@@ -16,27 +16,10 @@ function GroupSettings() {
     setShowUsers,
     setSelectedChat,
     setFetchUserChats,
-    groupMembers, setGroupMembers,
+    groupMembers,
+    setGroupMembers,
     socket,
   } = useContext(GlobalState);
-
-  useEffect(() => {
-    if (selectedChat.type === "group") {
-      (() => {
-        axios
-          .get(
-            `${import.meta.env.VITE_URL}/api/groups/${
-              selectedChat.info._id
-            }/members`,
-            {
-              withCredentials: true,
-            }
-          )
-          .then((res) => setGroupMembers(res.data.groupMembers))
-          .catch((err) => console.log(err));
-      })();
-    }
-  }, [selectedChat]);
 
   const handleRemoveGroupMember = async (group, userId) => {
     try {
@@ -152,26 +135,27 @@ function GroupSettings() {
             }
           </span>
         </div>
-        {selectedChat.info.admin === currentUser._id && (
-          <div className="flex space-x-1">
-            <MdAddCircle
-              className="cursor-pointer text-[#28a745] hover:text-green-700 outline-none border-none"
-              data-tooltip-id="add-user"
-              data-tooltip-content="add user"
-              onClick={() => {
-                setShowUsers({ type: "addingGroupMembers" });
-                setShowGroupSettings(false);
-              }}
-            />
 
+        <div className="flex space-x-1">
+          {selectedChat.info.admin === currentUser._id && (
             <AiFillDelete
               className="text-[#dc3545] cursor-pointer hover:text-red-700 outline-none border-none"
               data-tooltip-id="delete-group"
               data-tooltip-content="delete group"
               onClick={handleGroupDelete}
             />
-          </div>
-        )}
+          )}
+
+          <MdAddCircle
+            className="cursor-pointer text-[#28a745] hover:text-green-700 outline-none border-none"
+            data-tooltip-id="add-user"
+            data-tooltip-content="add user"
+            onClick={() => {
+              setShowUsers({ type: "addingGroupMembers" });
+              setShowGroupSettings(false);
+            }}
+          />
+        </div>
       </div>
       <ReactTooltip
         className="tooltip"

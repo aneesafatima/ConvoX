@@ -35,7 +35,7 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
   });
   const photo =  path.join(__dirname, `../public/img/users/${user.photo}`);  
   console.log(photo);
-  if(fs.existsSync(photo))
+  if(fs.existsSync(photo) && user.photo !== "default.png")
     fs.unlinkSync(photo);
   res.status(200).json({
     status: "success",
@@ -52,8 +52,9 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
 });
 exports.addUserContact = catchAsync(async (req, res, next) => {
   const { selectedUserId, type } = req.params;
-  console.log(req.body);
   const user = await User.findById(req.user._id);
+  const selectedUser = await User.findById(selectedUserId);
+  console.log(user)
   if (type === "personal") {
     if (user.contacts.includes(selectedUserId))
       return next(new ErrorHandler("User is already in your contacts", 400));
@@ -61,7 +62,7 @@ exports.addUserContact = catchAsync(async (req, res, next) => {
     await User.findByIdAndUpdate(req.user._id, {
       $push: { contacts: selectedUserId },
     });
-
+   if(!selectedUser.contacts.includes(user._id))
     await User.findByIdAndUpdate(selectedUserId, {
       $push: { contacts: req.user._id },
     });
@@ -87,9 +88,9 @@ exports.getUserContacts = catchAsync(async (req, res, next) => {
   });
 });
 exports.removeContactFromChats = catchAsync(async (req, res, next) => {
-  const { id, type } = req.params;
+  const { selectedUserId, type } = req.params;
   await User.findByIdAndUpdate(req.user._id, {
-    $pull: { [type]: id },
+    $pull: { [type]: selectedUserId },
   });
   res.status(200).json({
     status: "success",

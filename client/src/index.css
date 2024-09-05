@@ -49,7 +49,7 @@
   font-size: 13px;
   background-color: #d9f3f8;
   padding: 8px 10px;
-  width: 90%;
+  width: fit-content;
   border-radius: 10px;
   text-align: center;
   margin: 20px 0;
@@ -73,4 +73,22 @@ font-size: 10px !important;
 }
 #user:hover .user-remove-icon{
   display: block;
+}
+.p-fileupload-choose{
+background-color: #3b82f6;
+width: 10px;
+height: 10px;
+border-radius: 50%;
+
+}
+.p-fileupload-choose svg{
+  width: 6px;
+  height: 6px; 
+  color: white; 
+ line-height: 10px;
+  
+  margin:0 auto;
+}
+.p-button-label{
+  display:none;
 }

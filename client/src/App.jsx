@@ -1,6 +1,6 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Auth, Home } from "./components";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { NotFound } from "./components";
 import { GlobalState } from "./context/GlobalState";
 

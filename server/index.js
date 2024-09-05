@@ -40,12 +40,12 @@ app.use(
     } // Allows credentials (cookies) to be sent
   )
 );
-// app.use((req,res,next) => {console.log(req.url); next()})
+app.use((req,res,next) => {console.log(req.url); next()})
 app.use(express.json());
 app.use(cookieParser());
 // Middleware to parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/public/img/users', express.static(path.join(__dirname, '/public/img/users')));
+app.use('/public', express.static(path.join(__dirname, 'public/img')));
 app.use("/api/users", userRouter);
 app.use("/api/home", homeRouter);
 app.use("/api/messages", messageRouter);
@@ -88,11 +88,13 @@ io.on("connection", async (socket) => {
   connectedUsers.push({ userId, socketId: socket.id });
 
   socket.on("send-message", async (data) => {
+  
     if (data.type === "individual") {
       await Message.create({
         sender: userId,
         receiver: data.to,
         message: data.message,
+        isPhoto: data.isPhoto,
       });
 
       const receiver = connectedUsers.find((user) => user.userId === data.to);
@@ -120,6 +122,7 @@ io.on("connection", async (socket) => {
         groupId: data.to,
         message: data.message,
         isGroupMessage: true,
+        isPhoto: data.isPhoto,
       });
       const groupMemberIds = await User.find({ groupIds: data.to }).select(
         "_id unreadMessages"

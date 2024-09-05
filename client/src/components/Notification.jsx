@@ -19,7 +19,7 @@ function Notification() {
             { withCredentials: true }
           );
           if (res.data.status === "success") {
-            console.log(res.data.notifications);
+          
             setNotifications(res.data.notifications);
             initialRender.current = false;
           }
@@ -36,7 +36,7 @@ function Notification() {
             { withCredentials: true }
           );
           if (res.data.status === "success") {
-            console.log("Cleared notifs");
+    
             setNotifications([]);
           }
         } catch (err) {
@@ -47,9 +47,9 @@ function Notification() {
   }, [showNotificationBar]);
 
   return (
-    <div className="absolute h-fit top-[95%] ">
+    <div className=" h-fit absolute bottom-7   mx-5 ">
       <div
-        className="w-6 h-6 shadow-md absolute  rounded-full cursor-pointer"
+        className="w-6 h-6 shadow-md  rounded-full cursor-pointer"
         onClick={() => setShowNotificationBar((prev) => !prev)}
       >
         <div className="h-full">
@@ -66,7 +66,7 @@ function Notification() {
         </div>
       </div>
       {showNotificationBar && (
-        <div className="w-60 h-64 bg-[#f7f7f7] p-2 left-7  absolute -translate-y-full shadow-lg rounded-md overflow-auto">
+        <div className="w-60 h-64 bg-[#f7f7f7] p-2 right-0 bottom-full translate-x-full absolute  shadow-lg rounded-md overflow-auto">
           <h2 className="font-nunito font-extrabold text-lg border-b-2 pb-1">
             Notifications
           </h2>

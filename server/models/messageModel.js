@@ -11,15 +11,18 @@ const MessageSchema = new mongoose.Schema({
     type: Date,
     default: () => new Date(),
   },
+  isPhoto: { type: Boolean, default: false },
   isGroupMessage: {
     type: Boolean,
     default: false,
   },
   groupId: { type: mongoose.Schema.Types.ObjectId, ref: "Group" },
-  deletedBy: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-  }]
+  deletedBy: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
 });
 
 const Message = new mongoose.model("Message", MessageSchema);

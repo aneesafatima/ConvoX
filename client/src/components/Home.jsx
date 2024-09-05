@@ -8,8 +8,6 @@ import { showAlert } from "../utils/showAlert";
 
 function Home() {
   //add group name change functionality
-  //add profile picture change feature
-  //logout + delete account functionality
   //add loader
   const {
     giveAccess,
@@ -38,7 +36,6 @@ function Home() {
 
   useEffect(() => {
     if (isConnected && currentUser && !socket) {
-      console.log("RUNNING !!!!!");
       setSocket(
         io(`${import.meta.env.VITE_URL}`, {
           query: {
@@ -64,7 +61,6 @@ function Home() {
             setCurrentUser(res.data.user);
             setIsConnected(true);
             setShowErr(false);
-            console.log(res.data)
             setUnreadMessages(res.data.user.unreadMessages);
           }
         } catch (err) {
@@ -116,7 +112,6 @@ function Home() {
   useEffect(() => {
     if (fetchUserChats) {
       (async () => {
-        console.log("fetching contacts");
         const res = await axios.get(
           `${import.meta.env.VITE_URL}/api/users/userContacts`,
           {
@@ -127,7 +122,6 @@ function Home() {
           setContacts(res.data.contactUsers);
           setGroups(res.data.groups);
           setFetchUserChats(false);
-          console.log("Contacts fetched");
         }
       })();
     }
@@ -160,10 +154,10 @@ function Home() {
   return (
     giveAccess &&
     !refetch && (
-      <div className="w-screen flex space-x-10" id="home">
+      <div className="w-screen flex " id="home">
         <div className="w-1/4 md:w-1/5 ">
           <UserMessages contacts={contacts} groups={groups} />
-          <SelectUser />
+          <SelectUser contacts={contacts} />
         </div>
         <Chats />
         {showGroupSettings && <GroupSettings />}

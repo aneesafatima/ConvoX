@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { GlobalState } from "../context/GlobalState";
 import axios from "axios";
 import { ImExit } from "react-icons/im";
@@ -7,6 +7,9 @@ import { IoMdSettings } from "react-icons/io";
 import { MdDeleteForever } from "react-icons/md";
 import { ReactTooltip } from ".";
 import { getFormattedDate } from "../utils/helpers";
+import { HiUserRemove } from "react-icons/hi";
+import { IoSend } from "react-icons/io5";
+import { MdInsertPhoto } from "react-icons/md";
 
 function Chats() {
   const {
@@ -23,7 +26,29 @@ function Chats() {
     setShowGroupSettings,
     unreadMessages,
     setUnreadMessages,
+    groupMembers,
+    setGroupMembers
   } = useContext(GlobalState);
+  const [input, setInput] = useState("");
+  useEffect(() => console.log(groupMembers), [groupMembers])
+  
+  useEffect(() => {
+    if (selectedChat?.type === "group") {
+      (() => {
+        axios
+          .get(
+            `${import.meta.env.VITE_URL}/api/groups/${
+              selectedChat.info._id
+            }/members`,
+            {
+              withCredentials: true,
+            }
+          )
+          .then((res) => setGroupMembers(res.data.groupMembers))
+          .catch((err) => console.log(err));
+      })();
+    }
+  }, [selectedChat]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -36,7 +61,8 @@ function Chats() {
         if (res.data?.status === "success") {
           setTimeout(() => {
             const scrollContainer = document.getElementById("scroll-container");
-            scrollContainer.scrollTop = scrollContainer?.scrollHeight;
+            if (scrollContainer)
+              scrollContainer.scrollTop = scrollContainer.scrollHeight;
           }, 100);
           setMessages(res.data.messages);
           setFetchMessages(false);
@@ -62,7 +88,7 @@ function Chats() {
               const index = unreadMessages?.findIndex(
                 (msg) => msg.from === selectedChat.info._id
               );
-              console.log("index", index);
+
               if (index !== -1) {
                 setUnreadMessages((prev) => {
                   const newArray = [...prev];
@@ -82,34 +108,24 @@ function Chats() {
     if (selectedChat || fetchMessages) fetchData();
   }, [selectedChat, fetchMessages]);
 
-  useEffect(() => {
-    console.log("unreadMessages", unreadMessages);
-  }, [unreadMessages]);
-
   const handeSendingMessage = () => {
-    let message = document.getElementById("message");
-    const messageText = message.value.trim();
-
-    if (messageText !== "") {
+    if (input !== "") {
       socket.emit("send-message", {
-        message: messageText,
+        message: input,
         to: selectedChat.info._id,
         type: selectedChat.type,
       });
       setMessages((prev) => [
         ...prev,
         {
-          message: messageText,
+          message: input,
           sender: currentUser._id,
           receiver: selectedChat.info._id,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         },
       ]);
-      setTimeout(() => {
-        const scrollContainer = document.getElementById("scroll-container");
-        scrollContainer.scrollTop = scrollContainer?.scrollHeight;
-      }, 100);
-      message.value = "";
+
+      setInput("");
     }
   };
 
@@ -161,6 +177,62 @@ function Chats() {
       console.log(err);
     }
   };
+  const handleUserRemovalFromChats = async (id, type) => {
+    showAlert("Removing Contact", "home");
+    const res = await axios({
+      url: `${import.meta.env.VITE_URL}/api/users/removeContact/${type}/${id}`,
+      method: "DELETE",
+      withCredentials: true,
+    });
+    if (res.data.status === "success") {
+      showAlert("Contact Removed Successfully", "home");
+      setFetchUserChats(true);
+      setSelectedChat(null);
+    }
+  };
+
+  const handlePhotoUpload = async () => {
+    const photo = document.getElementById("photo-message").files[0];
+    const form = new FormData();
+    form.append("photo-message", photo);
+    const res = await axios({
+      url: `${import.meta.env.VITE_URL}/api/messages/send-photo-message`,
+      method: "POST",
+      data: form,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      withCredentials: true,
+    });
+    if (res.data?.status === "success") {
+      socket.emit("send-message", {
+        message: res.data.imageUrl,
+        to: selectedChat.info._id,
+        type: selectedChat.type,
+        isPhoto: true,
+      });
+      console.log(res.data);
+      setMessages((prev) => [
+        ...prev,
+        {
+          message: res.data.imageUrl,
+          sender: currentUser._id,
+          receiver: selectedChat.info._id,
+          timestamp: Date.now(),
+          isPhoto: true,
+        },
+      ]);
+    }
+  };
+
+  useEffect(() => {
+    console.log(messages)
+    setTimeout(() => {
+      const scrollContainer = document.getElementById("scroll-container");
+      if(scrollContainer)
+      scrollContainer.scrollTop = scrollContainer?.scrollHeight;
+    }, 100);
+  }, [messages]);
 
   return (
     selectedChat && (
@@ -191,20 +263,34 @@ function Chats() {
               />
             </span>
           ) : (
-            <MdDeleteForever
-              size={22}
-              className="text-red-500 hover:text-red-600   cursor-pointer outline-none border-none"
-              data-tooltip-id="delete-chats"
-              data-tooltip-content="delete chats"
-              onClick={() => handleDeleteChats(currentUser._id)}
-            />
+            <span className="flex items-center space-x-3">
+              <HiUserRemove
+                size={22}
+                className="text-red-500 hover:text-red-600 cursor-pointer outline-none border-none"
+                data-tooltip-id="remove-contact"
+                data-tooltip-content="remove contact"
+                onClick={() =>
+                  handleUserRemovalFromChats(
+                    selectedChat.info._id,
+                    selectedChat.type === "group" ? "groupIds" : "contacts"
+                  )
+                }
+              />
+              <MdDeleteForever
+                size={22}
+                className="text-red-500 hover:text-red-600   cursor-pointer outline-none border-none"
+                data-tooltip-id="delete-chats"
+                data-tooltip-content="delete chats"
+                onClick={() => handleDeleteChats(currentUser._id)}
+              />
+            </span>
           )}
         </div>
-        <div
-          className="border rounded-lg w-full h-full overflow-auto flex flex-col pb-12"
-          id="scroll-container"
-        >
-          <ul className="p-4 px-10 space-y-6 flex flex-col text-sm font-nunito font-medium">
+        <div className="border rounded-lg w-full h-[90%] flex flex-col pb-12 relative">
+          <ul
+            className="p-4 px-10 space-y-6 flex flex-col text-sm font-nunito font-medium h-full overflow-auto"
+            id="scroll-container"
+          >
             {messages?.map((message) =>
               message?.deletedBy?.includes(currentUser._id) ? null : (
                 <li
@@ -214,23 +300,33 @@ function Chats() {
                       : "self-start "
                   } `}
                 >
-                  <span
-                    className={`pointer-events-none ${
-                      message.sender !== currentUser._id
-                        ? "bg-[#E8F5E9] self-start rounded-bl-none"
-                        : "bg-[#E0F7FA] self-end rounded-br-none"
-                    } p-3 rounded-lg`}
-                  >
-                    {message.message}
-                  </span>
+                  {" "}
+                  {message.isPhoto ? (
+                    <img
+                      src={`${import.meta.env.VITE_URL}/public/chats/${
+                        message.message
+                      }`}
+                      alt="photo"
+                      className="h-60"
+                    />
+                  ) : (
+                    <span
+                      className={`pointer-events-none ${
+                        message.sender !== currentUser._id
+                          ? "bg-[#E8F5E9] self-start rounded-bl-none"
+                          : "bg-[#E0F7FA] self-end rounded-br-none"
+                      } p-3 rounded-lg`}
+                    >
+                      {message.message}
+                    </span>
+                  )}
                   <span className="text-[10px] pl-2 text-[#414141] font-nunito font-semibold">
                     {message.sender !== currentUser._id
                       ? message.isGroupMessage
-                        ? allUsers.find((user) => user._id === message.sender)
+                        ? groupMembers?.find((user) => user._id === message.sender)
                             .name
                         : selectedChat.info.name
                       : null}{" "}
-                    {/*remove all users*/}
                     <span className="mx-1 text-[#b2b2b2] text-[8px] ">
                       {getFormattedDate(message.timestamp)}
                     </span>
@@ -239,11 +335,11 @@ function Chats() {
               )
             )}
           </ul>
-          <div className="absolute bottom-0 -translate-y-full w-[60%]  left-1/2 -translate-x-1/2  flex">
+          <div className="sticky bottom-0  w-full  h-10  flex items-center mb-2 justify-center space-x-2">
             <input
               type="text"
               placeholder="type a message"
-              className={`w-full bg-[#f4f2f2] p-2 rounded-s-lg text-sm outline-0 border-0 ${
+              className={`w-[60%] bg-[#e1dfdf5c] h-8 p-4 rounded-full text-sm outline-0 border-0 font-nunito font-medium ${
                 selectedChat.type === "group" && !selectedChat.info.active
                   ? "cursor-not-allowed"
                   : null
@@ -252,30 +348,51 @@ function Chats() {
               disabled={
                 selectedChat.type === "group" && !selectedChat.info.active
               }
+              value={input}
+              onChange={(e) => setInput(e.target.value.trim())}
             />
-            <button
-              className="text-white font-roboto bg-[#333333] hover:bg-black rounded-e-lg px-2 text-sm"
+            <IoSend
               onClick={handeSendingMessage}
-            >
-              send
-            </button>
-            <ReactTooltip
-              className="tooltip"
-              id="exit-group"
-              style={{ backgroundColor: "#333333 " }}
+              className="cursor-pointer"
+              color={input === "" ? "#333333" : "#3b82f6"}
             />
-            <ReactTooltip
-              className="tooltip"
-              id="settings-of-group"
-              style={{ backgroundColor: "#333333 " }}
-            />
-            <ReactTooltip
-              className="tooltip"
-              id="delete-chats"
-              style={{ backgroundColor: "#ef4444 " }}
-            />
+            <div className=" w-5 h-6 relative cursor-pointer">
+              <input
+                type="file"
+                accept="image/*"
+                name="photo-upload"
+                className="w-full h-full opacity-0 absolute z-10"
+                onChange={handlePhotoUpload}
+                id="photo-message"
+              />
+
+              <MdInsertPhoto
+                className="cursor-pointer w-full h-full "
+                color="#333333"
+              />
+            </div>
           </div>
         </div>
+        <ReactTooltip
+          className="tooltip"
+          id="exit-group"
+          style={{ backgroundColor: "#333333 " }}
+        />
+        <ReactTooltip
+          className="tooltip"
+          id="settings-of-group"
+          style={{ backgroundColor: "#333333 " }}
+        />
+        <ReactTooltip
+          className="tooltip"
+          id="delete-chats"
+          style={{ backgroundColor: "#ef4444 " }}
+        />
+        <ReactTooltip
+          className="tooltip"
+          id="remove-contact"
+          style={{ backgroundColor: "#ef4444 " }}
+        />
       </div>
     )
   );

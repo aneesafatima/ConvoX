@@ -7,8 +7,7 @@ import { RxCross1 } from "react-icons/rx";
 import { GlobalState } from "../context/GlobalState";
 import { showAlert } from "../utils/showAlert";
 
-
-function SelectUser() {
+function SelectUser({contacts}) {
   const {
     allUsers,
     currentUser,
@@ -42,6 +41,10 @@ function SelectUser() {
         return groupArray;
       });
     } else {
+      setShowUsers(false);
+      console.log(currentUser)
+      if(contacts?.includes(selectedUser._id)){ showAlert("User already added", "home"); return ;}
+      showAlert("Adding user...", "home");
       const res = await axios.patch(
         `${import.meta.env.VITE_URL}/api/users/${
           showUsers?.type === "addingGroupMembers" ? "group" : "personal"
@@ -56,6 +59,7 @@ function SelectUser() {
           withCredentials: true,
         }
       );
+     
       if (res.data?.status === "success") {
         if (showUsers.type === "addingGroupMembers") {
         } else {
@@ -65,13 +69,11 @@ function SelectUser() {
           });
           setFetchUserChats(true);
         }
-        setShowUsers(false);
+
         showAlert("User added successfully", "home");
       }
     }
   };
-
-  const handleUsers = async () => {}; //filter users
 
   const handleGroupCreation = async () => {
     if (groupMembers.length > 1) {
@@ -127,7 +129,7 @@ function SelectUser() {
           <div className="flex">
             <input
               type="text"
-              className="w-[90%] h-8 rounded-lg font-roboto bg-white block text-sm font-lato px-3 outline-none border-0"
+              className="w-[90%] h-8 rounded-lg  bg-white block text-sm font-lato px-3 outline-none border-0"
               placeholder="search user"
               id="user-name"
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -183,7 +185,8 @@ function SelectUser() {
         <ul className=" flex flex-col space-y-3">
           {userArray?.map(
             (user, i) =>
-              user._id !== currentUser?._id && user.name.includes(searchTerm) && (
+              user._id !== currentUser?._id &&
+              user.name.includes(searchTerm) && (
                 <li
                   className={`text-sm flex items-center justify-between font-semibold font-roboto cursor-pointer hover:bg-[#e2e2e2] py-1 rounded-lg pl-1 px-6 `}
                   onClick={() => handleUserSelction(user)}
