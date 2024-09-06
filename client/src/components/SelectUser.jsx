@@ -42,9 +42,8 @@ function SelectUser({contacts}) {
       });
     } else {
       setShowUsers(false);
-      console.log(currentUser)
       if(contacts?.includes(selectedUser._id)){ showAlert("User already added", "home"); return ;}
-      showAlert("Adding user...", "home");
+    showAlert("Adding user...", "home")
       const res = await axios.patch(
         `${import.meta.env.VITE_URL}/api/users/${
           showUsers?.type === "addingGroupMembers" ? "group" : "personal"
@@ -69,8 +68,9 @@ function SelectUser({contacts}) {
           });
           setFetchUserChats(true);
         }
-
-        showAlert("User added successfully", "home");
+        document.querySelector('.alert').remove();
+       
+         showAlert("User added successfully", "home");
       }
     }
   };
@@ -119,11 +119,11 @@ function SelectUser({contacts}) {
   };
   return (
     showUsers && (
-      <div className="bg-blue-100 absolute z-40 w-[500px] h-[600px]  rounded-lg -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 py-4 px-10 space-y-4">
+      <div className="bg-[#f7f7f7] shadow-md absolute overflow-auto  z-40 w-[300px] h-[350px]  xs:w-[400px] xs:h-[400px]  rounded-lg -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 pb-3 xs:py-4 px-5 xs:px-10 space-y-4">
         <RxCross1
           className="absolute right-6 top-6 cursor-pointer"
           size={10}
-          onClick={() => setShowUsers(false)}
+          onClick={() =>{ setShowUsers(false); setIsGroup(false)}}
         />
         <div className=" flex-col pt-6 space-y-3">
           <div className="flex">
@@ -136,14 +136,14 @@ function SelectUser({contacts}) {
             />
             {isGroup ? (
               <IoCheckmarkDoneCircle
-                size={30}
+                size={22}
                 color="white"
                 className="cursor-pointer rounded-full w-fit h-fit p-1 bg-blue-400 hover:bg-blue-500 mx-2 "
                 onClick={handleGroupCreation}
               />
             ) : (
               <MdOutlineGroups
-                size={30}
+                size={22}
                 color="white"
                 className="cursor-pointer rounded-full w-fit h-fit p-1 bg-blue-400 hover:bg-blue-500 mx-2 "
                 onClick={() => setIsGroup(true)}
@@ -164,7 +164,7 @@ function SelectUser({contacts}) {
                 placeholder="description"
                 id="group-description"
               />
-              <ul className="  rounded-lg  text-sm flex space-x-2">
+              <ul className="  rounded-lg   text-sm flex space-x-2">
                 {groupMembers?.map((member, i) => (
                   <li
                     className="font-nunito  font-medium h-fit px-3 py-1 text-sm rounded-full bg-[#e3e3e3]"

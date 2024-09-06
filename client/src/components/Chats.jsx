@@ -10,6 +10,8 @@ import { getFormattedDate } from "../utils/helpers";
 import { HiUserRemove } from "react-icons/hi";
 import { IoSend } from "react-icons/io5";
 import { MdInsertPhoto } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
+import { SiFiles } from "react-icons/si";
 
 function Chats() {
   const {
@@ -20,18 +22,18 @@ function Chats() {
     fetchMessages,
     setFetchMessages,
     currentUser,
-    allUsers,
     setSelectedChat,
     setFetchUserChats,
     setShowGroupSettings,
     unreadMessages,
     setUnreadMessages,
     groupMembers,
-    setGroupMembers
+    setGroupMembers,
   } = useContext(GlobalState);
   const [input, setInput] = useState("");
-  useEffect(() => console.log(groupMembers), [groupMembers])
-  
+
+  useEffect(() => console.log(groupMembers), [groupMembers]);
+
   useEffect(() => {
     if (selectedChat?.type === "group") {
       (() => {
@@ -124,7 +126,7 @@ function Chats() {
           timestamp: Date.now(),
         },
       ]);
-
+      setFetchMessages(true);
       setInput("");
     }
   };
@@ -185,6 +187,7 @@ function Chats() {
       withCredentials: true,
     });
     if (res.data.status === "success") {
+      document.querySelector(".alert")?.remove();
       showAlert("Contact Removed Successfully", "home");
       setFetchUserChats(true);
       setSelectedChat(null);
@@ -209,9 +212,8 @@ function Chats() {
         message: res.data.imageUrl,
         to: selectedChat.info._id,
         type: selectedChat.type,
-        isPhoto: true,
+        type: "photo",
       });
-      console.log(res.data);
       setMessages((prev) => [
         ...prev,
         {
@@ -219,24 +221,44 @@ function Chats() {
           sender: currentUser._id,
           receiver: selectedChat.info._id,
           timestamp: Date.now(),
-          isPhoto: true,
+          type: "photo",
         },
       ]);
     }
   };
+  const handleDeleteMessage = async (messageId) => {
+    try {
+      const res = await axios.patch(
+        `${import.meta.env.VITE_URL}/api/messages/delete-message/${messageId}`,
+        {},
+        { withCredentials: true }
+      );
+      if (res.data?.status === "success") {
+        const deletedMessageIndex = messages.findIndex(
+          (msg) => msg._id === messageId
+        );
+        const newMessages = [...messages];
+        newMessages[deletedMessageIndex].message = "This message was deleted";
+        newMessages[deletedMessageIndex].deleted = "true";
+
+        setMessages(newMessages);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
-    console.log(messages)
     setTimeout(() => {
       const scrollContainer = document.getElementById("scroll-container");
-      if(scrollContainer)
-      scrollContainer.scrollTop = scrollContainer?.scrollHeight;
+      if (scrollContainer)
+        scrollContainer.scrollTop = scrollContainer?.scrollHeight;
     }, 100);
-  }, [messages]);
+  }, [selectedChat]);
 
   return (
     selectedChat && (
-      <div className="flex font-lato flex-col space-y-5 p-3 px-5 pb-4 flex-grow relative ">
+      <div className="flex font-lato flex-col space-y-5 p-3 px-5 pb-4 flex-grow relative w-svw xs:w-fit">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-roboto font-semibold text-[#333333] ">
             Chats with {selectedChat.info.name}
@@ -294,42 +316,55 @@ function Chats() {
             {messages?.map((message) =>
               message?.deletedBy?.includes(currentUser._id) ? null : (
                 <li
-                  className={`text-sm flex flex-col ${
+                  className={`text-sm flex flex-col relative ${
                     message.sender === currentUser._id
                       ? "self-end"
                       : "self-start "
                   } `}
+                  id="message"
                 >
                   {" "}
-                  {message.isPhoto ? (
+                  {message.type === "photo" && !message.deleted ? (
                     <img
                       src={`${import.meta.env.VITE_URL}/public/chats/${
                         message.message
                       }`}
                       alt="photo"
-                      className="h-60"
+                      className="h-32 sm:h-60"
                     />
                   ) : (
                     <span
-                      className={`pointer-events-none ${
-                        message.sender !== currentUser._id
-                          ? "bg-[#E8F5E9] self-start rounded-bl-none"
-                          : "bg-[#E0F7FA] self-end rounded-br-none"
-                      } p-3 rounded-lg`}
+                      className={`pointer-events-none 
+                        ${message.deleted ? "text-gray-500" : "text-[#333333]"}
+                        ${
+                          message.sender !== currentUser._id
+                            ? "bg-[#E8F5E9] self-start rounded-bl-none"
+                            : "bg-[#E0F7FA] self-end rounded-br-none"
+                        } p-1 px-2 py-2 sm:p-3 text-xs sm:text-sm rounded-lg`}
                     >
                       {message.message}
                     </span>
                   )}
-                  <span className="text-[10px] pl-2 text-[#414141] font-nunito font-semibold">
-                    {message.sender !== currentUser._id
-                      ? message.isGroupMessage
-                        ? groupMembers?.find((user) => user._id === message.sender)
-                            .name
-                        : selectedChat.info.name
-                      : null}{" "}
-                    <span className="mx-1 text-[#b2b2b2] text-[8px] ">
-                      {getFormattedDate(message.timestamp)}
+                  <span className="text-[10px] mt-[2px] pl-2 text-[#414141] font-nunito font-semibold flex justify-between items-center">
+                    <span>
+                      {message.sender !== currentUser._id
+                        ? message.isGroupMessage
+                          ? groupMembers?.find(
+                              (user) => user._id === message.sender
+                            ).name
+                          : selectedChat.info.name
+                        : null}{" "}
+                      <span className="mx-1 text-[#b2b2b2] text-[8px] ">
+                        {getFormattedDate(message.timestamp)}
+                      </span>
                     </span>
+                    {message.sender === currentUser._id && !message.deleted && (
+                      <MdDelete
+                        color="#b2b2b2"
+                        className=" cursor-pointer"
+                        onClick={() => handleDeleteMessage(message._id)}
+                      />
+                    )}
                   </span>
                 </li>
               )
@@ -339,7 +374,7 @@ function Chats() {
             <input
               type="text"
               placeholder="type a message"
-              className={`w-[60%] bg-[#e1dfdf5c] h-8 p-4 rounded-full text-sm outline-0 border-0 font-nunito font-medium ${
+              className={`w-[60%] bg-[#e1dfdf5c] h-8 px-3 sm:px-5 sm:py-5 rounded-full text-sm outline-0 border-0 font-nunito font-medium ${
                 selectedChat.type === "group" && !selectedChat.info.active
                   ? "cursor-not-allowed"
                   : null
@@ -361,12 +396,27 @@ function Chats() {
                 type="file"
                 accept="image/*"
                 name="photo-upload"
-                className="w-full h-full opacity-0 absolute z-10"
+                className="w-full h-full opacity-0 absolute  "
                 onChange={handlePhotoUpload}
                 id="photo-message"
               />
 
               <MdInsertPhoto
+                className="cursor-pointer w-full h-full "
+                color="#333333"
+              />
+            </div>
+            <div className=" w-5 h-6 relative cursor-pointer">
+              <input
+                type="file"
+                accept="image/*"
+                name="photo-upload"
+                className="w-full h-full opacity-0 absolute  "
+                onChange={handlePhotoUpload}
+                id="photo-message"
+              />
+
+              <SiFiles
                 className="cursor-pointer w-full h-full "
                 color="#333333"
               />

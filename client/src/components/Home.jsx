@@ -13,6 +13,7 @@ function Home() {
     giveAccess,
     seTGiveAccess,
     setCurrentUser,
+    selectedChat,
     refetch,
     setRefetch,
     setShowErr,
@@ -27,7 +28,8 @@ function Home() {
     showGroupSettings,
     fetchUsers,
     setFetchUsers,
-  setUnreadMessages
+  setUnreadMessages,
+  
   } = useContext(GlobalState);
 
   const [isConnected, setIsConnected] = useState(false);
@@ -77,6 +79,7 @@ function Home() {
       socket.on("connect", () => {
         console.log("Connected to the server with id : ", socket.id);
         socket.on("new-message", () => {
+       
           setFetchMessages(true);
         });
 
@@ -155,7 +158,7 @@ function Home() {
     giveAccess &&
     !refetch && (
       <div className="w-screen flex " id="home">
-        <div className="w-1/4 md:w-1/5 ">
+        <div className={`w-svw xs:w-[300px] ${selectedChat && window.innerWidth <=540 ? "hidden" : null}`}>
           <UserMessages contacts={contacts} groups={groups} />
           <SelectUser contacts={contacts} />
         </div>
@@ -167,3 +170,4 @@ function Home() {
 }
 
 export default Home;
+

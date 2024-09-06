@@ -27,6 +27,7 @@ export function GlobalProvider({ children }) {
   const [groupMembers, setGroupMembers] = useState();
   const [searchedUsers, setSearchedUser] = useState();
 
+
   return (
     <GlobalState.Provider
       value={{
@@ -75,7 +76,7 @@ export function GlobalProvider({ children }) {
         groupMembers,
         setGroupMembers,
         searchedUsers,
-        setSearchedUser,
+     
       }}
     >
       {children}

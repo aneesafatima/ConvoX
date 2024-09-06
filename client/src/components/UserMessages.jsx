@@ -16,9 +16,8 @@ function UserMessages({ contacts, groups }) {
     setShowUsers,
     currentUser,
     setSelectedChat,
-
     setFetchUsers,
-   
+
     unreadMessages,
     setShowGroupSettings,
   } = useContext(GlobalState);
@@ -38,13 +37,15 @@ function UserMessages({ contacts, groups }) {
     }
   };
   const handleImageUpload = (res) => {
-   setImageUrl(JSON.parse(res.xhr.response).imageUrl);
+    setImageUrl(JSON.parse(res.xhr.response).imageUrl);
   };
   useEffect(() => {
     console.log(imageUrl);
-  }, [imageUrl]);
+  }, [imageUrl]); 
   return (
-    <aside className="border-r-2 h-svh relative rounded-e-lg pt-3 flex flex-col p-2  ">
+    <aside
+      className={`border-r-2 h-svh relative rounded-e-lg pt-3 flex flex-col p-2 `}
+    >
       <button
         className="w-full sm:w-[50%] text-xs  px-1 py-2 flex justify-center items-center  rounded-lg bg-[#2c2c2c] hover:bg-black text-white font-lato"
         onClick={() => {
@@ -56,11 +57,11 @@ function UserMessages({ contacts, groups }) {
       </button>
       <div className="text-xs flex items-center justify-between font-semibold cursor-pointer  py-1 rounded-lg ">
         <span className="flex items-center space-x-2">
-          <div className="w-8 h-8  relative rounded-full ml-1">
+          <div className="w-14 h-14 xs:w-12 xs:h-12  my-3 relative rounded-full ml-1">
             <img
               src={`${import.meta.env.VITE_URL}/public/users/${imageUrl}`}
               alt="user profile photo"
-              className="rounded-full"
+              className=" rounded-full"
             />
             <FileUpload
               mode="basic"
@@ -90,7 +91,7 @@ function UserMessages({ contacts, groups }) {
           Direct messages
         </span>
 
-        <ul>
+        <ul className="space-x-0">
           {contacts?.map((contact, i) => (
             <li
               className="text-xs flex items-center justify-between px-2  font-semibold cursor-pointer hover:bg-[#eaeaea] py-1 rounded-lg "
@@ -102,7 +103,12 @@ function UserMessages({ contacts, groups }) {
               key={"contact" + i}
             >
               <span className="flex items-center">
-                <img src={`${import.meta.env.VITE_URL}/public/users/${contact.photo}`} className="mr-1 w-7 h-7 rounded-full"  />
+                <img
+                  src={`${import.meta.env.VITE_URL}/public/users/${
+                    contact.photo
+                  }`}
+                  className="mr-1 w-[45px] h-[45px] sm:w-7 sm:h-7 rounded-full"
+                />
                 {contact?.name}
               </span>
               <div className="bg-blue-500 min-w-3 max-w-fit rounded-full leading-3 text-center text-white font-nunito text-[7px]">
@@ -122,7 +128,7 @@ function UserMessages({ contacts, groups }) {
                   }
                 >
                   <span className="flex items-center">
-                    <RiGroup2Fill size={33} className="mr-1"  />
+                    <RiGroup2Fill size={53} className="mr-1" />
                     {group?.name}
                   </span>
                   <div className="bg-blue-500 min-w-3 max-w-fit rounded-full leading-3 text-center text-white font-nunito text-[7px]">

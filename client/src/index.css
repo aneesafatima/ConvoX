@@ -92,3 +92,9 @@ border-radius: 50%;
 .p-button-label{
   display:none;
 }
+#photo-message{
+  cursor: pointer !important;
+}
+#message:hover #delete-chat, #delete-chat:hover{
+ opacity: 1;
+}
