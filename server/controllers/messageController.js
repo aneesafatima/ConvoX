@@ -84,3 +84,14 @@ exports.resizeUploadedPhoto = catchAsync(async (req, res, next) => {
 });
 
 exports.sendPhotoAsChat = upload.single("photo-message");
+exports.deleteMessage = catchAsync(async (req, res, next) => {
+  const { messageId } = req.params;
+  console.log(messageId)
+  await Message.findByIdAndUpdate(messageId, {
+    message: "This message was deleted",
+    deleted: true
+  });
+  res.status(200).json({
+    status: "success",
+  });
+})

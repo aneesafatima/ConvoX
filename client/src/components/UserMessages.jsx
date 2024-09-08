@@ -17,7 +17,6 @@ function UserMessages({ contacts, groups }) {
     currentUser,
     setSelectedChat,
     setFetchUsers,
-
     unreadMessages,
     setShowGroupSettings,
   } = useContext(GlobalState);

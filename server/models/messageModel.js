@@ -11,12 +11,20 @@ const MessageSchema = new mongoose.Schema({
     type: Date,
     default: () => new Date(),
   },
-  isPhoto: { type: Boolean, default: false },
+  type: {
+    type: String,
+    enum: ["photo", "file", "text"],
+  },
   isGroupMessage: {
     type: Boolean,
     default: false,
   },
   groupId: { type: mongoose.Schema.Types.ObjectId, ref: "Group" },
+  deleted: {
+    type: Boolean,
+    default: false,
+  },
+
   deletedBy: [
     {
       type: mongoose.Schema.Types.ObjectId,

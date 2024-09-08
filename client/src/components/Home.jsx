@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from "react";
+import React, { useEffect, useContext, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import axios from "axios";
 import { Chats, ErrComponent, UserMessages, GroupSettings } from ".";
@@ -9,13 +9,16 @@ import { showAlert } from "../utils/showAlert";
 function Home() {
   //add group name change functionality
   //add loader
+  //fix profiles icons alignment
+  //add send file feature
+  //refactor
+
   const {
     giveAccess,
     seTGiveAccess,
     setCurrentUser,
     selectedChat,
     refetch,
-    setRefetch,
     setShowErr,
     showErr,
     currentUser,
@@ -28,16 +31,21 @@ function Home() {
     showGroupSettings,
     fetchUsers,
     setFetchUsers,
-  setUnreadMessages,
-  
+    setRefetch,
+    setUnreadMessages,
   } = useContext(GlobalState);
+  // Ref to track the current selectedChat
+  const selectedChatRef = useRef(selectedChat);
 
-  const [isConnected, setIsConnected] = useState(false);
   const [contacts, setContacts] = useState([]);
   const [groups, setGroups] = useState([]);
 
   useEffect(() => {
-    if (isConnected && currentUser && !socket) {
+    selectedChatRef.current = selectedChat;
+  }, [selectedChat]);
+
+  useEffect(() => {
+    if (currentUser && !socket) {
       setSocket(
         io(`${import.meta.env.VITE_URL}`, {
           query: {
@@ -46,45 +54,64 @@ function Home() {
           withCredentials: true,
         })
       );
-      setIsConnected(false);
     }
   }, [currentUser]);
 
   useEffect(() => {
-    if (refetch) {
-      async function fetchData() {
-        try {
-          const res = await axios.get(`${import.meta.env.VITE_URL}/api/home`, {
-            withCredentials: true,
-          });
-
-          if (res.data?.status === "success") {
-            seTGiveAccess(true);
-            setCurrentUser(res.data.user);
-            setIsConnected(true);
-            setShowErr(false);
-            setUnreadMessages(res.data.user.unreadMessages);
-          }
-        } catch (err) {
-          setShowErr({ status: true, message: err.message });
+    async function fetchData() {
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_URL}/api/home`, {
+          withCredentials: true,
+        });
+        if (res.data?.status === "success") {
+          seTGiveAccess(true);
+          setCurrentUser(res.data.user);
+     
+          setRefetch(false);
+          setUnreadMessages(res.data.user.unreadMessages);
         }
-        setRefetch(false);
+      } catch (err) {
+        setShowErr({ status: true, message: err.message });
       }
-      fetchData();
     }
-  }, [refetch]);
+    fetchData();
+  }, []);
 
   useEffect(() => {
-    if (socket && currentUser) {
+    if (socket) {
       socket.on("connect", () => {
         console.log("Connected to the server with id : ", socket.id);
-        socket.on("new-message", () => {
-       
-          setFetchMessages(true);
+        socket.on("new-message", (sender) => {
+        
+          if (!selectedChatRef.current || selectedChatRef.current.info._id !== sender) {
+            console.log("sender", sender);
+            socket.emit("unread-message", {
+              sender,
+              receiver: currentUser._id,
+            });
+            setUnreadMessages((prev) => {
+              const existingIndex = prev.findIndex(
+                (item) => item.from === sender
+              );
+              console.log("existing Index", existingIndex);
+              if (existingIndex !== -1) {
+                const updatedUnreadMessages = [...prev];
+                console.log(
+                  "existing count : :",
+                  updatedUnreadMessages[existingIndex].count
+                );
+                updatedUnreadMessages[existingIndex].count += 1;
+                console.log(
+                  "updated count : :",
+                  updatedUnreadMessages[existingIndex].count
+                );
+                return updatedUnreadMessages;
+              } else return [...prev, { from: sender, count: 1 }];
+            });
+          } else setFetchMessages(true);
         });
 
         socket.on("added-to-group", ({ userName, groupId, groupName }) => {
-         
           showAlert(`${userName} added you to the group ${groupName}`, "home");
           socket.emit("join-room", { roomId: groupId });
           setFetchUserChats(true);
@@ -94,13 +121,13 @@ function Home() {
           showAlert(`${user} added you as a contact`, "home");
           setFetchUserChats(true);
         });
-        socket.on("removed-from-group", ( groupName) => {
+        socket.on("removed-from-group", (groupName) => {
           showAlert(
             `You have been removed from the group ${groupName}`,
             "home"
           );
         });
-        socket.on("group-deleted", (groupId) => {
+        socket.on("group-deleted", () => {
           setFetchUserChats(true);
         });
       });
@@ -158,7 +185,11 @@ function Home() {
     giveAccess &&
     !refetch && (
       <div className="w-screen flex " id="home">
-        <div className={`w-svw xs:w-[300px] ${selectedChat && window.innerWidth <=540 ? "hidden" : null}`}>
+        <div
+          className={`w-svw xs:w-[300px] ${
+            selectedChat && window.innerWidth <= 540 ? "hidden" : null
+          }`}
+        >
           <UserMessages contacts={contacts} groups={groups} />
           <SelectUser contacts={contacts} />
         </div>
@@ -170,4 +201,3 @@ function Home() {
 }
 
 export default Home;
-

@@ -14,7 +14,7 @@ const notificationRouter = require("./routes/notificationRouter");
 const Notification = require("./models/notificationModel");
 const errorController = require("./controllers/errorController");
 const User = require("./models/userModel");
-const path = require("path")
+const path = require("path");
 
 const groupRouter = require("./routes/groupRouter");
 dotenv.config({ path: "./.env" });
@@ -40,12 +40,12 @@ app.use(
     } // Allows credentials (cookies) to be sent
   )
 );
-app.use((req,res,next) => {console.log(req.url); next()})
+
 app.use(express.json());
 app.use(cookieParser());
 // Middleware to parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/public', express.static(path.join(__dirname, 'public/img')));
+app.use("/public", express.static(path.join(__dirname, "public/img")));
 app.use("/api/users", userRouter);
 app.use("/api/home", homeRouter);
 app.use("/api/messages", messageRouter);
@@ -74,6 +74,25 @@ mongoose
     process.exit(1); //appication halting with an error
   });
 const connectedUsers = [];
+
+const unreadMessages = async (sender, receiver) => {
+  const receiverData = await User.findById(receiver).select("unreadMessages");
+
+  if (!receiverData.unreadMessages.find((el) => el.from?.toString() === sender))
+    await User.findByIdAndUpdate(receiver, {
+      $push: { unreadMessages: { from: sender, count: 1 } },
+    });
+  else
+    await User.findOneAndUpdate(
+      { _id: receiver, "unreadMessages.from": sender },
+      { $inc: { "unreadMessages.$.count": 1 } }
+    );
+};
+
+
+
+
+
 io.on("connection", async (socket) => {
   console.log("Connected to the server with id : ", socket.id);
   socket.broadcast.emit("new-connection");
@@ -87,42 +106,31 @@ io.on("connection", async (socket) => {
 
   connectedUsers.push({ userId, socketId: socket.id });
 
+  socket.on("unread-message", ({ sender, receiver }) => {
+    console.log("active but tab is not opened")
+    unreadMessages(sender, receiver);
+  });
+
   socket.on("send-message", async (data) => {
-  
     if (data.type === "individual") {
       await Message.create({
         sender: userId,
         receiver: data.to,
         message: data.message,
-        isPhoto: data.isPhoto,
+        type: data.format,
       });
 
       const receiver = connectedUsers.find((user) => user.userId === data.to);
       if (receiver) {
-        socket.to(receiver.socketId).emit("new-message");
-      } else {
-        const receiverUser = await User.findById(data.to);
-        if (
-          receiverUser.unreadMessages?.find(
-            (el) => el.from.toString() === userId
-          )
-        ) {
-          await User.updateOne(
-            { _id: data.to, "unreadMessages.from": userId }, //return a user document
-            { $inc: { "unreadMessages.$.count": 1 } } // the $ refers to that object inside the unreadMessage that satified the criteria
-          );
-        } else
-          await User.findByIdAndUpdate(data.to, {
-            $push: { unreadMessages: { from: userId, count: 1 } },
-          });
-      }
-    } else {
+        socket.to(receiver.socketId).emit("new-message", userId);
+      } else {unreadMessages(userId, data.to); console.log("inactive");};
+    } else if (data.type === "group") {
       await Message.create({
         sender: userId,
         groupId: data.to,
         message: data.message,
         isGroupMessage: true,
-        isPhoto: data.isPhoto,
+        type: data.format,
       });
       const groupMemberIds = await User.find({ groupIds: data.to }).select(
         "_id unreadMessages"
@@ -134,18 +142,10 @@ io.on("connection", async (socket) => {
       );
 
       disconnectedUsers?.forEach(async (user) => {
-        if (user.unreadMessages?.find((el) => el.from.toString() === data.to)) {
-          await User.updateOne(
-            { _id: user._id, "unreadMessages.from": data.to },
-            { $inc: { "unreadMessages.$.count": 1 } }
-          );
-        } else
-          await User.findByIdAndUpdate(user._id, {
-            $push: { unreadMessages: { from: data.to, count: 1 } },
-          });
+        unreadMessages(data.to, user._id);
       });
 
-      socket.to(data.to).emit("new-message");
+      socket.to(data.to).emit("new-message", data.to);
     }
   });
 

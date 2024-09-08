@@ -116,6 +116,7 @@ function Chats() {
         message: input,
         to: selectedChat.info._id,
         type: selectedChat.type,
+        format: "text",
       });
       setMessages((prev) => [
         ...prev,
@@ -212,7 +213,7 @@ function Chats() {
         message: res.data.imageUrl,
         to: selectedChat.info._id,
         type: selectedChat.type,
-        type: "photo",
+        format: "photo",
       });
       setMessages((prev) => [
         ...prev,
@@ -313,7 +314,7 @@ function Chats() {
             className="p-4 px-10 space-y-6 flex flex-col text-sm font-nunito font-medium h-full overflow-auto"
             id="scroll-container"
           >
-            {messages?.map((message) =>
+            {messages?.map((message,i) =>
               message?.deletedBy?.includes(currentUser._id) ? null : (
                 <li
                   className={`text-sm flex flex-col relative ${
@@ -321,7 +322,7 @@ function Chats() {
                       ? "self-end"
                       : "self-start "
                   } `}
-                  id="message"
+                  id="message" key={i}
                 >
                   {" "}
                   {message.type === "photo" && !message.deleted ? (

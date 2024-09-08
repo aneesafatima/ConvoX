@@ -15,7 +15,7 @@ export function GlobalProvider({ children }) {
   const [fetchUserChats, setFetchUserChats] = useState(true);
   const [allUsers, setAllUsers] = useState();
   const [userContacts, setUserContacts] = useState();
-  const [selectedChat, setSelectedChat] = useState(null);
+  const [selectedChat, setSelectedChat] = useState();
   const [messages, setMessages] = useState([]);
   const [socket, setSocket] = useState(undefined);
   const [fetchMessages, setFetchMessages] = useState(false);
@@ -75,7 +75,7 @@ export function GlobalProvider({ children }) {
         setUnreadMessages,
         groupMembers,
         setGroupMembers,
-        searchedUsers,
+       
      
       }}
     >
