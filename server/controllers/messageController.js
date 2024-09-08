@@ -69,6 +69,7 @@ const upload = multer({
   storage,
   fileFilter: multerFilter,
 });
+exports.sendPhotoAsChat = upload.single("photo-message");
 exports.resizeUploadedPhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
   req.file.filename = `chat-${req.user._id}-${Date.now()}.jpeg`;
@@ -79,19 +80,22 @@ exports.resizeUploadedPhoto = catchAsync(async (req, res, next) => {
     .toFile(`public/img/chats/${req.file.filename}`);
   res.status(200).json({
     status: "success",
-    imageUrl: req.file.filename,
+    file: req.file.filename,
   });
 });
 
-exports.sendPhotoAsChat = upload.single("photo-message");
 exports.deleteMessage = catchAsync(async (req, res, next) => {
   const { messageId } = req.params;
-  console.log(messageId)
+  console.log(messageId);
   await Message.findByIdAndUpdate(messageId, {
     message: "This message was deleted",
-    deleted: true
+    deleted: true,
   });
   res.status(200).json({
     status: "success",
   });
-})
+});
+
+exports.uploadFile = () => {
+  
+}

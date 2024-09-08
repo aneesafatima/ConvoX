@@ -11,7 +11,7 @@ const MessageSchema = new mongoose.Schema({
     type: Date,
     default: () => new Date(),
   },
-  type: {
+  format: {
     type: String,
     enum: ["photo", "file", "text"],
   },

@@ -45,7 +45,7 @@ app.use(express.json());
 app.use(cookieParser());
 // Middleware to parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use("/public", express.static(path.join(__dirname, "public/img")));
+app.use("/public", express.static(path.join(__dirname, "public")));
 app.use("/api/users", userRouter);
 app.use("/api/home", homeRouter);
 app.use("/api/messages", messageRouter);
@@ -117,7 +117,7 @@ io.on("connection", async (socket) => {
         sender: userId,
         receiver: data.to,
         message: data.message,
-        type: data.format,
+        format: data.format,
       });
 
       const receiver = connectedUsers.find((user) => user.userId === data.to);
@@ -130,7 +130,7 @@ io.on("connection", async (socket) => {
         groupId: data.to,
         message: data.message,
         isGroupMessage: true,
-        type: data.format,
+        format: data.format,
       });
       const groupMemberIds = await User.find({ groupIds: data.to }).select(
         "_id unreadMessages"

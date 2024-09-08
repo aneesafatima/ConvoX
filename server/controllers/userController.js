@@ -34,7 +34,6 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
     photo: req.file.filename,
   });
   const photo =  path.join(__dirname, `../public/img/users/${user.photo}`);  
-  console.log(photo);
   if(fs.existsSync(photo) && user.photo !== "default.png")
     fs.unlinkSync(photo);
   res.status(200).json({

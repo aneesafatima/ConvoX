@@ -4,16 +4,29 @@ import axios from "axios";
 import { ImExit } from "react-icons/im";
 import { showAlert } from "../utils/showAlert";
 import { IoMdSettings } from "react-icons/io";
-import { MdDeleteForever } from "react-icons/md";
 import { ReactTooltip } from ".";
 import { getFormattedDate } from "../utils/helpers";
 import { HiUserRemove } from "react-icons/hi";
 import { IoSend } from "react-icons/io5";
-import { MdInsertPhoto } from "react-icons/md";
-import { MdDelete } from "react-icons/md";
+import { MdInsertPhoto, MdDelete, MdDeleteForever } from "react-icons/md";
+import {
+  BsFillFileEarmarkPdfFill,
+  BsFileEarmarkWordFill,
+} from "react-icons/bs";
+import { FaFileAudio, FaFileVideo } from "react-icons/fa6";
 import { SiFiles } from "react-icons/si";
+import { GoDownload } from "react-icons/go";
 
 function Chats() {
+  const filesIcons = {
+    pdf: <BsFillFileEarmarkPdfFill size={50} color="#E94F4F" />,
+    "vnd.openxmlformats-officedocument.wordprocessingml.document": (
+      <BsFileEarmarkWordFill size={50} color="#2B579A" />
+    ),
+    mp3: <FaFileAudio size={50} color="#1DB954" />,
+    mp4: <FaFileVideo size={50} color="#4DB6AC" />,
+  };
+
   const {
     selectedChat,
     socket,
@@ -116,7 +129,6 @@ function Chats() {
         message: input,
         to: selectedChat.info._id,
         type: selectedChat.type,
-        format: "text",
       });
       setMessages((prev) => [
         ...prev,
@@ -195,38 +207,48 @@ function Chats() {
     }
   };
 
-  const handlePhotoUpload = async () => {
-    const photo = document.getElementById("photo-message").files[0];
+  const handleFileUpload = async (id, name) => {
+    console.log("id :", id, "name :", name);
+    const file = document.getElementById(id).files[0];
+
     const form = new FormData();
-    form.append("photo-message", photo);
-    const res = await axios({
-      url: `${import.meta.env.VITE_URL}/api/messages/send-photo-message`,
-      method: "POST",
-      data: form,
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-      withCredentials: true,
-    });
-    if (res.data?.status === "success") {
-      socket.emit("send-message", {
-        message: res.data.imageUrl,
-        to: selectedChat.info._id,
-        type: selectedChat.type,
-        format: "photo",
-      });
-      setMessages((prev) => [
-        ...prev,
-        {
-          message: res.data.imageUrl,
-          sender: currentUser._id,
-          receiver: selectedChat.info._id,
-          timestamp: Date.now(),
-          type: "photo",
+    form.append(name, file);
+    try {
+      const res = await axios({
+        url: `${import.meta.env.VITE_URL}/api/messages/${
+          name === "photo-upload" ? "send-photo-message" : "file-upload"
+        }`,
+        method: "POST",
+        data: form,
+        headers: {
+          "Content-Type": "multipart/form-data",
         },
-      ]);
+        withCredentials: true,
+      });
+      if (res.data?.status === "success") {
+        console.log(res.data);
+        socket.emit("send-message", {
+          message: res.data.file,
+          to: selectedChat.info._id,
+          type: selectedChat.type,
+          format: name === "photo-upload" ? "photo" : "file",
+        });
+        setMessages((prev) => [
+          ...prev,
+          {
+            message: res.data.file,
+            sender: currentUser._id,
+            receiver: selectedChat.info._id,
+            timestamp: Date.now(),
+            format: name === "photo-upload" ? "photo" : "file",
+          },
+        ]);
+      }
+    } catch (err) {
+      console.log(err.reponse);
     }
   };
+
   const handleDeleteMessage = async (messageId) => {
     try {
       const res = await axios.patch(
@@ -314,7 +336,7 @@ function Chats() {
             className="p-4 px-10 space-y-6 flex flex-col text-sm font-nunito font-medium h-full overflow-auto"
             id="scroll-container"
           >
-            {messages?.map((message,i) =>
+            {messages?.map((message, i) =>
               message?.deletedBy?.includes(currentUser._id) ? null : (
                 <li
                   className={`text-sm flex flex-col relative ${
@@ -322,17 +344,37 @@ function Chats() {
                       ? "self-end"
                       : "self-start "
                   } `}
-                  id="message" key={i}
+                  id="message"
+                  key={i}
                 >
                   {" "}
-                  {message.type === "photo" && !message.deleted ? (
+                  {message.format === "photo" && !message.deleted ? (
                     <img
-                      src={`${import.meta.env.VITE_URL}/public/chats/${
+                      src={`${import.meta.env.VITE_URL}/public/img/chats/${
                         message.message
                       }`}
                       alt="photo"
                       className="h-32 sm:h-60"
                     />
+                  ) : message.format === "file" && !message.deleted ? (
+                    <div className="flex items-center">
+                     
+                     { filesIcons[message.message.substring(message.message.indexOf('.')+1)]}
+                     <span>
+                     <span className="text-[8px] font-nunito font-semibold">{message.message}</span>
+                      <a
+                        href={`${
+                          import.meta.env.VITE_URL
+                        }/public/file-uploads/${message.message}`}
+                        downlaod
+                        target="_blank"
+                      >
+                        <GoDownload />
+                      </a>
+                  
+                     </span>
+                      
+                    </div>
                   ) : (
                     <span
                       className={`pointer-events-none 
@@ -398,7 +440,9 @@ function Chats() {
                 accept="image/*"
                 name="photo-upload"
                 className="w-full h-full opacity-0 absolute  "
-                onChange={handlePhotoUpload}
+                onChange={() =>
+                  handleFileUpload("photo-message", "photo-upload")
+                }
                 id="photo-message"
               />
 
@@ -410,11 +454,11 @@ function Chats() {
             <div className=" w-5 h-6 relative cursor-pointer">
               <input
                 type="file"
-                accept="image/*"
-                name="photo-upload"
+                accept=".doc,.docx,.pdf,.mp4,.mp3"
+                name="file-upload"
                 className="w-full h-full opacity-0 absolute  "
-                onChange={handlePhotoUpload}
-                id="photo-message"
+                onChange={() => handleFileUpload("file-message", "file-upload")}
+                id="file-message"
               />
 
               <SiFiles

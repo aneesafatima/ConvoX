@@ -8,9 +8,9 @@ import { showAlert } from "../utils/showAlert";
 
 function Home() {
   //add group name change functionality
+  //change the way uploaded files ae stored (their names)
   //add loader
   //fix profiles icons alignment
-  //add send file feature
   //refactor
 
   const {
@@ -34,6 +34,7 @@ function Home() {
     setRefetch,
     setUnreadMessages,
   } = useContext(GlobalState);
+  
   // Ref to track the current selectedChat
   const selectedChatRef = useRef(selectedChat);
 

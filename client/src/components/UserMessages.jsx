@@ -58,7 +58,7 @@ function UserMessages({ contacts, groups }) {
         <span className="flex items-center space-x-2">
           <div className="w-14 h-14 xs:w-12 xs:h-12  my-3 relative rounded-full ml-1">
             <img
-              src={`${import.meta.env.VITE_URL}/public/users/${imageUrl}`}
+              src={`${import.meta.env.VITE_URL}/public/img/users/${imageUrl}`}
               alt="user profile photo"
               className=" rounded-full"
             />
@@ -103,10 +103,10 @@ function UserMessages({ contacts, groups }) {
             >
               <span className="flex items-center">
                 <img
-                  src={`${import.meta.env.VITE_URL}/public/users/${
+                  src={`${import.meta.env.VITE_URL}/public/img/users/${
                     contact.photo
                   }`}
-                  className="mr-1 w-[45px] h-[45px] sm:w-7 sm:h-7 rounded-full"
+                  className="mr-1 w-[46px] h-[46px] rounded-full"
                 />
                 {contact?.name}
               </span>
