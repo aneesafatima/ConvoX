@@ -89,10 +89,6 @@ const unreadMessages = async (sender, receiver) => {
     );
 };
 
-
-
-
-
 io.on("connection", async (socket) => {
   console.log("Connected to the server with id : ", socket.id);
   socket.broadcast.emit("new-connection");
@@ -107,23 +103,28 @@ io.on("connection", async (socket) => {
   connectedUsers.push({ userId, socketId: socket.id });
 
   socket.on("unread-message", ({ sender, receiver }) => {
-    console.log("active but tab is not opened")
+    console.log("active but tab is not opened");
     unreadMessages(sender, receiver);
   });
 
   socket.on("send-message", async (data) => {
+    console.log(data);
     if (data.type === "individual") {
       await Message.create({
         sender: userId,
         receiver: data.to,
         message: data.message,
         format: data.format,
+        replyingToMessage: data.replyingMessage,
       });
 
       const receiver = connectedUsers.find((user) => user.userId === data.to);
       if (receiver) {
         socket.to(receiver.socketId).emit("new-message", userId);
-      } else {unreadMessages(userId, data.to); console.log("inactive");};
+      } else {
+        unreadMessages(userId, data.to);
+        console.log("inactive");
+      }
     } else if (data.type === "group") {
       await Message.create({
         sender: userId,
@@ -131,6 +132,7 @@ io.on("connection", async (socket) => {
         message: data.message,
         isGroupMessage: true,
         format: data.format,
+        replyingToMessage: data.replyingMessage,
       });
       const groupMemberIds = await User.find({ groupIds: data.to }).select(
         "_id unreadMessages"

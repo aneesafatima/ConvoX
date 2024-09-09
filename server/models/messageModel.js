@@ -7,6 +7,7 @@ const MessageSchema = new mongoose.Schema({
     type: String,
     required: [true, "Message is required"],
   },
+  replyingToMessage: String,
   timestamp: {
     type: Date,
     default: () => new Date(),
