@@ -7,9 +7,9 @@ import { GlobalState } from "./context/GlobalState";
 
 function App() {
   const location = useLocation();
-  const { giveAccess, refetch } = useContext(GlobalState);
+  const { giveAccess, fetch } = useContext(GlobalState);
 
-  if (!giveAccess && location.pathname === "/home" && !refetch)
+  if (!giveAccess && location.pathname === "/home" && !fetch)
     return (
       <NotFound
         code="400 - Bad Request"
@@ -18,6 +18,7 @@ function App() {
         message="You are not logged in. Please log in to access the dashboard."
       />
     );
+    
 
   return (
     <div

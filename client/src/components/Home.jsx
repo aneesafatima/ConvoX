@@ -8,11 +8,13 @@ import { showAlert } from "../utils/showAlert";
 
 function Home() {
   //add group name change functionality
-  //change the way uploaded files ae stored (their names)
+  //fix connect bug + unread messages bug
+  //add reply functionality
   //add loader
   //fix profiles icons alignment
   //refactor
-
+  //improve error handlimg + cookies tag
+ 
   const {
     giveAccess,
     seTGiveAccess,
@@ -31,10 +33,10 @@ function Home() {
     showGroupSettings,
     fetchUsers,
     setFetchUsers,
-    setRefetch,
+    setFetch,
     setUnreadMessages,
   } = useContext(GlobalState);
-  
+
   // Ref to track the current selectedChat
   const selectedChatRef = useRef(selectedChat);
 
@@ -67,8 +69,8 @@ function Home() {
         if (res.data?.status === "success") {
           seTGiveAccess(true);
           setCurrentUser(res.data.user);
-     
-          setRefetch(false);
+
+          setFetch(false);
           setUnreadMessages(res.data.user.unreadMessages);
         }
       } catch (err) {
@@ -83,8 +85,10 @@ function Home() {
       socket.on("connect", () => {
         console.log("Connected to the server with id : ", socket.id);
         socket.on("new-message", (sender) => {
-        
-          if (!selectedChatRef.current || selectedChatRef.current.info._id !== sender) {
+          if (
+            !selectedChatRef.current ||
+            selectedChatRef.current.info._id !== sender
+          ) {
             console.log("sender", sender);
             socket.emit("unread-message", {
               sender,
@@ -94,18 +98,10 @@ function Home() {
               const existingIndex = prev.findIndex(
                 (item) => item.from === sender
               );
-              console.log("existing Index", existingIndex);
+
               if (existingIndex !== -1) {
                 const updatedUnreadMessages = [...prev];
-                console.log(
-                  "existing count : :",
-                  updatedUnreadMessages[existingIndex].count
-                );
                 updatedUnreadMessages[existingIndex].count += 1;
-                console.log(
-                  "updated count : :",
-                  updatedUnreadMessages[existingIndex].count
-                );
                 return updatedUnreadMessages;
               } else return [...prev, { from: sender, count: 1 }];
             });

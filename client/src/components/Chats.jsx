@@ -19,12 +19,12 @@ import { GoDownload } from "react-icons/go";
 
 function Chats() {
   const filesIcons = {
-    pdf: <BsFillFileEarmarkPdfFill size={50} color="#E94F4F" />,
+    pdf: <BsFillFileEarmarkPdfFill size={70} color="#E94F4F" />,
     "vnd.openxmlformats-officedocument.wordprocessingml.document": (
-      <BsFileEarmarkWordFill size={50} color="#2B579A" />
+      <BsFileEarmarkWordFill size={70} color="#2B579A" />
     ),
-    mp3: <FaFileAudio size={50} color="#1DB954" />,
-    mp4: <FaFileVideo size={50} color="#4DB6AC" />,
+    mp3: <FaFileAudio size={70} color="#1DB954" />,
+    mp4: <FaFileVideo size={70} color="#4DB6AC" />,
   };
 
   const {
@@ -79,6 +79,7 @@ function Chats() {
             if (scrollContainer)
               scrollContainer.scrollTop = scrollContainer.scrollHeight;
           }, 100);
+          console.log(res.data.messages);
           setMessages(res.data.messages);
           setFetchMessages(false);
 
@@ -119,9 +120,13 @@ function Chats() {
         console.log(err);
       }
     };
-
+    console.log("Entered useEffect");
     if (selectedChat || fetchMessages) fetchData();
   }, [selectedChat, fetchMessages]);
+
+  useEffect(() => {
+    console.log(fetchMessages);
+  }, [fetchMessages]);
 
   const handeSendingMessage = () => {
     if (input !== "") {
@@ -130,6 +135,7 @@ function Chats() {
         to: selectedChat.info._id,
         type: selectedChat.type,
       });
+      setFetchMessages(true);
       setMessages((prev) => [
         ...prev,
         {
@@ -139,7 +145,7 @@ function Chats() {
           timestamp: Date.now(),
         },
       ]);
-      setFetchMessages(true);
+
       setInput("");
     }
   };
@@ -208,9 +214,8 @@ function Chats() {
   };
 
   const handleFileUpload = async (id, name) => {
-    console.log("id :", id, "name :", name);
     const file = document.getElementById(id).files[0];
-
+    console.log(file);
     const form = new FormData();
     form.append(name, file);
     try {
@@ -226,7 +231,6 @@ function Chats() {
         withCredentials: true,
       });
       if (res.data?.status === "success") {
-        console.log(res.data);
         socket.emit("send-message", {
           message: res.data.file,
           to: selectedChat.info._id,
@@ -243,6 +247,7 @@ function Chats() {
             format: name === "photo-upload" ? "photo" : "file",
           },
         ]);
+        setFetchMessages(true);
       }
     } catch (err) {
       console.log(err.reponse);
@@ -358,22 +363,30 @@ function Chats() {
                     />
                   ) : message.format === "file" && !message.deleted ? (
                     <div className="flex items-center">
-                     
-                     { filesIcons[message.message.substring(message.message.indexOf('.')+1)]}
-                     <span>
-                     <span className="text-[8px] font-nunito font-semibold">{message.message}</span>
-                      <a
-                        href={`${
-                          import.meta.env.VITE_URL
-                        }/public/file-uploads/${message.message}`}
-                        downlaod
-                        target="_blank"
-                      >
-                        <GoDownload />
-                      </a>
-                  
-                     </span>
-                      
+                      {
+                        filesIcons[
+                          message.message.substring(
+                            message.message.indexOf(".") + 1
+                          )
+                        ]
+                      }
+                      <span>
+                        <span className="text-[8px] font-nunito font-semibold text-wrap block w-28">
+                          {message.message.substring(
+                            0,
+                            message.message.lastIndexOf("-")
+                          )}
+                        </span>
+                        <a
+                          href={`${
+                            import.meta.env.VITE_URL
+                          }/public/file-uploads/${message.message}`}
+                          downlaod
+                          target="_blank"
+                        >
+                          <GoDownload />
+                        </a>
+                      </span>
                     </div>
                   ) : (
                     <span

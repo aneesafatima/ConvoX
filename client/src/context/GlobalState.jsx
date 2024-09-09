@@ -8,7 +8,7 @@ export function GlobalProvider({ children }) {
   const [errMessage, setErrMessage] = useState("");
   const [giveAccess, seTGiveAccess] = useState(false);
   const [currentUser, setCurrentUser] = useState();
-  const [refetch, setRefetch] = useState(true);
+  const [fetch, setFetch] = useState(true);
   const [passwordDetails, setPasswordDetails] = useState({});
   const [showLoader, setShowLoader] = useState(false);
   const [showErr, setShowErr] = useState(false);
@@ -25,8 +25,6 @@ export function GlobalProvider({ children }) {
   const [fetchUsers, setFetchUsers] = useState(true);
   const [unreadMessages, setUnreadMessages] = useState();
   const [groupMembers, setGroupMembers] = useState();
-  const [searchedUsers, setSearchedUser] = useState();
-
 
   return (
     <GlobalState.Provider
@@ -37,8 +35,8 @@ export function GlobalProvider({ children }) {
         setErrMessage,
         currentUser,
         setCurrentUser,
-        refetch,
-        setRefetch,
+        fetch,
+        setFetch,
         authStatus,
         setAuthStatus,
         userDetails,
@@ -75,8 +73,6 @@ export function GlobalProvider({ children }) {
         setUnreadMessages,
         groupMembers,
         setGroupMembers,
-       
-     
       }}
     >
       {children}

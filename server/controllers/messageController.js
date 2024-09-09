@@ -69,7 +69,7 @@ const upload = multer({
   storage,
   fileFilter: multerFilter,
 });
-exports.sendPhotoAsChat = upload.single("photo-message");
+exports.sendPhotoAsChat = upload.single("photo-upload");
 exports.resizeUploadedPhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
   req.file.filename = `chat-${req.user._id}-${Date.now()}.jpeg`;

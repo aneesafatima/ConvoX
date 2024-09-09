@@ -1,5 +1,6 @@
 const express = require("express");
 const multer = require("multer");
+const uuid = require("uuid");
 const ErrorHandler = require("../utils/errorHandler");
 const { protect } = require("../controllers/authController");
 const {
@@ -21,7 +22,7 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     console.log(file)
     const ext = file.mimetype.split("/")[1];
-    cb(null, `${file.originalname}`);
+    cb(null, `${file.originalname.split(".")[0]}-${uuid.v1().replace(/-/g, "")}.${ext}`);
   },
 });
 
