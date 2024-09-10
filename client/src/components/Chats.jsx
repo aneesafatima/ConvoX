@@ -4,33 +4,13 @@ import axios from "axios";
 import { ImExit } from "react-icons/im";
 import { showAlert } from "../utils/showAlert";
 import { IoMdSettings } from "react-icons/io";
-import { ReactTooltip } from ".";
-import { getFormattedDate } from "../utils/helpers";
+import { Message, ReactTooltip, MessageInputBox } from ".";
+
 import { HiUserRemove } from "react-icons/hi";
-import { RxCross2 } from "react-icons/rx";
-import { IoSend } from "react-icons/io5";
-import { MdInsertPhoto, MdDelete, MdDeleteForever } from "react-icons/md";
-import {
-  BsFillFileEarmarkPdfFill,
-  BsFileEarmarkWordFill,
-} from "react-icons/bs";
-import { FaFileAudio, FaFileVideo, FaReply } from "react-icons/fa6";
-import { SiFiles } from "react-icons/si";
-import { GoDownload } from "react-icons/go";
 
 function Chats() {
-  const filesIcons = {
-    pdf: <BsFillFileEarmarkPdfFill size={70} color="#E94F4F" />,
-    "vnd.openxmlformats-officedocument.wordprocessingml.document": (
-      <BsFileEarmarkWordFill size={70} color="#2B579A" />
-    ),
-    mp3: <FaFileAudio size={70} color="#1DB954" />,
-    mp4: <FaFileVideo size={70} color="#4DB6AC" />,
-  };
-
   const {
     selectedChat,
-    socket,
     messages,
     setMessages,
     fetchMessages,
@@ -41,13 +21,10 @@ function Chats() {
     setShowGroupSettings,
     unreadMessages,
     setUnreadMessages,
-    groupMembers,
     setGroupMembers,
   } = useContext(GlobalState);
-  const [input, setInput] = useState("");
-  const [replyingMessage, setReplyingMessage] = useState(null);
 
-  useEffect(() => console.log(groupMembers), [groupMembers]);
+  const [replyingMessage, setReplyingMessage] = useState(null);
 
   useEffect(() => {
     if (selectedChat?.type === "group") {
@@ -122,37 +99,9 @@ function Chats() {
         console.log(err);
       }
     };
-    console.log("Entered useEffect");
+
     if (selectedChat || fetchMessages) fetchData();
   }, [selectedChat, fetchMessages]);
-
-  useEffect(() => {
-    console.log(fetchMessages);
-  }, [fetchMessages]);
-
-  const handeSendingMessage = () => {
-    if (input !== "") {
-      socket.emit("send-message", {
-        message: input,
-        to: selectedChat.info._id,
-        type: selectedChat.type,
-        replyingMessage,
-      });
-      setFetchMessages(true);
-      setMessages((prev) => [
-        ...prev,
-        {
-          message: input,
-          sender: currentUser._id,
-          receiver: selectedChat.info._id,
-          timestamp: Date.now(),
-          replyingMessage,
-        },
-      ]);
-      if (replyingMessage) setReplyingMessage(false);
-      setInput("");
-    }
-  };
 
   const handleGroupExit = async (userId, groupId) => {
     const res = await axios.post(
@@ -214,72 +163,6 @@ function Chats() {
       showAlert("Contact Removed Successfully", "home");
       setFetchUserChats(true);
       setSelectedChat(null);
-    }
-  };
-
-  const handleFileUpload = async (id, name) => {
-    const file = document.getElementById(id).files[0];
-    console.log(file);
-    const form = new FormData();
-    form.append(name, file);
-    try {
-      const res = await axios({
-        url: `${import.meta.env.VITE_URL}/api/messages/${
-          name === "photo-upload" ? "send-photo-message" : "file-upload"
-        }`,
-        method: "POST",
-        data: form,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        withCredentials: true,
-      });
-      if (res.data?.status === "success") {
-        socket.emit("send-message", {
-          message: res.data.file,
-          to: selectedChat.info._id,
-          type: selectedChat.type,
-          format: name === "photo-upload" ? "photo" : "file",
-          replyingMessage
-        });
-        setMessages((prev) => [
-          ...prev,
-          {
-            message: res.data.file,
-            sender: currentUser._id,
-            receiver: selectedChat.info._id,
-            timestamp: Date.now(),
-            format: name === "photo-upload" ? "photo" : "file",
-            replyingMessage 
-          },
-        ]);
-        setFetchMessages(true);
-        setReplyingMessage(false);
-      }
-    } catch (err) {
-      console.log(err.reponse);
-    }
-  };
-
-  const handleDeleteMessage = async (messageId) => {
-    try {
-      const res = await axios.patch(
-        `${import.meta.env.VITE_URL}/api/messages/delete-message/${messageId}`,
-        {},
-        { withCredentials: true }
-      );
-      if (res.data?.status === "success") {
-        const deletedMessageIndex = messages.findIndex(
-          (msg) => msg._id === messageId
-        );
-        const newMessages = [...messages];
-        newMessages[deletedMessageIndex].message = "This message was deleted";
-        newMessages[deletedMessageIndex].deleted = "true";
-
-        setMessages(newMessages);
-      }
-    } catch (err) {
-      console.log(err);
     }
   };
 
@@ -350,178 +233,18 @@ function Chats() {
           >
             {messages?.map((message, i) =>
               message?.deletedBy?.includes(currentUser._id) ? null : (
-                <li
-                  className={`text-sm flex flex-col relative ${
-                    message.sender === currentUser._id
-                      ? "self-end"
-                      : "self-start "
-                  } `}
-                  id="message"
+                <Message
                   key={i}
-                >
-                  {message.replyingToMessage && (
-                    <span className="font-nunito self-end w-fit p-1 px-2 py-2 sm:p-3 translate-y-1 z-10 text-xs sm:text-sm rounded-lg bg-[#e2e2e2] text-[#535353]">
-                      {message.replyingToMessage}
-                    </span>
-                  )}{" "}
-                  {message.format === "photo" && !message.deleted ? (
-                    <img
-                      src={`${import.meta.env.VITE_URL}/public/img/chats/${
-                        message.message
-                      }`}
-                      alt="photo"
-                      className="h-32 sm:h-60"
-                    />
-                  ) : message.format === "file" && !message.deleted ? (
-                    <div className="flex items-center">
-                      {
-                        filesIcons[
-                          message.message.substring(
-                            message.message.indexOf(".") + 1
-                          )
-                        ]
-                      }
-                      <span>
-                        <span className="text-[8px] font-nunito font-semibold text-wrap block w-28">
-                          {message.message.substring(
-                            0,
-                            message.message.lastIndexOf("-")
-                          )}
-                        </span>
-                        <a
-                          href={`${
-                            import.meta.env.VITE_URL
-                          }/public/file-uploads/${message.message}`}
-                          downlaod
-                          target="_blank"
-                        >
-                          <GoDownload />
-                        </a>
-                      </span>
-                    </div>
-                  ) : (
-                    <span
-                      className={`pointer-events-none z-30
-                        ${message.deleted ? "text-gray-500" : "text-[#333333]"}
-                        ${
-                          message.sender !== currentUser._id
-                            ? "bg-[#E8F5E9] self-start rounded-bl-none"
-                            : "bg-[#E0F7FA] self-end rounded-br-none"
-                        } p-1 px-2 py-2 sm:p-3 text-xs sm:text-sm rounded-lg`}
-                    >
-                      {message.message}
-                    </span>
-                  )}
-                  <span className="text-[10px] mt-[2px] pl-2 text-[#414141] font-nunito font-semibold flex justify-between items-center">
-                    <span>
-                      {message.sender !== currentUser._id
-                        ? message.isGroupMessage
-                          ? groupMembers?.find(
-                              (user) => user._id === message.sender
-                            ).name
-                          : selectedChat.info.name
-                        : null}{" "}
-                      <span className="mx-1 text-[#b2b2b2] text-[8px] ">
-                        {getFormattedDate(message.timestamp)}
-                      </span>
-                    </span>
-                    {message.sender === currentUser._id && !message.deleted && (
-                      <MdDelete
-                        color="#b2b2b2"
-                        className=" cursor-pointer"
-                        onClick={() => handleDeleteMessage(message._id)}
-                      />
-                    )}
-                  </span>
-                  <FaReply
-                    className="absolute bg-yellow-500 right-full cursor-pointer hover:opacity-100 "
-                    onClick={() =>
-                      setReplyingMessage(
-                        message.format === "photo"
-                          ? "photo"
-                          : message.format === "file"
-                          ? message.message.substring(
-                              0,
-                              message.message.lastIndexOf("-")
-                            )
-                          : message.message
-                      )
-                    }
-                  />
-                </li>
+                  message={message}
+                  setReplyingMessage={setReplyingMessage}
+                />
               )
             )}
           </ul>
-          <div className="sticky bottom-0  w-full  h-10  flex items-center mb-2 justify-center space-x-2 ">
-            {replyingMessage && (
-              <div className="absolute bottom-full flex flex-col font-nunito   bg-[#f7f7f7]  shadow-sm w-48 text-xs space-y-2 p-3 rounded-md mb-3 -translate-x-[32%] ">
-                <span className="flex items-center justify-between">
-                  <span className="flex items-center font-semibold">
-                    <FaReply size={13} className="mr-2  " />
-                    Replying
-                  </span>
-                  <RxCross2
-                    onClick={() => setReplyingMessage(false)}
-                    className="cursor-pointer"
-                  />
-                </span>
-                <span>{replyingMessage}</span>
-              </div>
-            )}
-
-            <input
-              type="text"
-              placeholder="type a message"
-              className={`w-[60%] bg-[#e1dfdf5c] h-8 px-3 sm:px-5 sm:py-5 rounded-full text-sm outline-0 border-0 font-nunito font-medium ${
-                selectedChat.type === "group" && !selectedChat.info.active
-                  ? "cursor-not-allowed"
-                  : null
-              }`}
-              id="message"
-              disabled={
-                selectedChat.type === "group" && !selectedChat.info.active
-              }
-              value={input}
-              onChange={(e) => setInput(e.target.value.trim())}
-            />
-            <IoSend
-              onClick={handeSendingMessage}
-              className="cursor-pointer"
-              color={input === "" ? "#333333" : "#3b82f6"}
-            />
-            <div className=" w-5 h-6 relative cursor-pointer">
-              <input
-                type="file"
-                accept="image/*"
-                name="photo-upload"
-                className="w-full h-full opacity-0 absolute  "
-                onChange={() =>
-                  handleFileUpload("photo-message", "photo-upload")
-                }
-                id="photo-message"
-              />
-
-              <MdInsertPhoto
-                className="cursor-pointer w-full h-full "
-                color="#333333"
-              />
-            </div>
-            <div className=" w-5 h-6 relative cursor-pointer">
-              <input
-                type="file"
-                accept=".doc,.docx,.pdf,.mp4,.mp3"
-                name="file-upload"
-                className="w-full h-full opacity-0 absolute  "
-                onChange={() => handleFileUpload("file-message", "file-upload")}
-                id="file-message"
-              />
-
-              <SiFiles
-                className="cursor-pointer w-full h-full "
-                color="#333333"
-              />
-            </div>
-          </div>
+          <MessageInputBox
+            replyingMessage={replyingMessage}
+            setReplyingMessage={setReplyingMessage}
+          />
         </div>
         <ReactTooltip
           className="tooltip"

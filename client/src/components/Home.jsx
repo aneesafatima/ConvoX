@@ -7,15 +7,7 @@ import SelectUser from "./SelectUser";
 import { showAlert } from "../utils/showAlert";
 
 function Home() {
-  //fix connect bug + unread messages bug
-  // profile
-  //add view images and file showing feature
-  //fix reply design
-  //add loader
-  //refactor
-  //add last messasge in chat
-  //improve error handlimg + cookies tag
-  //fix map async problem
+
   const {
     giveAccess,
     seTGiveAccess,

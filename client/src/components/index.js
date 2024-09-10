@@ -6,4 +6,6 @@ export { default as UserMessages } from "./UserMessages.jsx";
 export { default as Chats } from "./Chats.jsx";
 export { default as GroupSettings } from "./GroupSettings.jsx";
 export { default as Notification } from "./Notification.jsx";
+export { default as Message } from "./Message.jsx";
+export { default as MessageInputBox } from "./MessageInputBox.jsx";
 export { Tooltip as ReactTooltip } from "react-tooltip";

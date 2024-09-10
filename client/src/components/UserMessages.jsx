@@ -68,7 +68,7 @@ function UserMessages({ contacts, groups }) {
               name="profile-picture"
               url={`${
                 import.meta.env.VITE_URL
-              }/api/users/updateProfilePicture/${currentUser._id}`}
+              }/api/users/updateProfilePicture/${currentUser?._id}`}
               accept="image/*"
               className="absolute bottom-0 right-0  text-center"
               id="photo-upload"
