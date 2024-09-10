@@ -7,7 +7,8 @@ import { RxCross1 } from "react-icons/rx";
 import { GlobalState } from "../context/GlobalState";
 import { showAlert } from "../utils/showAlert";
 
-function SelectUser({contacts}) {
+function SelectUser({ contacts }) {
+  let userArray;
   const {
     allUsers,
     currentUser,
@@ -23,12 +24,13 @@ function SelectUser({contacts}) {
   } = useContext(GlobalState);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const userArray =
-    showUsers?.type === "addingGroupMembers"
-      ? allUsers.filter(
-          (user) => !groupMembers.find((member) => member._id === user._id)
-        )
-      : allUsers;
+  if (showUsers)
+    userArray =
+      showUsers?.type === "addingGroupMembers"
+        ? allUsers.filter(
+            (user) => !groupMembers.find((member) => member._id === user._id)
+          )
+        : allUsers;
 
   const handleUserSelction = async (selectedUser) => {
     if (isGroup) {
@@ -42,8 +44,11 @@ function SelectUser({contacts}) {
       });
     } else {
       setShowUsers(false);
-      if(contacts?.includes(selectedUser._id)){ showAlert("User already added", "home"); return ;}
-    showAlert("Adding user...", "home")
+      if (contacts?.includes(selectedUser._id)) {
+        showAlert("User already added", "home");
+        return;
+      }
+      showAlert("Adding user...", "home");
       const res = await axios.patch(
         `${import.meta.env.VITE_URL}/api/users/${
           showUsers?.type === "addingGroupMembers" ? "group" : "personal"
@@ -58,19 +63,22 @@ function SelectUser({contacts}) {
           withCredentials: true,
         }
       );
-     
+
       if (res.data?.status === "success") {
         if (showUsers.type === "addingGroupMembers") {
-        } else {
-          socket.emit("added-new-user", {
-            selectedUserId: selectedUser._id,
-            userName: currentUser.name,
-          });
-          setFetchUserChats(true);
+          setGroupMembers((prev) => [...prev, selectedUser]);
         }
-        document.querySelector('.alert').remove();
-       
-         showAlert("User added successfully", "home");
+        socket.emit("added-new-user", {
+          selectedUserId: selectedUser._id,
+          userName: currentUser.name,
+          groupId: selectedChat.info._id,
+          groupName: selectedChat.info.name,
+        });
+        setFetchUserChats(true);
+
+        document.querySelector(".alert").remove();
+
+        showAlert("User added successfully", "home");
       }
     }
   };
@@ -119,11 +127,14 @@ function SelectUser({contacts}) {
   };
   return (
     showUsers && (
-      <div className="bg-[#f7f7f7] shadow-md absolute overflow-auto  z-40 w-[300px] h-[350px]  xs:w-[400px] xs:h-[400px]  rounded-lg -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 pb-3 xs:py-4 px-5 xs:px-10 space-y-4">
+      <div className="bg-[#f7f7f7] shadow-md absolute overflow-auto  z-20 w-[300px] h-[350px]  xs:w-[400px] xs:h-[400px]  rounded-lg -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 pb-3 xs:py-4 px-5 xs:px-10 space-y-4">
         <RxCross1
           className="absolute right-6 top-6 cursor-pointer"
           size={10}
-          onClick={() =>{ setShowUsers(false); setIsGroup(false)}}
+          onClick={() => {
+            setShowUsers(false);
+            setIsGroup(false);
+          }}
         />
         <div className=" flex-col pt-6 space-y-3">
           <div className="flex">

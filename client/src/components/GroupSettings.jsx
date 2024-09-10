@@ -6,6 +6,7 @@ import { MdAddCircle } from "react-icons/md";
 import { AiFillDelete } from "react-icons/ai";
 import { showAlert } from "../utils/showAlert";
 import { RxCross1 } from "react-icons/rx";
+import { IoCheckboxSharp } from "react-icons/io5";
 import axios from "axios";
 import { ReactTooltip } from ".";
 function GroupSettings() {
@@ -21,6 +22,7 @@ function GroupSettings() {
     socket,
   } = useContext(GlobalState);
 
+  const [groupName, setGroupName] = useState(selectedChat?.info.name);
   const handleRemoveGroupMember = async (group, userId) => {
     try {
       const res = await axios.delete(
@@ -73,6 +75,29 @@ function GroupSettings() {
       });
   };
 
+  const handleGroupNameChange = async () => {
+    try {
+      const res = await axios.patch(
+        `${import.meta.env.VITE_URL}/api/groups/updateGroupName/${
+          selectedChat.info._id
+        }`,
+        { name: groupName },
+        {
+          withCredentials: true,
+        }
+      );
+      if (res.data.status === "success") {
+        showAlert("Group Name Updated Successfully", "home");
+        setFetchUserChats(true);
+        socket.emit("group-name-updated", {
+          groupId: selectedChat.info._id,
+        });
+      }
+    } catch (err) {
+      showAlert(err.response?.data.message, "home");
+    }
+  };
+
   return (
     <div className="absolute bg-[#f7f7f7] flex flex-col justify-between z-50 w-56 min-h-[35vh]  max-h-[80vh] overflow-auto rounded-lg  shadow-xl pt-2 pb-2 px-2  right-10 top-12">
       <RxCross1
@@ -81,16 +106,28 @@ function GroupSettings() {
         onClick={() => setShowGroupSettings(false)}
       />
       <div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 mt-2">
           <RiGroup2Fill size={70} />
-          <div className="flex flex-col">
-            <span className="font-lato font-semibold">
-              {selectedChat.info.name}
-            </span>
-            <span className="text-[10px] font-nunito">
-              {" "}
-              {selectedChat.info.description ?? "no description"}
-            </span>
+          <div className="flex flex-col ">
+       
+              <span className=" font-nunito flex items-center">
+                <input
+                  className="font-lato font-semibold w-32 bg-transparent focus:p-1 outline-1 outline-gray-500 focus:text-xs"
+                  id="group-name"
+                  value={groupName}
+                  onChange={(e) => setGroupName(e.target.value)}
+                  minLength={40}
+                />
+                <IoCheckboxSharp
+                  size={17}
+                  className="check m-1 hidden"
+                  onClick={handleGroupNameChange}
+                />
+              </span>
+
+              <span className="text-[10px]">
+                {selectedChat?.info.description ?? "no description"}
+              </span>
           </div>
         </div>
         <span className="font-lato text-xs text-[#282727] px-2">Members</span>
@@ -120,20 +157,9 @@ function GroupSettings() {
         </ul>
       </div>
       <div className="flex items-center justify-between mt-2">
-        <div className="text-[8px] flex flex-col h-fit text-[#a6a6a6] font-nunito">
-          <span>
-            created at{" "}
-            {new Date(selectedChat.info.createdAt).toLocaleDateString()}
-          </span>
-
-          <span>
-            by{" "}
-            {
-              groupMembers?.find(
-                (member) => member._id === selectedChat.info.admin
-              )?.name
-            }
-          </span>
+        <div className="text-[8px]  text-[#a6a6a6] font-nunito">
+          created at{" "}
+          {new Date(selectedChat.info.createdAt).toLocaleDateString()}
         </div>
 
         <div className="flex space-x-1">

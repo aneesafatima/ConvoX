@@ -7,14 +7,15 @@ import SelectUser from "./SelectUser";
 import { showAlert } from "../utils/showAlert";
 
 function Home() {
-  //add group name change functionality
   //fix connect bug + unread messages bug
-  //add reply functionality
+  // profile
+  //add view images and file showing feature
+  //fix reply design
   //add loader
-  //fix profiles icons alignment
   //refactor
+  //add last messasge in chat
   //improve error handlimg + cookies tag
- 
+  //fix map async problem
   const {
     giveAccess,
     seTGiveAccess,
@@ -35,6 +36,8 @@ function Home() {
     setFetchUsers,
     setFetch,
     setUnreadMessages,
+    setSelectedChat,
+    showUsers,
   } = useContext(GlobalState);
 
   // Ref to track the current selectedChat
@@ -69,7 +72,7 @@ function Home() {
         if (res.data?.status === "success") {
           seTGiveAccess(true);
           setCurrentUser(res.data.user);
-
+          console.log("currentUser", res.data.user);
           setFetch(false);
           setUnreadMessages(res.data.user.unreadMessages);
         }
@@ -124,9 +127,25 @@ function Home() {
             "home"
           );
         });
-        socket.on("group-deleted", () => {
+
+        socket.on("group-name-updated", () => {
+          console.log("group name updated");
           setFetchUserChats(true);
         });
+
+        socket.on("group-deleted", (groupId) => {
+          setFetchUserChats(true);
+          if (selectedChatRef.current?.info._id === groupId) {
+            setFetchMessages(true);
+            setSelectedChat(null);
+          }
+        });
+
+        socket.on("added-new-grp-member", (groupId) => {
+      
+          if(selectedChatRef.current?.info._id === groupId)
+          setSelectedChat(prev => {return {...prev}})
+        })
       });
 
       return () => {
@@ -135,6 +154,10 @@ function Home() {
       };
     }
   }, [socket]);
+
+  useEffect(() => {
+    console.log("showUsers", showUsers);
+  }, [showUsers]);
 
   useEffect(() => {
     if (fetchUserChats) {
@@ -188,8 +211,8 @@ function Home() {
           }`}
         >
           <UserMessages contacts={contacts} groups={groups} />
-          <SelectUser contacts={contacts} />
         </div>
+        <SelectUser contacts={contacts} />
         <Chats />
         {showGroupSettings && <GroupSettings />}
       </div>

@@ -81,7 +81,7 @@ function Chats() {
             if (scrollContainer)
               scrollContainer.scrollTop = scrollContainer.scrollHeight;
           }, 100);
-          console.log(res.data.messages);
+
           setMessages(res.data.messages);
           setFetchMessages(false);
 
@@ -136,7 +136,7 @@ function Chats() {
         message: input,
         to: selectedChat.info._id,
         type: selectedChat.type,
-        replyingMessage
+        replyingMessage,
       });
       setFetchMessages(true);
       setMessages((prev) => [
@@ -146,10 +146,10 @@ function Chats() {
           sender: currentUser._id,
           receiver: selectedChat.info._id,
           timestamp: Date.now(),
-         replyingMessage 
+          replyingMessage,
         },
       ]);
-      if(replyingMessage) setReplyingMessage(false)
+      if (replyingMessage) setReplyingMessage(false);
       setInput("");
     }
   };
@@ -240,6 +240,7 @@ function Chats() {
           to: selectedChat.info._id,
           type: selectedChat.type,
           format: name === "photo-upload" ? "photo" : "file",
+          replyingMessage
         });
         setMessages((prev) => [
           ...prev,
@@ -249,9 +250,11 @@ function Chats() {
             receiver: selectedChat.info._id,
             timestamp: Date.now(),
             format: name === "photo-upload" ? "photo" : "file",
+            replyingMessage 
           },
         ]);
         setFetchMessages(true);
+        setReplyingMessage(false);
       }
     } catch (err) {
       console.log(err.reponse);
@@ -290,7 +293,7 @@ function Chats() {
 
   return (
     selectedChat && (
-      <div className="flex font-lato flex-col space-y-5 p-3 px-5 pb-4 flex-grow relative w-svw xs:w-fit">
+      <div className="flex font-lato flex-col space-y-5 p-3 px-5 pb-4 flex-grow  relative w-svw xs:w-fit">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-roboto font-semibold text-[#333333] ">
             Chats with {selectedChat.info.name}
@@ -356,8 +359,11 @@ function Chats() {
                   id="message"
                   key={i}
                 >
-                  {message.replyingToMessage && <span className="font-nunito self-end w-fit p-1 px-2 py-2 sm:p-3 translate-y-1 z-10 text-xs sm:text-sm rounded-lg bg-[#e2e2e2] text-[#535353]">{message.replyingToMessage}</span>}
-                  {" "}
+                  {message.replyingToMessage && (
+                    <span className="font-nunito self-end w-fit p-1 px-2 py-2 sm:p-3 translate-y-1 z-10 text-xs sm:text-sm rounded-lg bg-[#e2e2e2] text-[#535353]">
+                      {message.replyingToMessage}
+                    </span>
+                  )}{" "}
                   {message.format === "photo" && !message.deleted ? (
                     <img
                       src={`${import.meta.env.VITE_URL}/public/img/chats/${
@@ -428,8 +434,19 @@ function Chats() {
                     )}
                   </span>
                   <FaReply
-                    className="absolute top-1/2 -translate-y-1/2 cursor-pointer hover:opacity-100 opacity-0"
-                    onClick={() => setReplyingMessage(message.message)}
+                    className="absolute bg-yellow-500 right-full cursor-pointer hover:opacity-100 "
+                    onClick={() =>
+                      setReplyingMessage(
+                        message.format === "photo"
+                          ? "photo"
+                          : message.format === "file"
+                          ? message.message.substring(
+                              0,
+                              message.message.lastIndexOf("-")
+                            )
+                          : message.message
+                      )
+                    }
                   />
                 </li>
               )
@@ -437,13 +454,16 @@ function Chats() {
           </ul>
           <div className="sticky bottom-0  w-full  h-10  flex items-center mb-2 justify-center space-x-2 ">
             {replyingMessage && (
-              <div className="absolute bottom-full flex flex-col  bg-[#f7f7f7]  shadow-sm w-48 text-xs space-y-2 p-3 rounded-md mb-3 -translate-x-[32%] ">
+              <div className="absolute bottom-full flex flex-col font-nunito   bg-[#f7f7f7]  shadow-sm w-48 text-xs space-y-2 p-3 rounded-md mb-3 -translate-x-[32%] ">
                 <span className="flex items-center justify-between">
-                  <span className="font-nunito flex items-center">
+                  <span className="flex items-center font-semibold">
                     <FaReply size={13} className="mr-2  " />
                     Replying
                   </span>
-                  <RxCross2 onClick={() => setReplyingMessage(false)} className="cursor-pointer" />
+                  <RxCross2
+                    onClick={() => setReplyingMessage(false)}
+                    className="cursor-pointer"
+                  />
                 </span>
                 <span>{replyingMessage}</span>
               </div>

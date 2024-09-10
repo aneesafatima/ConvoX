@@ -6,6 +6,7 @@ const {
   removeGroupMember,
   getGroupMembers,
   deleteGroup,
+  updateGroupName
 } = require("../controllers/groupController");
 const groupRouter = express.Router();
 groupRouter.use(protect);
@@ -14,7 +15,8 @@ groupRouter.patch("/:groupId", deleteGroup);
 groupRouter.post("/exit-group", exitGroup);
 groupRouter.get("/:groupId/members", getGroupMembers);
 groupRouter.delete("/removeGroupMember/:groupId/:userId", removeGroupMember);
+groupRouter.patch("/updateGroupName/:groupId", updateGroupName);
 
-//http://localhost:5000/api/groups/removeGroupMember/66cb3c5180db5545aee911b4/66c5e9d9e00e710a48cd079c
+
 
 module.exports = groupRouter;

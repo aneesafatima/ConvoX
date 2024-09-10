@@ -151,20 +151,33 @@ io.on("connection", async (socket) => {
     }
   });
 
-  socket.on("added-new-user", async ({ selectedUserId, userName }) => {
-    const selectedUser = connectedUsers.find(
-      (user) => user.userId === selectedUserId
-    );
+  socket.on(
+    "added-new-user",
+    async ({ selectedUserId, userName, groupId, groupName }) => {
+      console.log("selected user id", selectedUserId);
+      console.log("group id", groupId);
+      console.log("group name", groupName);
+      console.log("user name", userName);
+      const selectedUser = connectedUsers.find(
+        (user) => user.userId === selectedUserId
+      );
+      console.log("selectedUser", selectedUser);
 
-    if (selectedUser)
-      socket.to(selectedUser.socketId).emit("added-as-contact", userName);
-    else {
-      await Notification.create({
-        message: `${userName} added you as a contact`,
-        userIds: [selectedUserId],
-      });
+      if (!selectedUser) {
+        await Notification.create({
+          message: groupId
+            ? `${userName} added you to a group ${groupName}`
+            : `${userName} added you as a contact`,
+          userIds: [selectedUserId],
+        });
+      }
+      if (selectedUser && !groupId)
+        socket.to(selectedUser.socketId).emit("added-as-contact", userName);
+      else if (groupId) {
+        socket.to(groupId).emit("added-new-grp-member", groupId);
+      }
     }
-  });
+  );
 
   socket.on(
     "group-creation",
@@ -191,6 +204,11 @@ io.on("connection", async (socket) => {
     }
   );
 
+  socket.on("group-name-updated", ({ groupId }) => {
+    console.log(groupId);
+    socket.to(groupId).emit("group-name-updated");
+  });
+
   socket.on("join-room", ({ roomId }) => {
     socket.join(roomId);
   });
@@ -209,7 +227,7 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("group-deleted", async ({ groupId, groupName }) => {
-    socket.to(groupId).emit("group-deleted");
+    socket.to(groupId).emit("group-deleted", groupId);
     const userIds = (await User.find({ groupIds: groupId }).select("_id")).map(
       (el) => el._id
     );

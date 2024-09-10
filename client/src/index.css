@@ -98,3 +98,7 @@ border-radius: 50%;
 #message:hover #delete-chat, #delete-chat:hover{
  opacity: 1;
 }
+
+#group-name:focus + .check{
+  display: block;
+}
