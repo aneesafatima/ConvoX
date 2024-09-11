@@ -48,13 +48,14 @@ function MessageInputBox({ setReplyingMessage, replyingMessage }) {
           },
         ]);
         setFetchMessages(true);
-        setReplyingMessage(false);
+        setReplyingMessage(undefined);
       }
     } catch (err) {
       console.log(err);
     }
   };
   const handeSendingMessage = () => {
+    console.log(replyingMessage)
     if (input !== "") {
       socket.emit("send-message", {
         message: input,
@@ -73,7 +74,7 @@ function MessageInputBox({ setReplyingMessage, replyingMessage }) {
           replyingMessage,
         },
       ]);
-      if (replyingMessage) setReplyingMessage(false);
+      if (replyingMessage) setReplyingMessage(undefined);
       setInput("");
     }
   };

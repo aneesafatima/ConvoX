@@ -154,10 +154,7 @@ io.on("connection", async (socket) => {
   socket.on(
     "added-new-user",
     async ({ selectedUserId, userName, groupId, groupName }) => {
-      console.log("selected user id", selectedUserId);
-      console.log("group id", groupId);
-      console.log("group name", groupName);
-      console.log("user name", userName);
+     
       const selectedUser = connectedUsers.find(
         (user) => user.userId === selectedUserId
       );

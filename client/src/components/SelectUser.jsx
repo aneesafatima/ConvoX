@@ -56,7 +56,7 @@ function SelectUser({ contacts }) {
         {
           groupId:
             showUsers.type === "addingGroupMembers"
-              ? selectedChat.info._id
+              ? selectedChat?.info._id
               : null,
         },
         {
@@ -71,8 +71,8 @@ function SelectUser({ contacts }) {
         socket.emit("added-new-user", {
           selectedUserId: selectedUser._id,
           userName: currentUser.name,
-          groupId: selectedChat.info._id,
-          groupName: selectedChat.info.name,
+          groupId: showUsers.type === "addingGroupMembers" ? selectedChat.info._id : undefined,
+          groupName: showUsers.type === "addingGroupMembers" ?  selectedChat.info.name : undefined,
         });
         setFetchUserChats(true);
 

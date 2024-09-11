@@ -1,170 +1,26 @@
 import React, { useContext, useEffect, useState } from "react";
 import { GlobalState } from "../context/GlobalState";
-import axios from "axios";
 import { ImExit } from "react-icons/im";
-import { showAlert } from "../utils/showAlert";
 import { IoMdSettings } from "react-icons/io";
 import { Message, ReactTooltip, MessageInputBox } from ".";
-
 import { HiUserRemove } from "react-icons/hi";
+import { useChatHandlers } from "../utils/useChatHandlers";
+import { MdDeleteForever } from "react-icons/md";
 
 function Chats() {
   const {
     selectedChat,
     messages,
-    setMessages,
-    fetchMessages,
-    setFetchMessages,
     currentUser,
-    setSelectedChat,
-    setFetchUserChats,
     setShowGroupSettings,
-    unreadMessages,
-    setUnreadMessages,
-    setGroupMembers,
   } = useContext(GlobalState);
+
+  const { handleGroupExit, handleDeleteChats, handleUserRemovalFromChats } =
+    useChatHandlers(); //called on every render abd uses this component's lifecycle
 
   const [replyingMessage, setReplyingMessage] = useState(null);
 
-  useEffect(() => {
-    if (selectedChat?.type === "group") {
-      (() => {
-        axios
-          .get(
-            `${import.meta.env.VITE_URL}/api/groups/${
-              selectedChat.info._id
-            }/members`,
-            {
-              withCredentials: true,
-            }
-          )
-          .then((res) => setGroupMembers(res.data.groupMembers))
-          .catch((err) => console.log(err));
-      })();
-    }
-  }, [selectedChat]);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_URL}/api/messages/${selectedChat.type}/${
-            selectedChat.info._id
-          }`,
-          { withCredentials: true }
-        );
-        if (res.data?.status === "success") {
-          setTimeout(() => {
-            const scrollContainer = document.getElementById("scroll-container");
-            if (scrollContainer)
-              scrollContainer.scrollTop = scrollContainer.scrollHeight;
-          }, 100);
 
-          setMessages(res.data.messages);
-          setFetchMessages(false);
-
-          if (
-            currentUser.unreadMessages.find(
-              (msg) => msg.from === selectedChat.info._id
-            ) &&
-            !fetchMessages
-          ) {
-            const response = await axios.patch(
-              `${import.meta.env.VITE_URL}/api/messages/read-unread-messages`,
-              {
-                userId: currentUser._id,
-                senderId: selectedChat.info._id,
-              },
-              {
-                withCredentials: true,
-              }
-            );
-
-            if (response.data?.status === "success") {
-              const index = unreadMessages?.findIndex(
-                (msg) => msg.from === selectedChat.info._id
-              );
-
-              if (index !== -1) {
-                setUnreadMessages((prev) => {
-                  const newArray = [...prev];
-                  newArray.splice(index, 1);
-                  console.log(newArray);
-                  return newArray;
-                });
-              }
-            }
-          }
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    if (selectedChat || fetchMessages) fetchData();
-  }, [selectedChat, fetchMessages]);
-
-  const handleGroupExit = async (userId, groupId) => {
-    const res = await axios.post(
-      `${import.meta.env.VITE_URL}/api/groups/exit-group`,
-      {
-        userId,
-        groupId,
-      },
-      {
-        withCredentials: true,
-      }
-    );
-    if (res.data?.status === "success") {
-      setTimeout(() => {
-        setSelectedChat(null);
-        setFetchUserChats(true);
-        showAlert(
-          `You have exited the group ${selectedChat.info.name}`,
-          "home"
-        );
-      }, 500);
-    }
-  };
-
-  const handleDeleteChats = async () => {
-    let fetch = false;
-    messages.forEach((message) => {
-      if (!message.deletedBy.includes(currentUser._id)) fetch = true;
-    });
-    if (messages.length === 0 || !fetch) return;
-    try {
-      const res = await axios({
-        url: `${import.meta.env.VITE_URL}/api/messages/delete-chat-messages`,
-        data: {
-          userId: currentUser._id,
-          receiverId: selectedChat.info._id,
-        },
-        method: "PATCH",
-        withCredentials: true,
-      });
-      if (res.data.status === "success") {
-        setFetchMessages(true);
-        setMessages([]);
-        showAlert("Chats Deleted Successfully", "home");
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  const handleUserRemovalFromChats = async (id, type) => {
-    showAlert("Removing Contact", "home");
-    const res = await axios({
-      url: `${import.meta.env.VITE_URL}/api/users/removeContact/${type}/${id}`,
-      method: "DELETE",
-      withCredentials: true,
-    });
-    if (res.data.status === "success") {
-      document.querySelector(".alert")?.remove();
-      showAlert("Contact Removed Successfully", "home");
-      setFetchUserChats(true);
-      setSelectedChat(null);
-    }
-  };
 
   useEffect(() => {
     setTimeout(() => {
@@ -172,7 +28,7 @@ function Chats() {
       if (scrollContainer)
         scrollContainer.scrollTop = scrollContainer?.scrollHeight;
     }, 100);
-  }, [selectedChat]);
+  }, [selectedChat, messages]);
 
   return (
     selectedChat && (

@@ -38,9 +38,7 @@ function UserMessages({ contacts, groups }) {
   const handleImageUpload = (res) => {
     setImageUrl(JSON.parse(res.xhr.response).imageUrl);
   };
-  useEffect(() => {
-    console.log(imageUrl);
-  }, [imageUrl]); 
+
   return (
     <aside
       className={`border-r-2 h-svh relative rounded-e-lg pt-3 flex flex-col p-2 `}
