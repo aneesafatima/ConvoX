@@ -8,4 +8,5 @@ export { default as GroupSettings } from "./GroupSettings.jsx";
 export { default as Notification } from "./Notification.jsx";
 export { default as Message } from "./Message.jsx";
 export { default as MessageInputBox } from "./MessageInputBox.jsx";
+export { default as ShowFiles } from "./ShowFiles.jsx";
 export { Tooltip as ReactTooltip } from "react-tooltip";

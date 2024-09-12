@@ -5,23 +5,13 @@ import { GoDownload } from "react-icons/go";
 import { getFormattedDate } from "../utils/helpers";
 import { GlobalState } from "../context/GlobalState";
 import axios from "axios";
-import {
-  BsFillFileEarmarkPdfFill,
-  BsFileEarmarkWordFill,
-} from "react-icons/bs";
-import { FaFileAudio, FaFileVideo } from "react-icons/fa6";
+import { getFileIcon } from "../utils/helpers";
+
 
 function Message({ message, i, setReplyingMessage }) {
   const { currentUser, selectedChat, groupMembers, messages, setMessages } =
     useContext(GlobalState);
-  const filesIcons = {
-    pdf: <BsFillFileEarmarkPdfFill size={70} color="#E94F4F" />,
-    "vnd.openxmlformats-officedocument.wordprocessingml.document": (
-      <BsFileEarmarkWordFill size={70} color="#2B579A" />
-    ),
-    mp3: <FaFileAudio size={70} color="#1DB954" />,
-    mp4: <FaFileVideo size={70} color="#4DB6AC" />,
-  };
+
   const handleDeleteMessage = async (messageId) => {
     try {
       const res = await axios.patch(
@@ -67,9 +57,9 @@ function Message({ message, i, setReplyingMessage }) {
       ) : message.format === "file" && !message.deleted ? (
         <div className="flex items-center">
           {
-            filesIcons[
-              message.message.substring(message.message.indexOf(".") + 1)
-            ]
+            getFileIcon(
+              message.message.substring(message.message.indexOf(".") + 1))
+            
           }
           <span>
             <span className="text-[8px] font-nunito font-semibold text-wrap block w-28">

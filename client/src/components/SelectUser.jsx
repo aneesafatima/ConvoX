@@ -127,7 +127,7 @@ function SelectUser({ contacts }) {
   };
   return (
     showUsers && (
-      <div className="bg-[#f7f7f7] shadow-md absolute overflow-auto  z-20 w-[300px] h-[350px]  xs:w-[400px] xs:h-[400px]  rounded-lg -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 pb-3 xs:py-4 px-5 xs:px-10 space-y-4">
+      <div className="bg-[#f7f7f7] shadow-md absolute overflow-auto scrollbar z-20 w-[300px] h-[350px]  xs:w-[400px] xs:h-[400px]  rounded-lg -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 pb-3 xs:py-4 px-5 xs:px-10 space-y-4">
         <RxCross1
           className="absolute right-6 top-6 cursor-pointer"
           size={10}

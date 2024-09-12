@@ -15,31 +15,16 @@ function Home() {
   //add view images and file showing feature
   //fix reply design
   //add loader
-  //refactor
+  //refactor of selectUser + server index.js
   //add last messasge in chat
   //improve error handlimg + cookies tag
   //fix map async problem
   const {
     giveAccess,
-    // seTGiveAccess,
-    // setCurrentUser,
     selectedChat,
-    refetch,
-    // setShowErr,
+    fetch,
     showErr,
-    // currentUser,
-    // socket,
-    // setSocket,
-    // fetchUserChats,
-    // setFetchMessages,
-    // setFetchUserChats,
-    // setAllUsers,
     showGroupSettings,
-    // fetchUsers,
-    // setFetchUsers,
-    // setFetch,
-    // setUnreadMessages,
-    // setSelectedChat,
   } = useContext(GlobalState);
 
   const [contacts, setContacts] = useState([]);
@@ -50,13 +35,13 @@ function Home() {
 
   if (showErr.status) return <ErrComponent message={showErr.message} />;
 
-  if (refetch) {
+  if (fetch) {
     return <p> Loading... </p>;
   }
 
   return (
     giveAccess &&
-    !refetch && (
+    !fetch && (
       <div className="w-screen flex " id="home">
         <div
           className={`w-svw xs:w-[300px] ${

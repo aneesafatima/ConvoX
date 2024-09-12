@@ -2,10 +2,11 @@ import React, { useContext, useEffect, useState } from "react";
 import { GlobalState } from "../context/GlobalState";
 import { ImExit } from "react-icons/im";
 import { IoMdSettings } from "react-icons/io";
-import { Message, ReactTooltip, MessageInputBox } from ".";
+import { Message, ReactTooltip, MessageInputBox, ShowFiles } from ".";
 import { HiUserRemove } from "react-icons/hi";
 import { useChatHandlers } from "../utils/useChatHandlers";
 import { MdDeleteForever } from "react-icons/md";
+import { IoMdInformationCircle } from "react-icons/io";
 
 function Chats() {
   const {
@@ -19,6 +20,7 @@ function Chats() {
     useChatHandlers(); //called on every render abd uses this component's lifecycle
 
   const [replyingMessage, setReplyingMessage] = useState(null);
+  const [showFilesMessages, setShowFilesMessages] = useState(false);
 
 
 
@@ -30,17 +32,20 @@ function Chats() {
     }, 100);
   }, [selectedChat, messages]);
 
+
+
   return (
     selectedChat && (
-      <div className="flex font-lato flex-col space-y-5 p-3 px-5 pb-4 flex-grow  relative w-svw xs:w-fit">
+      <div className="flex font-lato flex-col space-y-5 p-3 px-5 pb-4 flex-grow   w-svw xs:w-fit">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-roboto font-semibold text-[#333333] ">
             Chats with {selectedChat.info.name}
           </h2>
+          <div className="flex items-center space-x-1">
           {selectedChat.type === "group" ? (
-            <span className="flex items-center space-x-3">
+            <span className="flex items-center space-x-1 ">
               <IoMdSettings
-                size={22}
+                size={20}
                 color="#333333 "
                 className="cursor-pointer outline-none border-none"
                 data-tooltip-id="settings-of-group"
@@ -48,7 +53,7 @@ function Chats() {
                 onClick={() => setShowGroupSettings(true)}
               />
               <ImExit
-                size={19}
+                size={18}
                 color="#333333 "
                 className="cursor-pointer outline-none border-none"
                 data-tooltip-id="exit-group"
@@ -59,10 +64,10 @@ function Chats() {
               />
             </span>
           ) : (
-            <span className="flex items-center space-x-3">
+            <span className="flex items-center space-x-1">
               <HiUserRemove
-                size={22}
-                className="text-red-500 hover:text-red-600 cursor-pointer outline-none border-none"
+                size={20}
+                className="text-[#333333]  cursor-pointer outline-none border-none"
                 data-tooltip-id="remove-contact"
                 data-tooltip-content="remove contact"
                 onClick={() =>
@@ -73,14 +78,19 @@ function Chats() {
                 }
               />
               <MdDeleteForever
-                size={22}
-                className="text-red-500 hover:text-red-600   cursor-pointer outline-none border-none"
+                size={20}
+                className="text-[#333333]   cursor-pointer outline-none border-none"
                 data-tooltip-id="delete-chats"
                 data-tooltip-content="delete chats"
                 onClick={() => handleDeleteChats(currentUser._id)}
               />
             </span>
           )}
+
+          <IoMdInformationCircle color="#333333" onClick={() => setShowFilesMessages(prev => !prev)}/>
+
+          </div>
+          
         </div>
         <div className="border rounded-lg w-full h-[90%] flex flex-col pb-12 relative">
           <ul
@@ -96,12 +106,18 @@ function Chats() {
                 />
               )
             )}
-          </ul>
+          </ul>{
+
+          }
           <MessageInputBox
             replyingMessage={replyingMessage}
             setReplyingMessage={setReplyingMessage}
           />
         </div>
+        {
+            showFilesMessages && <ShowFiles/>
+        }
+        
         <ReactTooltip
           className="tooltip"
           id="exit-group"
@@ -120,6 +136,11 @@ function Chats() {
         <ReactTooltip
           className="tooltip"
           id="remove-contact"
+          style={{ backgroundColor: "#ef4444 " }}
+        />
+        <ReactTooltip
+          className="tooltip"
+          id="view-files"
           style={{ backgroundColor: "#ef4444 " }}
         />
       </div>
