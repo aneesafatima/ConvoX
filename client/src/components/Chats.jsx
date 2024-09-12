@@ -36,7 +36,7 @@ function Chats() {
 
   return (
     selectedChat && (
-      <div className="flex font-lato flex-col space-y-5 p-3 px-5 pb-4 flex-grow   w-svw xs:w-fit">
+      <div className="flex font-lato flex-col space-y-5 pt-3 px-5  flex-grow relative  w-svw xs:w-fit">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-roboto font-semibold text-[#333333] ">
             Chats with {selectedChat.info.name}
@@ -87,7 +87,7 @@ function Chats() {
             </span>
           )}
 
-          <IoMdInformationCircle color="#333333" onClick={() => setShowFilesMessages(prev => !prev)}/>
+          <IoMdInformationCircle color="#333333" className="cursor-pointer" size={20} onClick={() => setShowFilesMessages(prev => !prev)}/>
 
           </div>
           

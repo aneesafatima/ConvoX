@@ -10,14 +10,17 @@ const {
   addUserContact,
   getUserContacts,
   removeContactFromChats,
-  uploadProfilePicture,
-  resizeUserPhoto,
 } = require("../controllers/userController");
+const { uploadProfilePicture, resizePhoto } = require("../utils/fileUpload");
 const userRouter = express.Router();
 
 userRouter.route("/signup").post(signUp);
 userRouter.route("/login").post(logIn);
-userRouter.post("/updateProfilePicture/:userId", uploadProfilePicture, resizeUserPhoto);
+userRouter.post(
+  "/updateProfilePicture/:type/:id",
+  uploadProfilePicture,
+  resizePhoto
+);
 userRouter.use(protect);
 userRouter.get("/", getAllUsers);
 userRouter.route("/logout").get(logOut);

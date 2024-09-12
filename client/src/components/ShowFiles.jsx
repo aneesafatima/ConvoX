@@ -6,7 +6,7 @@ function showFiles() {
   const { messages } = useContext(GlobalState);
   const [category, setCategory] = useState("photo");
   const fileMessages = messages.filter(
-    (msg) => msg.format === "photo" || msg.format === "file"
+    (msg) => msg.format === category
   );
   console.log(fileMessages);
   return (
@@ -35,9 +35,9 @@ function showFiles() {
           category === "file" && "flex-col"
         } justify-center `}
       >
-        {fileMessages?.map(
-          (msg) =>
-            msg.format === category && (
+        { fileMessages?.map(
+          (msg) => !msg.deleted &&
+           (
               <li className=" m-1">
                 {category === "file" ? (
                   <div className="flex items-center justify-between">
@@ -70,7 +70,7 @@ function showFiles() {
                 )}
               </li>
             )
-        ) && <p className="text-center font-lato text-sm">No {category}</p>}
+        ) ?? <p className="text-center font-lato text-sm">No {category}</p>}
       </ul>
     </div>
   );

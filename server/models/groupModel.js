@@ -5,6 +5,10 @@ const groupSchema = new mongoose.Schema({
     type: Date,
     default: new Date(),
   },
+  photo: {
+    type: String,
+    default: "default.png",
+  },
   name: {
     type: String,
     required: [true, "A group must have a name"],

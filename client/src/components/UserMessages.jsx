@@ -56,7 +56,7 @@ function UserMessages({ contacts, groups }) {
         <span className="flex items-center space-x-2">
           <div className="w-14 h-14 xs:w-12 xs:h-12  my-3 relative rounded-full ml-1">
             <img
-              src={`${import.meta.env.VITE_URL}/public/img/users/${imageUrl}`}
+              src={`${import.meta.env.VITE_URL}/public/img/profiles/${imageUrl}`}
               alt="user profile photo"
               className=" rounded-full"
             />
@@ -66,7 +66,7 @@ function UserMessages({ contacts, groups }) {
               name="profile-picture"
               url={`${
                 import.meta.env.VITE_URL
-              }/api/users/updateProfilePicture/${currentUser?._id}`}
+              }/api/users/updateProfilePicture/user/${currentUser?._id}`}
               accept="image/*"
               className="absolute bottom-0 right-0  text-center"
               id="photo-upload"
@@ -101,7 +101,7 @@ function UserMessages({ contacts, groups }) {
             >
               <span className="flex items-center">
                 <img
-                  src={`${import.meta.env.VITE_URL}/public/img/users/${
+                  src={`${import.meta.env.VITE_URL}/public/img/profiles/${
                     contact.photo
                   }`}
                   className="mr-1 w-[46px] h-[46px] rounded-full"
@@ -125,10 +125,15 @@ function UserMessages({ contacts, groups }) {
                   }
                 >
                   <span className="flex items-center">
-                    <RiGroup2Fill size={53} className="mr-1" />
+                  <img
+                  src={`${import.meta.env.VITE_URL}/public/img/profiles/${
+                    group.photo
+                  }`}
+                  className="mr-1 w-[46px] h-[46px] rounded-full"
+                />
                     {group?.name}
                   </span>
-                  <div className="bg-blue-500 min-w-3 max-w-fit rounded-full leading-3 text-center text-white font-nunito text-[7px]">
+                  <div className="bg-blue-500 min-w-5 max-w-fit rounded-full leading-3 text-center text-white font-nunito text-[7px]">
                     {unreadMessages?.find((el) => el.from === group._id)?.count}
                   </div>
                 </li>

@@ -1,6 +1,5 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { GlobalState } from "../context/GlobalState";
-import { RiGroup2Fill } from "react-icons/ri";
 import { FaUserCircle } from "react-icons/fa";
 import { MdAddCircle } from "react-icons/md";
 import { AiFillDelete } from "react-icons/ai";
@@ -8,6 +7,7 @@ import { RxCross1 } from "react-icons/rx";
 import { IoCheckboxSharp } from "react-icons/io5";
 import { useGroupSettingsHandlers } from "../utils/useGroupSettingsHandlers";
 import { ReactTooltip } from ".";
+import { FileUpload } from "primereact/fileupload";
 function GroupSettings() {
   const {
     setShowGroupSettings,
@@ -18,9 +18,17 @@ function GroupSettings() {
   } = useContext(GlobalState);
 
   const [groupName, setGroupName] = useState(selectedChat?.info.name);
+  const [groupImageUrl, setGroupImageUrl] = useState(selectedChat?.info.photo);
   const { handleRemoveGroupMember, handleGroupDelete, handleGroupNameChange } =
     useGroupSettingsHandlers(groupName);
 
+  const handleImageUpload = (res) => {
+    setGroupImageUrl(JSON.parse(res.xhr.response).imageUrl);
+  };
+  useEffect(() => {
+    if (selectedChat.type === "group")
+      setGroupImageUrl(selectedChat.info.photo);
+  }, [selectedChat]);
   return (
     <div className="absolute bg-[#f7f7f7] flex flex-col justify-between z-50 w-56 min-h-[35vh]  max-h-[80vh] overflow-auto rounded-lg  shadow-xl pt-2 pb-2 px-2  right-10 top-12">
       <RxCross1
@@ -30,7 +38,27 @@ function GroupSettings() {
       />
       <div>
         <div className="flex items-center space-x-2 mt-2">
-          <RiGroup2Fill size={70} />
+          <div className="w-14 h-14 xs:w-12 xs:h-12  my-3 relative rounded-full ml-1">
+            <img
+              src={`${
+                import.meta.env.VITE_URL
+              }/public/img/profiles/${groupImageUrl}`}
+              alt="user profile photo"
+              className=" rounded-full"
+            />
+            <FileUpload
+              mode="basic"
+              auto
+              name="profile-picture"
+              url={`${
+                import.meta.env.VITE_URL
+              }/api/groups/updateProfilePicture/group/${selectedChat?.info._id}`}
+              accept="image/*"
+              className="absolute bottom-0 right-0  text-center"
+              id="photo-upload"
+              onUpload={handleImageUpload}
+            />
+          </div>
           <div className="flex flex-col ">
             <span className=" font-nunito flex items-center">
               <input

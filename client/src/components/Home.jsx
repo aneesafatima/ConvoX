@@ -11,14 +11,12 @@ import useFetchData from "../utils/useFetchData";
 function Home() {
   //fix connect bug + unread messages bug
   // profile pic of groups
-  //fix styling issues of chats
-  //add view images and file showing feature
-  //fix reply design
   //add loader
   //refactor of selectUser + server index.js
   //add last messasge in chat
   //improve error handlimg + cookies tag
   //fix map async problem
+  //fix show files thing
   const {
     giveAccess,
     selectedChat,

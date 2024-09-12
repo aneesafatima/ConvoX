@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { MdDelete } from "react-icons/md";
-import { FaReply } from "react-icons/fa";
+import { RiShareForwardFill } from "react-icons/ri";
 import { GoDownload } from "react-icons/go";
 import { getFormattedDate } from "../utils/helpers";
 import { GlobalState } from "../context/GlobalState";
@@ -78,7 +78,7 @@ function Message({ message, i, setReplyingMessage }) {
         </div>
       ) : (
         <span
-          className={`pointer-events-none z-30
+          className={` z-30 relative
                         ${message.deleted ? "text-gray-500" : "text-[#333333]"}
                         ${
                           message.sender !== currentUser._id
@@ -87,6 +87,20 @@ function Message({ message, i, setReplyingMessage }) {
                         } p-1 px-2 py-2 sm:p-3 text-xs sm:text-sm rounded-lg`}
         >
           {message.message}
+          {!message.deleted && message.sender !== currentUser._id && (
+        <RiShareForwardFill size={10}
+          className="absolute z-40 left-full mx-1 top-1/2 -translate-y-1/2 cursor-pointer hover:opacity-100 "
+          onClick={() =>
+            setReplyingMessage(
+              message.format === "photo"
+                ? "photo"
+                : message.format === "file"
+                ? message.message.substring(0, message.message.lastIndexOf("-"))
+                : message.message
+            )
+          }
+        />
+      )}
         </span>
       )}
       <span className="text-[10px] mt-[2px] pl-2 text-[#414141] font-nunito font-semibold flex justify-between items-center">
@@ -108,20 +122,7 @@ function Message({ message, i, setReplyingMessage }) {
           />
         )}
       </span>
-      {!message.deleted && (
-        <FaReply
-          className="absolute bg-yellow-500 right-full cursor-pointer hover:opacity-100 "
-          onClick={() =>
-            setReplyingMessage(
-              message.format === "photo"
-                ? "photo"
-                : message.format === "file"
-                ? message.message.substring(0, message.message.lastIndexOf("-"))
-                : message.message
-            )
-          }
-        />
-      )}
+     
     </li>
   );
 }
