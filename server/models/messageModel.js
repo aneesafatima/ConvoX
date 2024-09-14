@@ -35,5 +35,6 @@ const MessageSchema = new mongoose.Schema({
 });
 
 const Message = new mongoose.model("Message", MessageSchema);
+// Message.createIndex({ deleted: -1, timestamp: -1 });
 
 module.exports = Message;

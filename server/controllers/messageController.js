@@ -86,7 +86,6 @@ exports.resizeUploadedPhoto = catchAsync(async (req, res, next) => {
 
 exports.deleteMessage = catchAsync(async (req, res, next) => {
   const { messageId } = req.params;
-  console.log(messageId);
   await Message.findByIdAndUpdate(messageId, {
     message: "This message was deleted",
     deleted: true,
@@ -96,6 +95,10 @@ exports.deleteMessage = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.uploadFile = () => {
-  
-}
+
+exports.lastMessage = catchAsync(async (req, res, next) => {
+// const sender = req.user._id;
+// const receiver = req.body.receiver;
+// const
+
+});

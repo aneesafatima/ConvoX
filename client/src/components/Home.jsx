@@ -1,29 +1,19 @@
-import React, { useEffect, useContext, useState, useRef } from "react";
-import { io } from "socket.io-client";
-import axios from "axios";
+import React, { useContext, useState } from "react";
 import { Chats, ErrComponent, UserMessages, GroupSettings } from ".";
 import { GlobalState } from "../context/GlobalState";
 import SelectUser from "./SelectUser";
-import { showAlert } from "../utils/showAlert";
 import useSocket from "../utils/useSocket";
 import useFetchData from "../utils/useFetchData";
 
 function Home() {
-  //fix connect bug + unread messages bug
-  // profile pic of groups
-  //add loader
+  //unread messages bug
   //refactor of selectUser + server index.js
   //add last messasge in chat
-  //improve error handlimg + cookies tag
+  //improve error handlimg + cookies tag + add jwt error hnadling in err middleware
   //fix map async problem
   //fix show files thing
-  const {
-    giveAccess,
-    selectedChat,
-    fetch,
-    showErr,
-    showGroupSettings,
-  } = useContext(GlobalState);
+  const { giveAccess, selectedChat, fetch, showErr, showGroupSettings } =
+    useContext(GlobalState);
 
   const [contacts, setContacts] = useState([]);
   const [groups, setGroups] = useState([]);
@@ -34,7 +24,12 @@ function Home() {
   if (showErr.status) return <ErrComponent message={showErr.message} />;
 
   if (fetch) {
-    return <p> Loading... </p>;
+    return (
+      <div
+        class="main-loader absolute top-1/2 -translate-y-1/2 left-1/2
+     -translate-x-1/2"
+      ></div>
+    );
   }
 
   return (

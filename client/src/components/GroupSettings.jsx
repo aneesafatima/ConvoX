@@ -26,10 +26,11 @@ function GroupSettings() {
     setGroupImageUrl(JSON.parse(res.xhr.response).imageUrl);
   };
   useEffect(() => {
-    if (selectedChat.type === "group")
+    if (selectedChat?.type === "group")
       setGroupImageUrl(selectedChat.info.photo);
   }, [selectedChat]);
   return (
+    selectedChat &&
     <div className="absolute bg-[#f7f7f7] flex flex-col justify-between z-50 w-56 min-h-[35vh]  max-h-[80vh] overflow-auto rounded-lg  shadow-xl pt-2 pb-2 px-2  right-10 top-12">
       <RxCross1
         size={10}
@@ -81,14 +82,18 @@ function GroupSettings() {
           </div>
         </div>
         <span className="font-lato text-xs text-[#282727] px-2">Members</span>
+
+       { !groupMembers && <div className="loader"></div>}
+
         <ul className="space-y-2 px-2 mt-1">
+       
           {groupMembers?.map((member) => (
             <li className="flex items-center ">
               <FaUserCircle size={30} />
               <div className="text-xs mx-2 flex justify-between items-center w-full">
                 <span>{member.name}</span>
                 <span className="text-[9px] text-[#a6a6a6]">
-                  {member._id === selectedChat.info.admin ? (
+                  {member._id === selectedChat?.info.admin ? (
                     "admin"
                   ) : currentUser._id === selectedChat.info.admin ? (
                     <span

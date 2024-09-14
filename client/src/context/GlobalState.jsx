@@ -16,7 +16,7 @@ export function GlobalProvider({ children }) {
   const [allUsers, setAllUsers] = useState();
   const [userContacts, setUserContacts] = useState();
   const [selectedChat, setSelectedChat] = useState();
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState();
   const [socket, setSocket] = useState(undefined);
   const [fetchMessages, setFetchMessages] = useState(false);
   const [isGroup, setIsGroup] = useState(false);

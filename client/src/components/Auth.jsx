@@ -50,6 +50,7 @@ function auth() {
         seTGiveAccess(true);
         setShowErr(false);
         navigate("/home", { replace: true });
+       
       }
     } catch (err) {
       setErrMessage(err.response?.data.message);
