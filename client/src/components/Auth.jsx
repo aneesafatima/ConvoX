@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import coverPng from "/assets/cover.jpg";
@@ -10,6 +10,7 @@ import { CiLock } from "react-icons/ci";
 import { PiPasswordLight } from "react-icons/pi";
 import { FaRocketchat } from "react-icons/fa6";
 import { GlobalState } from "../context/GlobalState";
+import {CookieAlert} from ".";
 
 function auth() {
   const {
@@ -25,10 +26,10 @@ function auth() {
     setShowLoader,
     seTGiveAccess,
     setShowErr,
-    setCurrentUser,
   } = useContext(GlobalState);
 
   const navigate = useNavigate();
+  const [showCookieAlert, setShowCookieAlert] = useState(true);
 
   const handleFormSubmission = async (e) => {
     e.preventDefault();
@@ -64,11 +65,11 @@ function auth() {
   };
 
   return (
-    <div className="pr-3 rounded-lg lg:flex lg:items-center  h-svh  w-full overflow-hidden  lg:space-x-5">
+    <div className="lg:pr-4 rounded-lg lg:flex lg:items-center  h-svh  w-full overflow-hidden  lg:space-x-5">
       <img
         src={coverPng}
         alt="cover img"
-        className="lg:w-[70%] h-full object-cover object-center"
+        className="lg:w-[70%] w-full h-full object-cover object-center"
       />
       <div className="right-section bg-white  flex-grow h-fit  w-[295px] sm:w-80 md:w-96 rounded-lg p-5 lg:p-0 lg:rounded-none lg:h-fit lg:w-fit absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 lg:top-0 lg:left-0 lg:translate-x-0 lg:translate-y-0 lg:bg-transparent lg:relative">
         <h1 className="font-roboto font-bold text-center w-full text-lg mb-2 lg:mb-0 lg:absolute bottom-[108%]">
@@ -188,6 +189,8 @@ function auth() {
           <div className="block border-b-[1px] w-full border-[#e2e2e2]"></div>
         </div>
       </div>
+
+      {showCookieAlert && <CookieAlert setShowCookieAlert={setShowCookieAlert}/>}
     </div>
   );
 }

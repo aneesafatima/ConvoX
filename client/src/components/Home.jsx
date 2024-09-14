@@ -7,9 +7,8 @@ import useFetchData from "../utils/useFetchData";
 
 function Home() {
   //unread messages bug
-  //refactor of selectUser + server index.js
   //add last messasge in chat
-  //improve error handlimg + cookies tag + add jwt error hnadling in err middleware
+  //cookies tag + add jwt error hnadling in err middleware
   //fix map async problem
   //fix show files thing
   const { giveAccess, selectedChat, fetch, showErr, showGroupSettings } =

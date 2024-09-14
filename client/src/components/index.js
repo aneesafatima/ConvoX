@@ -9,4 +9,5 @@ export { default as Notification } from "./Notification.jsx";
 export { default as Message } from "./Message.jsx";
 export { default as MessageInputBox } from "./MessageInputBox.jsx";
 export { default as ShowFiles } from "./ShowFiles.jsx";
+export { default as CookieAlert } from "./CookieAlert.jsx";
 export { Tooltip as ReactTooltip } from "react-tooltip";
