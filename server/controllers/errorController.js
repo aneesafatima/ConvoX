@@ -30,8 +30,10 @@ const duplicateErrors = () => {
   return new ErrorHandler("This email is taken !", 400);
 };
 
-module.exports = (err, req, res, next) => {
+const handleJWTExpiredError = () =>
+  new AppError("Your token has expired! Please log in again.", 401);
 
+module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
 
@@ -40,9 +42,9 @@ module.exports = (err, req, res, next) => {
     error.message = err.message;
     if (err.name === "ValidationError") {
       error = validationError(err);
-      
     }
     if (err.code === 11000) error = duplicateErrors();
+    if (err.name === "TokenExpiredError") error = handleJWTExpiredError();
 
     errorProd(error, res);
   } else if (process.env.NODE_ENV === "development") errorDev(err, res);

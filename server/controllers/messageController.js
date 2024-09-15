@@ -95,10 +95,31 @@ exports.deleteMessage = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getLastMessages = catchAsync(async (req, res, next) => {
+  const sender = req.user;
 
-exports.lastMessage = catchAsync(async (req, res, next) => {
-// const sender = req.user._id;
-// const receiver = req.body.receiver;
-// const
+  const userContacts = sender.contacts.concat(sender.groupIds);
 
+  const messagePromises = userContacts?.map(
+    async (contact) =>
+      await Message.findOne({
+        $or: [
+          { sender: sender._id, receiver: contact._id },
+          { receiver: sender._id, sender: contact._id },
+        ],
+
+        deleted: false,
+        deletedBy: { $nin: [sender._id] },
+      })
+        .sort({ timestamp: -1 })
+        .select("message timestamp sender receiver")
+  );
+
+  const lastMessages = await Promise.all(messagePromises);
+
+  res.status(200).json({
+    status: "success",
+    lastMessages,
+  });
 });
+

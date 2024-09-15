@@ -47,9 +47,9 @@ function Notification() {
   }, [showNotificationBar]);
 
   return (
-    <div className=" h-fit absolute bottom-7   mx-5 ">
+    <div className=" h-fit fixed bottom-4  mx-5 ">
       <div
-        className="w-6 h-6 shadow-md  rounded-full cursor-pointer"
+        className="w-6 h-6 shadow-md bg-[#f7f7f7] rounded-full cursor-pointer"
         onClick={() => setShowNotificationBar((prev) => !prev)}
       >
         <div className="h-full">
@@ -59,7 +59,7 @@ function Notification() {
           />
 
           {notifications?.length > 0 && (
-            <span className="absolute w-3 h-3  text-center font-bold font-nunito text-white top-0 right-0 text-[8px] bg-blue-600 rounded-full">
+            <span className="absolute w-3 h-3  text-center font-bold font-nunito   text-white top-0 right-0 text-[8px] bg-blue-600 rounded-full">
               <span className="h-full  my-auto">{notifications.length}</span>
             </span>
           )}

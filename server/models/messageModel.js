@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const MessageSchema = new mongoose.Schema({
+const messageSchema = new mongoose.Schema({
   sender: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
   receiver: { type: mongoose.Schema.Types.ObjectId, ref: "Users" },
   message: {
@@ -33,8 +33,9 @@ const MessageSchema = new mongoose.Schema({
     },
   ],
 });
-
-const Message = new mongoose.model("Message", MessageSchema);
-// Message.createIndex({ deleted: -1, timestamp: -1 });
+messageSchema.index({timestamp: -1});
+messageSchema.index({ groupId: 1 });
+messageSchema.index({ sender: 1, receiver: 1 });
+const Message = new mongoose.model("Message", messageSchema);
 
 module.exports = Message;

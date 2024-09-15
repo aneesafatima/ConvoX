@@ -6,11 +6,12 @@ const { protect } = require("../controllers/authController");
 const {
   getMessagesForContact,
   deleteChatMessages,
-  uploadFile,
+
   deleteMessage,
   readUnreadMessages,
   sendPhotoAsChat,
   resizeUploadedPhoto,
+  getLastMessages,
 } = require("../controllers/messageController");
 const messageRouter = express.Router();
 
@@ -65,5 +66,6 @@ messageRouter.post("/file-upload", upload.single("file-upload"), (req, res) => {
     file: req.file.filename,
   });
 });
+messageRouter.get("/last-messages", getLastMessages)
 
 module.exports = messageRouter;

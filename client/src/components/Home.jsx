@@ -1,21 +1,23 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Chats, ErrComponent, UserMessages, GroupSettings } from ".";
 import { GlobalState } from "../context/GlobalState";
 import SelectUser from "./SelectUser";
 import useSocket from "../utils/useSocket";
 import useFetchData from "../utils/useFetchData";
 
+
 function Home() {
   //unread messages bug
-  //add last messasge in chat
-  //cookies tag + add jwt error hnadling in err middleware
+  //make groups and contacts in one array in userMessages component 
+  //add lazing loading for pictures + loading of all users
+  //add jwt error hnadling in err middleware
   //fix map async problem
-  //fix show files thing
-  const { giveAccess, selectedChat, fetch, showErr, showGroupSettings } =
+  const { giveAccess, selectedChat, fetch, showErr, showGroupSettings, lastMessage   } =
     useContext(GlobalState);
 
   const [contacts, setContacts] = useState([]);
   const [groups, setGroups] = useState([]);
+ 
 
   useFetchData(setContacts, setGroups);
   useSocket();

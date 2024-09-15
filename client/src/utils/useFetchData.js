@@ -4,7 +4,7 @@ import { GlobalState } from "../context/GlobalState";
 
 const useFetchData = (setContacts, setGroups) => {
   const {
-   seTGiveAccess,
+    seTGiveAccess,
     setCurrentUser,
     setFetch,
     setUnreadMessages,
@@ -14,6 +14,7 @@ const useFetchData = (setContacts, setGroups) => {
     fetchUsers,
     setFetchUsers,
     setAllUsers,
+    setLastMessage,
   } = useContext(GlobalState);
 
   useEffect(() => {
@@ -45,6 +46,15 @@ const useFetchData = (setContacts, setGroups) => {
           }
         );
         if (res.data?.status === "success") {
+          const response = await axios.get(
+            `${import.meta.env.VITE_URL}/api/messages/last-messages`,
+            {
+              withCredentials: true,
+            }
+          );
+          if (response.data) {
+            setLastMessage(response.data.lastMessages);
+          }
           setContacts(res.data.contactUsers);
           setGroups(res.data.groups);
           setFetchUserChats(false);

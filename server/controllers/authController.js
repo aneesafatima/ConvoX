@@ -10,13 +10,17 @@ const sendToken = (user, statusCode, res) => {
 
   res.cookie("jwt", token, {
     expires: new Date(
-      Date.now() + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
-    ),
+        Date.now() + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+      ),
+    // maxAge: 5000,
     secure: process.env.NODE_ENV === "development" ? false : true,
     sameSite: process.env.NODE_ENV === "development" ? "Strict" : "None",
     httpOnly: true,
     path: "/",
   });
+  //new Date(
+  //   Date.now() + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+  // )
   
   res.status(statusCode).json({
     status: "success",

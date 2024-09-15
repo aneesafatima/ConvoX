@@ -1,7 +1,6 @@
 import React, { useContext, useState } from "react";
 import { GlobalState } from "../context/GlobalState";
 import { RiPencilFill } from "react-icons/ri";
-
 import { Notification } from ".";
 import { TbLogout } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +9,7 @@ import { ReactTooltip } from ".";
 
 import axios from "axios";
 import { showAlert } from "../utils/showAlert";
+import { getFormattedDate } from "../utils/helpers";
 
 function UserMessages({ contacts, groups }) {
   const {
@@ -20,7 +20,8 @@ function UserMessages({ contacts, groups }) {
     unreadMessages,
     seTGiveAccess,
     setShowGroupSettings,
-    setGroupMembers
+    setGroupMembers,
+    lastMessage,
   } = useContext(GlobalState);
   const [imageUrl, setImageUrl] = useState(currentUser?.photo);
   const navigate = useNavigate();
@@ -41,10 +42,22 @@ function UserMessages({ contacts, groups }) {
   const handleImageUpload = (res) => {
     setImageUrl(JSON.parse(res.xhr.response).imageUrl);
   };
+  const lastMessageDetails = (contact) => {
+    const details = lastMessage.find(
+      (item) =>
+        (item?.sender === currentUser._id && item?.receiver === contact._id) ||
+        (item?.sender === contact._id && item?.receiver === currentUser._id)
+    );
+    if(details === undefined) return {};
+    return {
+      message: details?.message,
+      timestamp: getFormattedDate(details?.timestamp),
+    };
+  };
 
   return (
     <aside
-      className={`border-r-2 h-svh relative rounded-e-lg pt-3 flex flex-col p-2 `}
+      className={`border-r-2 h-svh overflow-auto scrollbar relative rounded-e-lg pt-3 flex flex-col p-2 pb-5 `}
     >
       <button
         className="w-full sm:w-[50%] text-xs  px-1 py-2 flex justify-center items-center  rounded-lg bg-[#2c2c2c] hover:bg-black text-white font-lato"
@@ -106,14 +119,23 @@ function UserMessages({ contacts, groups }) {
               id="user"
               key={"contact" + i}
             >
-              <span className="flex items-center">
+              <span className="flex items-center w-full">
                 <img
                   src={`${import.meta.env.VITE_URL}/public/img/profiles/${
                     contact.photo
                   }`}
                   className="mr-1 w-[46px] h-[46px] rounded-full"
                 />
-                {contact?.name}
+                <span className="flex flex-col w-full">
+                  {contact?.name}
+                  <span className=" items-center text-xs font-nunito text-[#777777] ">
+                    {" "}
+                    {lastMessageDetails(contact).message ?? "No messages yet"}
+                    <span className="mx-2 text-[10px]">
+                      {lastMessageDetails(contact).timestamp}
+                    </span>
+                  </span>
+                </span>
               </span>
               <div className="bg-blue-500 min-w-3 max-w-fit rounded-full leading-3 text-center text-white font-nunito text-[7px]">
                 {unreadMessages?.find((el) => el.from === contact._id)?.count}

@@ -9,7 +9,7 @@ const chatCreation = (contacts) => {
     selectedChat,
     setGroupMembers,
     setShowUsers,
-  
+
     showUsers,
     setFetchUserChats,
     groupMembers,
@@ -19,22 +19,18 @@ const chatCreation = (contacts) => {
   } = useContext(GlobalState);
 
   const handleUserSelction = async (selectedUser) => {
-    console.log("selectedUser", selectedUser);
-    console.log("groupMembers", groupMembers);
-    console.log("contacts", contacts);
-    if (
-      groupMembers?.includes(selectedUser) ||
-      contacts?.find((contact) => contact._id === selectedUser._id)
-    ) {
-      showAlert("User already added", "home");
-      return;
-    }
     if (isGroup) {
+      if (groupMembers?.includes(selectedUser)) {
+        showAlert("User already added", "home");
+        return;
+      }
       setGroupMembers((prev) => {
         const groupArray = prev ? [...prev, selectedUser] : [selectedUser];
         return groupArray;
       });
     } else {
+      if (contacts?.find((contact) => contact._id === selectedUser._id))
+        return showAlert("User already added", "home");
       setShowUsers(false);
       if (contacts?.includes(selectedUser._id)) {
         showAlert("User already added", "home");
