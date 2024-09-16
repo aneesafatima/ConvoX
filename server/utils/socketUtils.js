@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const Message = require("../models/messageModel");
 const connectedUsers = [];
 
 const unreadMessages = async (contactId, receiver) => {
@@ -15,4 +16,14 @@ const unreadMessages = async (contactId, receiver) => {
     );
 };
 
-module.exports = { connectedUsers, unreadMessages };
+const createMessage = async (userId,data) => {
+  await Message.create({
+    sender: userId,
+    groupId: data.to,
+    message: data.message,
+    isGroupMessage: data.type === "group" ,
+    format: data.format,
+    replyingToMessage: data.replyingMessage,
+  })
+}
+module.exports = { connectedUsers, unreadMessages, createMessage };

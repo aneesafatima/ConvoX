@@ -5,7 +5,9 @@ import { GoDownload } from "react-icons/go";
 function showFiles() {
   const { messages } = useContext(GlobalState);
   const [category, setCategory] = useState("photo");
-  const fileMessages = messages.filter((msg) => msg.format === category && !msg.deleted);
+  const fileMessages = messages.filter(
+    (msg) => msg.format === category && !msg.deleted
+  );
 
   return (
     <div className="absolute z-50 h-96 overflow-auto scrollbar top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#f7f7f7] p-4 w-80 rounded-md shadow-md">
@@ -67,6 +69,7 @@ function showFiles() {
                       }`}
                       alt="photo"
                       className="w-32 h-32"
+                      loading="lazy"
                     />
                   )}
                 </li>

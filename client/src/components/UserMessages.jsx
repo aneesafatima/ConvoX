@@ -24,6 +24,7 @@ function UserMessages({ contacts }) {
     lastMessage,
   } = useContext(GlobalState);
   const [imageUrl, setImageUrl] = useState(currentUser?.photo);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
   const handleLogOut = async () => {
@@ -97,13 +98,20 @@ function UserMessages({ contacts }) {
         />
       </div>
       <div>
-        <span className="text-[11px] font-roboto text-[#2c2c2c]">
+        <span className="text-[12px] font-roboto font-medium text-[#2c2c2c]">
           Direct messages
         </span>
+        <input
+            type="text"
+            className=" h-7 my-2 rounded-lg w-full  bg-[#f2f2f2] block text-sm font-lato px-3 outline-none border-0"
+            placeholder="search chat"
+            id="user-name"
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
 
         <ul className="space-x-0">
           {contacts?.map((contact, i) => (
-            <li
+          contact.name.includes(searchTerm) && <li
               className="text-xs flex items-center justify-between px-2  font-semibold cursor-pointer hover:bg-[#eaeaea] py-1 rounded-lg "
               onClick={() => {
                 setSelectedChat({

@@ -11,9 +11,6 @@ const useFetchData = (setContacts, setGroups) => {
     setShowErr,
     fetchUserChats,
     setFetchUserChats,
-    fetchUsers,
-    setFetchUsers,
-    setAllUsers,
     setLastMessage,
   } = useContext(GlobalState);
 
@@ -56,30 +53,13 @@ const useFetchData = (setContacts, setGroups) => {
             setLastMessage(response.data.lastMessages);
           }
           setContacts(res.data.contactUsers);
-          // setGroups(res.data.groups);
           setFetchUserChats(false);
         }
       })();
     }
   }, [fetchUserChats]);
 
-  useEffect(() => {
-    if (fetchUsers) {
-      (async () => {
-        try {
-          const res = await axios.get(`${import.meta.env.VITE_URL}/api/users`, {
-            withCredentials: true,
-          });
-          if (res.data?.status === "success") {
-            setAllUsers(res.data.users);
-            setFetchUsers(false);
-          }
-        } catch (err) {
-          console.log(err);
-        }
-      })();
-    }
-  }, [fetchUsers]);
+
 };
 
 export default useFetchData;

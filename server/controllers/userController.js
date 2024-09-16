@@ -83,8 +83,7 @@ exports.getUserContacts = catchAsync(async (req, res, next) => {
     status: "success",
     contactUsers: user.contacts
       .concat(activeGroupIds)
-      .sort((a, b) => a.timestamp - b.timestamp),
-    // groups: user.groupIds,
+      .sort((a, b) => a.timestamp - b.timestamp)
   });
 });
 exports.removeContactFromChats = catchAsync(async (req, res, next) => {

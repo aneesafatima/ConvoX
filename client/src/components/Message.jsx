@@ -53,6 +53,7 @@ function Message({ message, i, setReplyingMessage }) {
           }`}
           alt="photo"
           className="h-32 sm:h-60"
+          loading="lazy"
         />
       ) : message.format === "file" && !message.deleted ? (
         <div className="flex items-center">
