@@ -1,4 +1,4 @@
-import React, { useContext ,useEffect,useState} from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import { IoSend } from "react-icons/io5";
 import { MdInsertPhoto } from "react-icons/md";
@@ -7,12 +7,19 @@ import { FaReply } from "react-icons/fa6";
 import { SiFiles } from "react-icons/si";
 import { GlobalState } from "../context/GlobalState";
 import axios from "axios";
+import { handleLastMessageUpdation } from "../utils/helpers";
 
 function MessageInputBox({ setReplyingMessage, replyingMessage }) {
-  const { selectedChat , socket, setMessages,currentUser, setFetchMessages} = useContext(GlobalState);
+  const {
+    selectedChat,
+    socket,
+    setMessages,
+    currentUser,
+    setFetchMessages,
+    lastMessage,
+    setLastMessage,
+  } = useContext(GlobalState);
   const [input, setInput] = useState("");
-
-  useEffect(() => console.log(replyingMessage), [replyingMessage])
 
   const handleFileUpload = async (id, name) => {
     const file = document.getElementById(id).files[0];
@@ -51,18 +58,25 @@ function MessageInputBox({ setReplyingMessage, replyingMessage }) {
         ]);
         setFetchMessages(true);
         setReplyingMessage(undefined);
+        setLastMessage(
+          handleLastMessageUpdation(
+            lastMessage,
+            selectedChat.info._id,
+            name === "photo-upload" ? "photo" : "file"
+          )
+        );
       }
     } catch (err) {
       console.log(err);
     }
   };
   const handeSendingMessage = () => {
-    console.log(replyingMessage)
     if (input !== "") {
       socket.emit("send-message", {
         message: input,
         to: selectedChat.info._id,
         type: selectedChat.type,
+        format: "text",
         replyingMessage,
       });
       setFetchMessages(true);
@@ -78,6 +92,9 @@ function MessageInputBox({ setReplyingMessage, replyingMessage }) {
       ]);
       if (replyingMessage) setReplyingMessage(undefined);
       setInput("");
+      setLastMessage(
+        handleLastMessageUpdation(lastMessage, selectedChat.info._id, input)
+      );
     }
   };
   return (
@@ -141,7 +158,10 @@ function MessageInputBox({ setReplyingMessage, replyingMessage }) {
           id="file-message"
         />
 
-        <SiFiles className="cursor-pointer w-full h-full ml-1" color="#333333" />
+        <SiFiles
+          className="cursor-pointer w-full h-full ml-1"
+          color="#333333"
+        />
       </div>
     </div>
   );

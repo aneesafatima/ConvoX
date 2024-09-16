@@ -6,6 +6,7 @@ import {
 import { FaFileAudio, FaFileVideo } from "react-icons/fa6";
 
 export const getFormattedDate = (date) => {
+  if (!date) return;
   return new Date(date).toLocaleDateString("en-US") ===
     new Date(Date.now()).toLocaleDateString("en-US")
     ? new Date(date).toLocaleTimeString("en-US", {
@@ -20,9 +21,15 @@ export const getFormattedDate = (date) => {
 export const getFileIcon = (fileType) => {
   switch (fileType) {
     case "pdf":
-      return React.createElement(BsFillFileEarmarkPdfFill, { size: 70, color: "#E94F4F" });
+      return React.createElement(BsFillFileEarmarkPdfFill, {
+        size: 70,
+        color: "#E94F4F",
+      });
     case "vnd.openxmlformats-officedocument.wordprocessingml.document":
-      return React.createElement(BsFileEarmarkWordFill, { size: 70, color: "#2B579A" });
+      return React.createElement(BsFileEarmarkWordFill, {
+        size: 70,
+        color: "#2B579A",
+      });
     case "mp3":
       return React.createElement(FaFileAudio, { size: 70, color: "#1DB954" });
     case "mp4":
@@ -32,3 +39,18 @@ export const getFileIcon = (fileType) => {
   }
 };
 
+export const handleLastMessageUpdation = (lastMessage, contactId, message) => {
+  const updatedLastMessage = [...lastMessage];
+  const existingIndex = updatedLastMessage.findIndex(
+    (el) => el.contactId === contactId
+  );
+  if (existingIndex !== -1) {
+    updatedLastMessage[existingIndex].message = message;
+    updatedLastMessage[existingIndex].timestamp = Date.now();
+    return updatedLastMessage;
+  } else {
+    return lastMessage
+      ? [...lastMessage, { contactId, message, timestamp: Date.now() }]
+      : [{contactId, message, timestamp: Date.now() }];
+  }
+};

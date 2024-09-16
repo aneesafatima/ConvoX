@@ -27,7 +27,6 @@ exports.resizePhoto = catchAsync(async (req, res, next) => {
   let doc;
   if (!req.file) return next();
   const { id, type } = req.params;
-  console.log(id, type);
   req.file.filename =
     type === "user"
       ? `user-${id}-${Date.now()}.jpeg`

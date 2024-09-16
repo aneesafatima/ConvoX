@@ -14,7 +14,6 @@ exports.getNotifications = catchAsync(async (req, res, next) => {
 });
 
 exports.readAllNotifications = catchAsync(async (req, res, next) => {
-  console.log("Entered reading controller")
   await Notification.updateMany(
     { userIds: req.body.userId },
     { $push: { read: req.body.userId } }

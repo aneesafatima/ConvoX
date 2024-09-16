@@ -5,22 +5,27 @@ import SelectUser from "./SelectUser";
 import useSocket from "../utils/useSocket";
 import useFetchData from "../utils/useFetchData";
 
-
 function Home() {
   //unread messages bug
-  //make groups and contacts in one array in userMessages component 
+  //make groups and contacts in one array in userMessages component
   //add lazing loading for pictures + loading of all users
   //add jwt error hnadling in err middleware
   //fix map async problem
-  const { giveAccess, selectedChat, fetch, showErr, showGroupSettings, lastMessage   } =
-    useContext(GlobalState);
+  const {
+    giveAccess,
+    selectedChat,
+    fetch,
+    showErr,
+    showGroupSettings,
+    lastMessage,
+  } = useContext(GlobalState);
 
   const [contacts, setContacts] = useState([]);
-  const [groups, setGroups] = useState([]);
- 
 
-  useFetchData(setContacts, setGroups);
+
+  useFetchData(setContacts);
   useSocket();
+  useEffect(() => console.log(lastMessage), [lastMessage]);
 
   if (showErr.status) return <ErrComponent message={showErr.message} />;
 
@@ -42,7 +47,7 @@ function Home() {
             selectedChat && window.innerWidth <= 540 ? "hidden" : null
           }`}
         >
-          <UserMessages contacts={contacts} groups={groups} />
+          <UserMessages contacts={contacts} />
         </div>
         <SelectUser contacts={contacts} />
         <Chats />

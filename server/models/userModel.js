@@ -13,11 +13,6 @@ const UserSchema = new mongoose.Schema({
     required: [true, "A user must have an email"],
     validate: [validator.isEmail, "Please provide a valid email"],
   },
-  status: {
-    type: String,
-    default: "none",
-  },
-
   password: {
     type: String,
     required: [true, "A user must have a password"],
@@ -34,10 +29,9 @@ const UserSchema = new mongoose.Schema({
       message: "Passwords do not match",
     },
   },
-  passwordChangedAt: Date,
   photo: {
     type: String,
-    default: "default.png",
+    default: "default-user.jpg",
   },
   active: Boolean,
   contacts: {

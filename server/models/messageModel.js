@@ -15,6 +15,7 @@ const messageSchema = new mongoose.Schema({
   format: {
     type: String,
     enum: ["photo", "file", "text"],
+    default: "text"
   },
   isGroupMessage: {
     type: Boolean,

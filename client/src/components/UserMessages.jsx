@@ -11,7 +11,7 @@ import axios from "axios";
 import { showAlert } from "../utils/showAlert";
 import { getFormattedDate } from "../utils/helpers";
 
-function UserMessages({ contacts, groups }) {
+function UserMessages({ contacts }) {
   const {
     setShowUsers,
     currentUser,
@@ -43,16 +43,9 @@ function UserMessages({ contacts, groups }) {
     setImageUrl(JSON.parse(res.xhr.response).imageUrl);
   };
   const lastMessageDetails = (contact) => {
-    const details = lastMessage.find(
-      (item) =>
-        (item?.sender === currentUser._id && item?.receiver === contact._id) ||
-        (item?.sender === contact._id && item?.receiver === currentUser._id)
-    );
-    if(details === undefined) return {};
-    return {
-      message: details?.message,
-      timestamp: getFormattedDate(details?.timestamp),
-    };
+    const details = lastMessage?.find((el) => el.contactId === contact._id);
+    if (details === undefined) return {};
+    return details;
   };
 
   return (
@@ -113,11 +106,14 @@ function UserMessages({ contacts, groups }) {
             <li
               className="text-xs flex items-center justify-between px-2  font-semibold cursor-pointer hover:bg-[#eaeaea] py-1 rounded-lg "
               onClick={() => {
-                setSelectedChat({ info: contact, type: "individual" });
+                setSelectedChat({
+                  info: contact,
+                  type: contact.admin ? "group" : "individual",
+                });
                 setShowGroupSettings(false);
               }}
-              id="user"
-              key={"contact" + i}
+              id="contact"
+              key={i}
             >
               <span className="flex items-center w-full">
                 <img
@@ -132,7 +128,7 @@ function UserMessages({ contacts, groups }) {
                     {" "}
                     {lastMessageDetails(contact).message ?? "No messages yet"}
                     <span className="mx-2 text-[10px]">
-                      {lastMessageDetails(contact).timestamp}
+                      {getFormattedDate(lastMessageDetails(contact).timestamp)}
                     </span>
                   </span>
                 </span>
@@ -142,32 +138,6 @@ function UserMessages({ contacts, groups }) {
               </div>
             </li>
           ))}
-          {groups?.map(
-            (group, i) =>
-              group.active && (
-                <li
-                  className="text-xs flex px-2 items-center justify-between font-semibold cursor-pointer hover:bg-[#eaeaea] py-1 rounded-lg "
-                  key={"group" + i}
-                  id="user"
-                  onClick={() =>
-                    setSelectedChat({ info: group, type: "group" })
-                  }
-                >
-                  <span className="flex items-center">
-                    <img
-                      src={`${import.meta.env.VITE_URL}/public/img/profiles/${
-                        group.photo
-                      }`}
-                      className="mr-1 w-[46px] h-[46px] rounded-full"
-                    />
-                    {group?.name}
-                  </span>
-                  <div className="bg-blue-500 min-w-5 max-w-fit rounded-full leading-3 text-center text-white font-nunito text-[7px]">
-                    {unreadMessages?.find((el) => el.from === group._id)?.count}
-                  </div>
-                </li>
-              )
-          )}
         </ul>
       </div>
       <ReactTooltip

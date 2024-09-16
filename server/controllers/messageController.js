@@ -96,30 +96,37 @@ exports.deleteMessage = catchAsync(async (req, res, next) => {
 });
 
 exports.getLastMessages = catchAsync(async (req, res, next) => {
+  let message;
   const sender = req.user;
 
   const userContacts = sender.contacts.concat(sender.groupIds);
 
-  const messagePromises = userContacts?.map(
-    async (contact) =>
-      await Message.findOne({
-        $or: [
-          { sender: sender._id, receiver: contact._id },
-          { receiver: sender._id, sender: contact._id },
-        ],
+  const messagePromises = userContacts?.map(async (contact) => {
+    message = await Message.findOne({
+      $or: [
+        { groupId: contact._id },
+        { sender: sender._id, receiver: contact._id },
+        { receiver: sender._id, sender: contact._id },
+      ],
 
-        deleted: false,
-        deletedBy: { $nin: [sender._id] },
-      })
-        .sort({ timestamp: -1 })
-        .select("message timestamp sender receiver")
-  );
+      deleted: false,
+      deletedBy: { $nin: [sender._id] },
+    })
+      .sort({ timestamp: -1 })
+      .select("message timestamp format");
+
+    if (message) {
+      return {
+        message: message.format !== "text" ? message.format : message.message,
+        timestamp: message.timestamp,
+        contactId: contact._id,
+      };
+    }
+  });
 
   const lastMessages = await Promise.all(messagePromises);
-
   res.status(200).json({
     status: "success",
-    lastMessages,
+    lastMessages: lastMessages.filter((el) => el !== undefined),
   });
 });
-

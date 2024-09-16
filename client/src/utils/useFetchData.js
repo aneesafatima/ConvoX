@@ -56,7 +56,7 @@ const useFetchData = (setContacts, setGroups) => {
             setLastMessage(response.data.lastMessages);
           }
           setContacts(res.data.contactUsers);
-          setGroups(res.data.groups);
+          // setGroups(res.data.groups);
           setFetchUserChats(false);
         }
       })();

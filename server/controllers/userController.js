@@ -33,8 +33,8 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
   const user = await User.findByIdAndUpdate(userId, {
     photo: req.file.filename,
   });
-  const photo =  path.join(__dirname, `../public/img/users/${user.photo}`);  
-  if(fs.existsSync(photo) && user.photo !== "default.png")
+  const photo = path.join(__dirname, `../public/img/users/${user.photo}`);
+  if (fs.existsSync(photo) && user.photo !== "default.png")
     fs.unlinkSync(photo);
   res.status(200).json({
     status: "success",
@@ -53,7 +53,6 @@ exports.addUserContact = catchAsync(async (req, res, next) => {
   const { selectedUserId, type } = req.params;
   const user = await User.findById(req.user._id);
   const selectedUser = await User.findById(selectedUserId);
-  console.log(user)
   if (type === "personal") {
     if (user.contacts.includes(selectedUserId))
       return next(new ErrorHandler("User is already in your contacts", 400));
@@ -61,10 +60,10 @@ exports.addUserContact = catchAsync(async (req, res, next) => {
     await User.findByIdAndUpdate(req.user._id, {
       $push: { contacts: selectedUserId },
     });
-   if(!selectedUser.contacts.includes(user._id))
-    await User.findByIdAndUpdate(selectedUserId, {
-      $push: { contacts: req.user._id },
-    });
+    if (!selectedUser.contacts.includes(user._id))
+      await User.findByIdAndUpdate(selectedUserId, {
+        $push: { contacts: req.user._id },
+      });
   } else {
     await User.findByIdAndUpdate(selectedUserId, {
       $push: { groupIds: req.body.groupId },
@@ -76,14 +75,16 @@ exports.addUserContact = catchAsync(async (req, res, next) => {
 });
 
 exports.getUserContacts = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.user._id).populate([
-    { path: "contacts" },
-    { path: "groupIds" },
-  ]);
+  const user = await User.findById(req.user._id)
+    .populate([{ path: "contacts" }, { path: "groupIds" }])
+    .select("-passwordConfirm");
+  const activeGroupIds = user.groupIds.filter((el) => el.active);
   res.status(200).json({
     status: "success",
-    contactUsers: user.contacts,
-    groups: user.groupIds,
+    contactUsers: user.contacts
+      .concat(activeGroupIds)
+      .sort((a, b) => a.timestamp - b.timestamp),
+    // groups: user.groupIds,
   });
 });
 exports.removeContactFromChats = catchAsync(async (req, res, next) => {

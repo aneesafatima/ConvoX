@@ -19,13 +19,11 @@ const handleIoConnection = (io) => {
 
     connectedUsers.push({ userId, socketId: socket.id });
 
-    socket.on("unread-message", ({ sender, receiver }) => {
-      console.log("active but tab is not opened");
-      unreadMessages(sender, receiver);
+    socket.on("unread-message", ({ contactId, receiver }) => {
+      unreadMessages(contactId, receiver);
     });
 
     socket.on("send-message", async (data) => {
-      console.log(data);
       if (data.type === "individual") {
         await Message.create({
           sender: userId,
@@ -37,10 +35,12 @@ const handleIoConnection = (io) => {
 
         const receiver = connectedUsers.find((user) => user.userId === data.to);
         if (receiver) {
-          socket.to(receiver.socketId).emit("new-message", userId);
+          socket.to(receiver.socketId).emit("new-message", {
+            contactId: userId,
+            message: data.format !== "text" ? data.format : data.message,
+          });
         } else {
           unreadMessages(userId, data.to);
-          console.log("inactive");
         }
       } else if (data.type === "group") {
         await Message.create({
@@ -66,7 +66,10 @@ const handleIoConnection = (io) => {
           unreadMessages(data.to, user._id);
         });
 
-        socket.to(data.to).emit("new-message", data.to);
+        socket.to(data.to).emit("new-message", {
+          contactId: data.to,
+          message: data.format !== "text" ? data.format : data.message,
+        });
       }
     });
 
@@ -76,8 +79,6 @@ const handleIoConnection = (io) => {
         const selectedUser = connectedUsers.find(
           (user) => user.userId === selectedUserId
         );
-        console.log("selectedUser", selectedUser);
-
         if (!selectedUser) {
           await Notification.create({
             message: groupId
@@ -120,7 +121,6 @@ const handleIoConnection = (io) => {
     );
 
     socket.on("group-name-updated", ({ groupId }) => {
-      console.log(groupId);
       socket.to(groupId).emit("group-name-updated");
     });
 

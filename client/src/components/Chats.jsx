@@ -25,18 +25,16 @@ function Chats() {
         scrollContainer.scrollTop = scrollContainer?.scrollHeight;
     }, 100);
   }, [selectedChat, messages]);
-  useEffect(() => {console.log(messages)}, [messages])
 
   return (
     selectedChat && (
       <div className="flex font-lato flex-col space-y-5 pt-3 px-5  flex-grow relative  w-svw xs:w-fit ">
-        {
-          !messages && 
-            <div
-              class="main-loader absolute top-1/2 -translate-y-1/2 left-1/2
+        {!messages && (
+          <div
+            class="main-loader absolute top-1/2 -translate-y-1/2 left-1/2
           -translate-x-1/2"
-            ></div>
-        }
+          ></div>
+        )}
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-roboto font-semibold text-[#333333] ">
             Chats with {selectedChat.info.name}
@@ -90,61 +88,60 @@ function Chats() {
             <IoMdInformationCircle
               color="#333333"
               className="cursor-pointer"
+              data-tooltip-id="view-files"
+              data-tooltip-content="View Files"
               size={18}
               onClick={() => setShowFilesMessages((prev) => !prev)}
             />
           </div>
         </div>
         <div className="border rounded-lg w-full h-[90%] flex flex-col pb-12 relative">
-         
-            <ul
-              className="p-4 px-10 space-y-6 flex flex-col text-sm font-nunito font-medium h-full overflow-auto"
-              id="scroll-container"
-            >
-              {messages?.map((message, i) =>
-                message?.deletedBy?.includes(currentUser._id) ? null : (
-                  <Message
-                    key={i}
-                    message={message}
-                    setReplyingMessage={setReplyingMessage}
-                  />
-                )
-              )}
-            </ul>
-        
+          <ul
+            className="p-4 px-10 space-y-6 flex flex-col text-sm font-nunito font-medium h-full overflow-auto"
+            id="scroll-container"
+          >
+            {messages?.map((message, i) =>
+              message?.deletedBy?.includes(currentUser._id) ? null : (
+                <Message
+                  key={i}
+                  message={message}
+                  setReplyingMessage={setReplyingMessage}
+                />
+              )
+            )}
+          </ul>
 
           <MessageInputBox
             replyingMessage={replyingMessage}
             setReplyingMessage={setReplyingMessage}
           />
+          <ReactTooltip
+            className="tooltip"
+            id="exit-group"
+            style={{ backgroundColor: "#333333 " }}
+          />
+          <ReactTooltip
+            className="tooltip"
+            id="settings-of-group"
+            style={{ backgroundColor: "#333333 " }}
+          />
+          <ReactTooltip
+            className="tooltip"
+            id="delete-chats"
+            style={{ backgroundColor: "#333333 " }}
+          />
+          <ReactTooltip
+            className="tooltip"
+            id="remove-contact"
+            style={{ backgroundColor: "#333333 " }}
+          />
+          <ReactTooltip
+            className="tooltip"
+            id="view-files"
+            style={{ backgroundColor: "#333333 " }}
+          />
         </div>
         {showFilesMessages && <ShowFiles />}
-
-        <ReactTooltip
-          className="tooltip"
-          id="exit-group"
-          style={{ backgroundColor: "#333333 " }}
-        />
-        <ReactTooltip
-          className="tooltip"
-          id="settings-of-group"
-          style={{ backgroundColor: "#333333 " }}
-        />
-        <ReactTooltip
-          className="tooltip"
-          id="delete-chats"
-          style={{ backgroundColor: "#ef4444 " }}
-        />
-        <ReactTooltip
-          className="tooltip"
-          id="remove-contact"
-          style={{ backgroundColor: "#ef4444 " }}
-        />
-        <ReactTooltip
-          className="tooltip"
-          id="view-files"
-          style={{ backgroundColor: "#ef4444 " }}
-        />
       </div>
     )
   );
