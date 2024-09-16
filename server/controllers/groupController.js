@@ -29,14 +29,6 @@ exports.updateGroupName = catchAsync(async (req, res, next) => {
     status: "success",
   });
 });
-
-exports.exitGroup = catchAsync(async (req, res, next) => {
-  const { userId, groupId } = req.body;
-  await User.findByIdAndUpdate(userId, { $pull: { groupIds: groupId } });
-  res.status(200).json({
-    status: "success",
-  });
-});
 exports.removeGroupMember = catchAsync(async (req, res, next) => {
   const { groupId, userId } = req.params;
   await User.findByIdAndUpdate(userId, { $pull: { groupIds: groupId } });

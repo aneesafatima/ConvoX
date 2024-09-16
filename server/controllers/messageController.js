@@ -3,6 +3,7 @@ const catchAsync = require("../utils/catchAsync");
 const User = require("../models/userModel");
 const multer = require("multer");
 const sharp = require("sharp");
+const sharpResizing = require( "../utils/sharpResizing" );
 
 exports.getMessagesForContact = catchAsync(async (req, res, next) => {
   let messages;
@@ -83,7 +84,6 @@ exports.resizeUploadedPhoto = catchAsync(async (req, res, next) => {
     file: req.file.filename,
   });
 });
-
 exports.deleteMessage = catchAsync(async (req, res, next) => {
   const { messageId } = req.params;
   await Message.findByIdAndUpdate(messageId, {

@@ -18,7 +18,6 @@ export const useChatHandlers = () => {
     messages,
   } = useContext(GlobalState);
 
-
   useEffect(() => {
     if (selectedChat?.type === "group") {
       (() => {
@@ -90,29 +89,29 @@ export const useChatHandlers = () => {
     if (selectedChat || fetchMessages) fetchData();
   }, [selectedChat, fetchMessages]);
 
-  const handleGroupExit = useCallback(async (userId, groupId) => {
-
-    const res = await axios.post(
-      `${import.meta.env.VITE_URL}/api/groups/exit-group`,
-      {
-        userId,
-        groupId,
-      },
-      {
-        withCredentials: true,
+  const handleGroupExit = useCallback(
+    async (userId, groupId) => {
+      const res = await axios.delete(
+        `${
+          import.meta.env.VITE_URL
+        }/api/groups/removeGroupMember/${groupId}/${userId}`,
+        {
+          withCredentials: true,
+        }
+      );
+      if (res.data?.status === "success") {
+        setTimeout(() => {
+          setFetchUserChats(true);
+          showAlert(
+            `You have exited the group ${selectedChat.info.name}`,
+            "home"
+          );
+          setSelectedChat(null);
+        }, 500);
       }
-    );
-    if (res.data?.status === "success") {
-      setTimeout(() => {
-        setFetchUserChats(true);
-        showAlert(
-          `You have exited the group ${selectedChat.info.name}`,
-          "home"
-        );
-        setSelectedChat(null);
-      }, 500);
-    }
-  }, [selectedChat]);
+    },
+    [selectedChat]
+  );
 
   const handleDeleteChats = useCallback(async () => {
     let fetch = false;

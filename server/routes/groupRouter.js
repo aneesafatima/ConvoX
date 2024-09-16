@@ -2,7 +2,6 @@ const express = require("express");
 const { protect } = require("../controllers/authController");
 const {
   createGroup,
-  exitGroup,
   removeGroupMember,
   getGroupMembers,
   deleteGroup,
@@ -18,7 +17,6 @@ groupRouter.post(
 groupRouter.use(protect);
 groupRouter.post("/", createGroup);
 groupRouter.patch("/:groupId", deleteGroup);
-groupRouter.post("/exit-group", exitGroup);
 groupRouter.get("/:groupId/members", getGroupMembers);
 groupRouter.delete("/removeGroupMember/:groupId/:userId", removeGroupMember);
 groupRouter.patch("/updateGroupName/:groupId", updateGroupName);

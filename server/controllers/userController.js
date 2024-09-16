@@ -1,10 +1,8 @@
 const catchAsync = require("../utils/catchAsync");
 const ErrorHandler = require("../utils/errorHandler");
 const multer = require("multer");
-const sharp = require("sharp");
 const User = require("../models/userModel");
-const fs = require("fs");
-const path = require("path");
+const sharpResizing = require("../utils/sharpResizing");
 
 const multerStrorage = multer.memoryStorage();
 const multerFilter = (req, file, cb) => {
@@ -17,30 +15,8 @@ const multerFilter = (req, file, cb) => {
     );
   }
 };
-const upload = multer({ storage: multerStrorage, fileFilter: multerFilter });
 
-exports.uploadProfilePicture = upload.single("profile-picture");
 
-exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
-  if (!req.file) return next();
-  const userId = req.params.userId;
-  req.file.filename = `user-${userId}-${Date.now()}.jpeg`;
-  await sharp(req.file.buffer)
-    .resize(600, 600)
-    .toFormat("jpeg")
-    .jpeg({ quality: 90 })
-    .toFile(`public/img/users/${req.file.filename}`);
-  const user = await User.findByIdAndUpdate(userId, {
-    photo: req.file.filename,
-  });
-  const photo = path.join(__dirname, `../public/img/users/${user.photo}`);
-  if (fs.existsSync(photo) && user.photo !== "default.png")
-    fs.unlinkSync(photo);
-  res.status(200).json({
-    status: "success",
-    imageUrl: req.file.filename,
-  });
-});
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find();
@@ -83,7 +59,7 @@ exports.getUserContacts = catchAsync(async (req, res, next) => {
     status: "success",
     contactUsers: user.contacts
       .concat(activeGroupIds)
-      .sort((a, b) => a.timestamp - b.timestamp)
+      .sort((a, b) => a.timestamp - b.timestamp),
   });
 });
 exports.removeContactFromChats = catchAsync(async (req, res, next) => {
