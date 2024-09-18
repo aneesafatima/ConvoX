@@ -7,7 +7,9 @@ import useFetchData from "../utils/useFetchData";
 
 function Home() {
   //unread messages bug + add some more refactoring
+  //fix the unreadmessage 
   //add jwt error hnadling in err middleware
+  //update styling
   const {
     giveAccess,
     selectedChat,
@@ -20,7 +22,7 @@ function Home() {
   const [contacts, setContacts] = useState([]);
 
 
-  useFetchData(setContacts);
+  useFetchData(setContacts, contacts);
   useSocket();
 
   if (showErr.status) return <ErrComponent message={showErr.message} />;

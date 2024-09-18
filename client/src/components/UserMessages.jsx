@@ -46,7 +46,13 @@ function UserMessages({ contacts }) {
   const lastMessageDetails = (contact) => {
     const details = lastMessage?.find((el) => el.contactId === contact._id);
     if (details === undefined) return {};
-    return details;
+    return {
+      ...details,
+      message:
+        details.message.length > 22
+          ? details.message.substring(0, 22) + "..."
+          : details.message,
+    };
   };
 
   return (
@@ -102,50 +108,58 @@ function UserMessages({ contacts }) {
           Direct messages
         </span>
         <input
-            type="text"
-            className=" h-7 my-2 rounded-lg w-full  bg-[#f2f2f2] block text-sm font-lato px-3 outline-none border-0"
-            placeholder="search chat"
-            id="user-name"
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+          type="text"
+          className=" h-7 my-2 rounded-lg w-full  bg-[#f2f2f2] block text-sm font-lato px-3 outline-none border-0"
+          placeholder="search chat"
+          id="user-name"
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
 
         <ul className="space-x-0">
-          {contacts?.map((contact, i) => (
-          contact.name.includes(searchTerm) && <li
-              className="text-xs flex items-center justify-between px-2  font-semibold cursor-pointer hover:bg-[#eaeaea] py-1 rounded-lg "
-              onClick={() => {
-                setSelectedChat({
-                  info: contact,
-                  type: contact.admin ? "group" : "individual",
-                });
-                setShowGroupSettings(false);
-              }}
-              id="contact"
-              key={i}
-            >
-              <span className="flex items-center w-full">
-                <img
-                  src={`${import.meta.env.VITE_URL}/public/img/profiles/${
-                    contact.photo
-                  }`}
-                  className="mr-1 w-[46px] h-[46px] rounded-full"
-                />
-                <span className="flex flex-col w-full">
-                  {contact?.name}
-                  <span className=" items-center text-xs font-nunito text-[#777777] ">
-                    {" "}
-                    {lastMessageDetails(contact).message ?? "No messages yet"}
-                    <span className="mx-2 text-[10px]">
-                      {getFormattedDate(lastMessageDetails(contact).timestamp)}
+          {contacts?.map(
+            (contact, i) =>
+              contact.name.includes(searchTerm) && (
+                <li
+                  className="text-xs flex items-center justify-between px-2  font-semibold cursor-pointer hover:bg-[#eaeaea] py-1 rounded-lg "
+                  onClick={() => {
+                    setSelectedChat({
+                      info: contact,
+                      type: contact.admin ? "group" : "individual",
+                    });
+                    setShowGroupSettings(false);
+                  }}
+                  id="contact"
+                  key={i}
+                >
+                  <span className="flex items-center w-full">
+                    <img
+                      src={`${import.meta.env.VITE_URL}/public/img/profiles/${
+                        contact.photo
+                      }`}
+                      className="mr-1 w-[46px] h-[46px] rounded-full"
+                    />
+                    <span className="flex flex-col w-full">
+                      {contact?.name}
+                      <span className=" items-center text-xs font-nunito text-[#777777] ">
+                        {" "}
+                        {lastMessageDetails(contact).message}
+                        <span className="mx-2 text-[10px]">
+                          {getFormattedDate(
+                            lastMessageDetails(contact).timestamp
+                          )}
+                        </span>
+                      </span>
                     </span>
                   </span>
-                </span>
-              </span>
-              <div className="bg-blue-500 min-w-3 max-w-fit rounded-full leading-3 text-center text-white font-nunito text-[7px]">
-                {unreadMessages?.find((el) => el.from === contact._id)?.count}
-              </div>
-            </li>
-          ))}
+                  <div className="bg-blue-500 min-w-3 max-w-fit rounded-full leading-3 text-center text-white font-nunito text-[7px]">
+                    {
+                      unreadMessages?.find((el) => el.from === contact._id)
+                        ?.count
+                    }
+                  </div>
+                </li>
+              )
+          )}
         </ul>
       </div>
       <ReactTooltip

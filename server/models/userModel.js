@@ -31,7 +31,7 @@ const UserSchema = new mongoose.Schema({
   },
   photo: {
     type: String,
-    default: "default-user.jpg",
+    default: "default-user.jpeg",
   },
   active: Boolean,
   contacts: {

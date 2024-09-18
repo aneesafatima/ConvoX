@@ -2,7 +2,7 @@ import { useEffect, useContext } from "react";
 import axios from "axios";
 import { GlobalState } from "../context/GlobalState";
 
-const useFetchData = (setContacts, setGroups) => {
+const useFetchData = (setContacts, contacts) => {
   const {
     seTGiveAccess,
     setCurrentUser,
@@ -12,6 +12,7 @@ const useFetchData = (setContacts, setGroups) => {
     fetchUserChats,
     setFetchUserChats,
     setLastMessage,
+    lastMessage,
   } = useContext(GlobalState);
 
   useEffect(() => {
@@ -52,6 +53,7 @@ const useFetchData = (setContacts, setGroups) => {
           if (response.data) {
             setLastMessage(response.data.lastMessages);
           }
+
           setContacts(res.data.contactUsers);
           setFetchUserChats(false);
         }
@@ -59,7 +61,18 @@ const useFetchData = (setContacts, setGroups) => {
     }
   }, [fetchUserChats]);
 
-
+  useEffect(() => {
+    if (lastMessage?.length > 0) {
+      const sortedLastMessages = lastMessage.sort(
+        (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+      );
+      const orderedContacts = sortedLastMessages.map((item) =>
+        contacts.find((contact) => contact._id === item.contactId)
+      );
+      setContacts(orderedContacts);
+    }
+  }, [lastMessage]);
 };
 
 export default useFetchData;
+

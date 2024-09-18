@@ -16,11 +16,11 @@ const useSocket = () => {
     selectedChat,
     setLastMessage,
     lastMessage,
+    unreadMessages,
   } = useContext(GlobalState);
 
   const selectedChatRef = useRef(selectedChat);
   const lastMessageRef = useRef(lastMessage);
-
   useEffect(() => {
     selectedChatRef.current = selectedChat;
   }, [selectedChat]);
@@ -41,13 +41,17 @@ const useSocket = () => {
     }
   }, [currentUser]);
 
+  useEffect(() => {console.log("UseEffect");
+    console.log(unreadMessages)}, [unreadMessages]);
+
   useEffect(() => {
     if (socket) {
+   
       socket.on("connect", () => {
         console.log("Connected to the server with id : ", socket.id);
 
         socket.on("new-message", ({ contactId, message }) => {
-          
+          console.log("new-message received");
           setLastMessage(
             handleLastMessageUpdation(
               lastMessageRef.current,
@@ -63,16 +67,23 @@ const useSocket = () => {
               contactId,
               receiver: currentUser._id,
             });
-
+            console.log("unread-message emitted");
             setUnreadMessages((prev) => {
               const existingIndex = prev.findIndex(
                 (item) => item.from === contactId
               );
               if (existingIndex !== -1) {
                 const updatedUnreadMessages = [...prev];
+
+                console.log(
+                  "updatedUnreadMessages",
+                  prev
+                );
                 updatedUnreadMessages[existingIndex].count += 1;
                 return updatedUnreadMessages;
-              } else return [...prev, { from: contactId, count: 1 }];
+              } else {
+                return [...prev, { from: contactId, count: 1 }];
+              }
             });
           } else setFetchMessages(true);
         });

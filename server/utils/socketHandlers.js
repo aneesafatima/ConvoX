@@ -20,6 +20,7 @@ const handleIoConnection = (io) => {
     connectedUsers.push({ userId, socketId: socket.id });
 
     socket.on("unread-message", ({ contactId, receiver }) => {
+      console.log("active but tab not opened")
       unreadMessages(contactId, receiver);
     });
 
@@ -35,6 +36,7 @@ const handleIoConnection = (io) => {
 
         const receiver = connectedUsers.find((user) => user.userId === data.to);
         if (receiver) {
+          console.log("receiver", receiver);
           socket.to(receiver.socketId).emit("new-message", {
             contactId: userId,
             message: data.format !== "text" ? data.format : data.message,

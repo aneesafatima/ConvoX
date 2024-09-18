@@ -1,11 +1,11 @@
 const catchAsync = require("../utils/catchAsync");
 const ErrorHandler = require("../utils/errorHandler");
 const multer = require("multer");
-const sharp = require("sharp");
 const User = require("../models/userModel");
 const Group = require("../models/groupModel");
 const fs = require("fs");
 const path = require("path");
+const sharpResizing = require("./sharpResizing");
 
 const multerStrorage = multer.memoryStorage();
 const multerFilter = (req, file, cb) => {
@@ -32,11 +32,7 @@ exports.resizePhoto = catchAsync(async (req, res, next) => {
     type === "user"
       ? `user-${id}-${Date.now()}.jpeg`
       : `group-${id}-${Date.now()}.jpeg`;
-  await sharp(req.file.buffer)
-    .resize(600, 600)
-    .toFormat("jpeg")
-    .jpeg({ quality: 90 })
-    .toFile(`public/img/profiles/${req.file.filename}`);
+  sharpResizing(`profiles`, req);
 
   if (type === "user") {
     doc = await User.findByIdAndUpdate(id, {
@@ -49,8 +45,13 @@ exports.resizePhoto = catchAsync(async (req, res, next) => {
   }
 
   const photo = path.join(__dirname, `../public/img/profiles/${doc.photo}`);
-  if (fs.existsSync(photo) && doc.photo !== "default.png")
+  if (
+    fs.existsSync(photo) &&
+    doc.photo !== "default-user.jpeg" &&
+    doc.photo !== "default-group.png"
+  ) {
     fs.unlinkSync(photo);
+  }
   res.status(200).json({
     status: "success",
     imageUrl: req.file.filename,

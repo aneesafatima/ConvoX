@@ -2,8 +2,7 @@ const Message = require("../models/messageModel");
 const catchAsync = require("../utils/catchAsync");
 const User = require("../models/userModel");
 const multer = require("multer");
-const sharp = require("sharp");
-const sharpResizing = require( "../utils/sharpResizing" );
+const sharpResizing = require("../utils/sharpResizing");
 
 exports.getMessagesForContact = catchAsync(async (req, res, next) => {
   let messages;
@@ -74,11 +73,7 @@ exports.sendPhotoAsChat = upload.single("photo-upload");
 exports.resizeUploadedPhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
   req.file.filename = `chat-${req.user._id}-${Date.now()}.jpeg`;
-  await sharp(req.file.buffer)
-    .resize(600, 700)
-    .toFormat("jpeg")
-    .jpeg({ quality: 90 })
-    .toFile(`public/img/chats/${req.file.filename}`);
+  sharpResizing(`chats`, req);
   res.status(200).json({
     status: "success",
     file: req.file.filename,
@@ -119,6 +114,12 @@ exports.getLastMessages = catchAsync(async (req, res, next) => {
       return {
         message: message.format !== "text" ? message.format : message.message,
         timestamp: message.timestamp,
+        contactId: contact._id,
+      };
+    } else {
+      return {
+        message: "No Messages Yet",
+        timestamp: 0,
         contactId: contact._id,
       };
     }

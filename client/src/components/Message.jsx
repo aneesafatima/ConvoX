@@ -7,7 +7,6 @@ import { GlobalState } from "../context/GlobalState";
 import axios from "axios";
 import { getFileIcon } from "../utils/helpers";
 
-
 function Message({ message, i, setReplyingMessage }) {
   const { currentUser, selectedChat, groupMembers, messages, setMessages } =
     useContext(GlobalState);
@@ -57,13 +56,8 @@ function Message({ message, i, setReplyingMessage }) {
         />
       ) : message.format === "file" && !message.deleted ? (
         <div className="flex items-center">
-          {
-            getFileIcon(
-              message.message.substring(message.message.indexOf(".") + 1))
-            
-          }
           <span>
-            <span className="text-[8px] font-nunito font-semibold text-wrap block w-28">
+            <span className="text-[8px] font-nunito font-semibold text-wrap block max-w-24">
               {message.message.substring(0, message.message.lastIndexOf("-"))}
             </span>
             <a
@@ -76,6 +70,10 @@ function Message({ message, i, setReplyingMessage }) {
               <GoDownload />
             </a>
           </span>
+
+          {getFileIcon(
+            message.message.substring(message.message.indexOf(".") + 1)
+          )}
         </div>
       ) : (
         <span
@@ -89,19 +87,23 @@ function Message({ message, i, setReplyingMessage }) {
         >
           {message.message}
           {!message.deleted && message.sender !== currentUser._id && (
-        <RiShareForwardFill size={10}
-          className="absolute z-40 left-full mx-1 top-1/2 -translate-y-1/2 cursor-pointer hover:opacity-100 "
-          onClick={() =>
-            setReplyingMessage(
-              message.format === "photo"
-                ? "photo"
-                : message.format === "file"
-                ? message.message.substring(0, message.message.lastIndexOf("-"))
-                : message.message
-            )
-          }
-        />
-      )}
+            <RiShareForwardFill
+              size={10}
+              className="absolute z-40 left-full mx-1 top-1/2 -translate-y-1/2 cursor-pointer hover:opacity-100 "
+              onClick={() =>
+                setReplyingMessage(
+                  message.format === "photo"
+                    ? "photo"
+                    : message.format === "file"
+                    ? message.message.substring(
+                        0,
+                        message.message.lastIndexOf("-")
+                      )
+                    : message.message
+                )
+              }
+            />
+          )}
         </span>
       )}
       <span className="text-[10px] mt-[2px] pl-2 text-[#414141] font-nunito font-semibold flex justify-between items-center">
@@ -123,7 +125,6 @@ function Message({ message, i, setReplyingMessage }) {
           />
         )}
       </span>
-     
     </li>
   );
 }

@@ -4,20 +4,6 @@ const multer = require("multer");
 const User = require("../models/userModel");
 const sharpResizing = require("../utils/sharpResizing");
 
-const multerStrorage = multer.memoryStorage();
-const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith("image")) {
-    cb(null, true);
-  } else {
-    cb(
-      new ErrorHandler("Not an image! Please upload only images.", 400),
-      false
-    );
-  }
-};
-
-
-
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find();
   res.status(200).json({
