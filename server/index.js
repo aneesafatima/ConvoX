@@ -28,32 +28,32 @@ const DB = process.env.DB_CONNECTION_STRING.replace(
 );
 const app = express(); //app is an instance of express
 const server = http.createServer(app);
-
-
 //ERROR HANDLING
 
 // This will catch any uncaught exceptions from anywhere in your app
-process.on("uncaughtException", (err) => {
-  console.log("UNCAUGHT EXCEPTION! 💥 Shutting down...");
-  console.error(err.name, err.message);
-  process.exit(1);
-});
-// This will catch any unhandled promise rejections from anywhere in your app
-process.on("unhandledRejection", (err) => {
-  console.log("UNHANDLED REJECTION! 💥 Shutting down...");
-  console.error(err.name, err.message);
-  // Attempt to close server gracefully before exiting
-  server.close(() => {
-    process.exit(1);
-  });
-});
+// process.on("uncaughtException", (err) => {
+//   console.log("UNCAUGHT EXCEPTION! 💥 Shutting down...");
+//   console.error(err.name, err.message);
+//   process.exit(1);
+// });
+// // This will catch any unhandled promise rejections from anywhere in your app
+// process.on("unhandledRejection", (err) => {
+//   console.log("UNHANDLED REJECTION! 💥 Shutting down...");
+//   console.error(err.name, err.message);
+//   // Attempt to close server gracefully before exiting
+//   server.close(() => {
+//     process.exit(1);
+//   });
+// });
 
 // Middleware setup
 // Set Security HTTP Headers using Helmet
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }  // CORP (Cross-Origin Resource Policy):
-  // Allows cross-origin access for images, videos, etc.
-}));
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }, // CORP (Cross-Origin Resource Policy):
+    // Allows cross-origin access for images, videos, etc.
+  })
+);
 
 // Rate Limiting: Limit requests from the same IP
 const limiter = rateLimit({
@@ -71,7 +71,6 @@ app.use(xss());
 
 // Prevent HTTP Parameter Pollution
 app.use(hpp());
-
 
 const io = new Server(server, {
   cors: {
@@ -115,7 +114,7 @@ mongoose
     if (process.env.NODE_ENV === "development") {
       server.listen(process.env.PORT, () => {
         console.log(`Server is listening on port ${process.env.PORT}`);
-      });
+      }); //remove this condition checking in if for testing in production mode
     }
   })
   .catch((err) => {

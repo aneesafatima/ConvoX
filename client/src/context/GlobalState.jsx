@@ -26,6 +26,7 @@ export function GlobalProvider({ children }) {
   const [unreadMessages, setUnreadMessages] = useState();
   const [groupMembers, setGroupMembers] = useState();
   const [lastMessage, setLastMessage] = useState();
+  const [replyingToMessage, setReplyingToMessage] = useState(null);
 
   return (
     <GlobalState.Provider
@@ -76,6 +77,8 @@ export function GlobalProvider({ children }) {
         setGroupMembers,
         lastMessage,
         setLastMessage,
+        replyingToMessage,
+        setReplyingToMessage,
       }}
     >
       {children}

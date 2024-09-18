@@ -4,24 +4,19 @@ const ErrorHandler = require("../utils/ErrorHandler");
 const { promisify } = require("util");
 const catchAsync = require("../utils/catchAsync");
 
-
 const sendToken = (user, statusCode, res) => {
   const token = createSendToken(user._id);
 
   res.cookie("jwt", token, {
     expires: new Date(
-        Date.now() + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
-      ),
-    // maxAge: 5000,
+      Date.now() + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
     secure: process.env.NODE_ENV === "development" ? false : true,
     sameSite: process.env.NODE_ENV === "development" ? "Strict" : "None",
     httpOnly: true,
     path: "/",
   });
-  //new Date(
-  //   Date.now() + process.env.COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
-  // )
-  
+
   res.status(statusCode).json({
     status: "success",
     token,
@@ -35,15 +30,6 @@ const createSendToken = (id) => {
   });
 };
 
-const filterObject = (req, ...data) => {
-  const filteredObject = {};
-  data.forEach((el) => {
-    if (data.includes(el)) {
-      filteredObject[el] = req[el];
-    }
-  });
-  return filteredObject;
-};
 exports.signUp = catchAsync(async (req, res, next) => {
   const user = await User.create({
     name: req.body.name,
@@ -86,53 +72,11 @@ exports.protect = catchAsync(async (req, res, next) => {
   if (!currentUser)
     return next(new ErrorHandler("There is no user belonging to this Id", 400));
 
-
-  //check if token was issued before the password was changed
-
-  if (currentUser.passwordChangedAfter(decoded.iat))
-    return next(new ErrorHandler("Your password was changed recently", 400));
-
   req.user = currentUser;
 
   //promisify returns a promise based version of the jwt.verify function which we are immediatedly calling in the next step
 
   next();
-});
-
-exports.updateMyPassword = catchAsync(async (req, res, next) => {
-  const { password, passwordConfirm, newPassword } = req.body;
-
-  const user = await User.findOne({ _id: req.user._id }).select("+password");
- 
-
-  if (!password || !(await user.comparePasswords(password, user.password)))
-    return next(new ErrorHandler("Invalid password", 400));
-  //add a middleware to set a passwordChangedAt date
-
- 
-  user.password = newPassword;
-  user.passwordConfirm = passwordConfirm;
-  await user.save(); //validators for all the fields are run
-
-  sendToken(user, 200, res);
-});
-
-exports.updateMe = catchAsync(async (req, res, next) => {
-  const filteredObject = filterObject(req.body, "name", "email", "status");
-
-  const updatedUser = await User.findByIdAndUpdate(
-    req.user._id,
-    filteredObject,
-    {
-      runValidators: true,
-      new: true,
-    }
-  );
-
-  res.status(200).json({
-    status: "success",
-    user: updatedUser,
-  });
 });
 
 exports.logOut = (req, res) => {
@@ -148,13 +92,3 @@ exports.logOut = (req, res) => {
     status: "success",
   });
 };
-
-exports.deleteMe = catchAsync(async (req, res, next) => {
-  const { userId } = req.params;
-
-  await User.findByIdAndDelete(userId);
-  res.status(204).json({
-    status: "success",
-  });
-});
-

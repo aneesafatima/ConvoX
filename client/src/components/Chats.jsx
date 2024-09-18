@@ -2,11 +2,12 @@ import React, { useContext, useEffect, useState } from "react";
 import { GlobalState } from "../context/GlobalState";
 import { Message, MessageInputBox, ShowFiles, ChatsHeader, ReactTooltip } from ".";
 
+
 function Chats() {
-  const { selectedChat, messages, currentUser } =
+  const { selectedChat, messages, currentUser,replyingToMessage, setReplyingToMessage } =
     useContext(GlobalState);
 
-  const [replyingMessage, setReplyingMessage] = useState(null);
+  
   const [showFilesMessages, setShowFilesMessages] = useState(false);
 
   useEffect(() => {
@@ -38,15 +39,13 @@ function Chats() {
                 <Message
                   key={i}
                   message={message}
-                  setReplyingMessage={setReplyingMessage}
+                 
                 />
               )
             )}
           </ul>
 
           <MessageInputBox
-            replyingMessage={replyingMessage}
-            setReplyingMessage={setReplyingMessage}
           />
         </div>
         {showFilesMessages && <ShowFiles />}

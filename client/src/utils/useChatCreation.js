@@ -9,7 +9,6 @@ const chatCreation = (contacts) => {
     selectedChat,
     setGroupMembers,
     setShowUsers,
-
     showUsers,
     setFetchUserChats,
     groupMembers,

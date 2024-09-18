@@ -20,7 +20,7 @@ const handleIoConnection = (io) => {
     connectedUsers.push({ userId, socketId: socket.id });
 
     socket.on("unread-message", ({ contactId, receiver }) => {
-      console.log("active but tab not opened")
+      console.log("active but tab not opened");
       unreadMessages(contactId, receiver);
     });
 
@@ -31,15 +31,16 @@ const handleIoConnection = (io) => {
           receiver: data.to,
           message: data.message,
           format: data.format,
-          replyingToMessage: data.replyingMessage,
+          replyingToMessage: data.replyingToMessage,
         });
 
         const receiver = connectedUsers.find((user) => user.userId === data.to);
         if (receiver) {
-          console.log("receiver", receiver);
           socket.to(receiver.socketId).emit("new-message", {
             contactId: userId,
-            message: data.format !== "text" ? data.format : data.message,
+            message: data.message,
+            replyingToMessage: data.replyingToMessage,
+            format: data.format,
           });
         } else {
           unreadMessages(userId, data.to);
@@ -51,7 +52,7 @@ const handleIoConnection = (io) => {
           message: data.message,
           isGroupMessage: true,
           format: data.format,
-          replyingToMessage: data.replyingMessage,
+          replyingToMessage: data.replyingToMessage,
         });
         const groupMemberIds = await User.find({ groupIds: data.to }).select(
           "_id unreadMessages"
@@ -73,6 +74,15 @@ const handleIoConnection = (io) => {
           message: data.format !== "text" ? data.format : data.message,
         });
       }
+    });
+
+    socket.on("delete-message", ({ id, chatId, userId }) => {
+      const receiverSocketId = connectedUsers.find(
+        (user) => user.userId === userId
+      )?.socketId;
+      console.log(receiverSocketId);
+      if (receiverSocketId)
+        socket.to(receiverSocketId).emit("delete-message", { id, chatId });
     });
 
     socket.on(

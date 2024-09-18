@@ -51,6 +51,34 @@ export const handleLastMessageUpdation = (lastMessage, contactId, message) => {
   } else {
     return lastMessage
       ? [...lastMessage, { contactId, message, timestamp: Date.now() }]
-      : [{contactId, message, timestamp: Date.now() }];
+      : [{ contactId, message, timestamp: Date.now() }];
+  }
+};
+
+//delete message
+export const handleDeleteMessage = (
+  socket,
+  messageId,
+  setMessages,
+  currentUser,
+  selectedChat
+) => {
+  setMessages((prev) => {
+    const deletedMessageIndex = prev.findIndex(
+      (msg) => msg.timestamp === messageId
+    );
+    const newMessages = [...prev];
+    newMessages[deletedMessageIndex].message = "This message was deleted";
+    newMessages[deletedMessageIndex].deleted = "true";
+    return newMessages;
+  });
+  if (selectedChat) {
+    console.log("selectedChat", selectedChat);
+    socket.emit("delete-message", {
+      id: messageId,
+      chatId:
+        selectedChat.type === "group" ? currentUser._id : selectedChat.info._id,
+      userId: selectedChat.info._id,
+    });
   }
 };

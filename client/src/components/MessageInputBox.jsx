@@ -9,7 +9,7 @@ import { GlobalState } from "../context/GlobalState";
 import axios from "axios";
 import { handleLastMessageUpdation } from "../utils/helpers";
 
-function MessageInputBox({ setReplyingMessage, replyingMessage }) {
+function MessageInputBox() {
   const {
     selectedChat,
     socket,
@@ -18,6 +18,8 @@ function MessageInputBox({ setReplyingMessage, replyingMessage }) {
     setFetchMessages,
     lastMessage,
     setLastMessage,
+    setReplyingToMessage,
+    replyingToMessage,
   } = useContext(GlobalState);
   const [input, setInput] = useState("");
 
@@ -43,7 +45,7 @@ function MessageInputBox({ setReplyingMessage, replyingMessage }) {
           to: selectedChat.info._id,
           type: selectedChat.type,
           format: name === "photo-upload" ? "photo" : "file",
-          replyingMessage,
+          replyingToMessage,
         });
         setMessages((prev) => [
           ...prev,
@@ -53,11 +55,11 @@ function MessageInputBox({ setReplyingMessage, replyingMessage }) {
             receiver: selectedChat.info._id,
             timestamp: Date.now(),
             format: name === "photo-upload" ? "photo" : "file",
-            replyingMessage,
+            replyingToMessage,
           },
         ]);
         setFetchMessages(true);
-        setReplyingMessage(undefined);
+        setReplyingToMessage(undefined);
         setLastMessage(
           handleLastMessageUpdation(
             lastMessage,
@@ -77,9 +79,8 @@ function MessageInputBox({ setReplyingMessage, replyingMessage }) {
         to: selectedChat.info._id,
         type: selectedChat.type,
         format: "text",
-        replyingMessage,
+        replyingToMessage,
       });
-      setFetchMessages(true);
       setMessages((prev) => [
         ...prev,
         {
@@ -87,10 +88,11 @@ function MessageInputBox({ setReplyingMessage, replyingMessage }) {
           sender: currentUser._id,
           receiver: selectedChat.info._id,
           timestamp: Date.now(),
-          replyingMessage,
+          format: "text",
+          replyingToMessage,
         },
       ]);
-      if (replyingMessage) setReplyingMessage(undefined);
+      if (replyingToMessage) setReplyingToMessage(undefined);
       setInput("");
       setLastMessage(
         handleLastMessageUpdation(lastMessage, selectedChat.info._id, input)
@@ -99,19 +101,19 @@ function MessageInputBox({ setReplyingMessage, replyingMessage }) {
   };
   return (
     <div className="sticky bottom-0 m-auto  w-fit h-10  flex items-center mb-2 justify-center ">
-      {replyingMessage && (
-        <div className="absolute left-0  flex flex-col font-nunito  bottom-full bg-[#f7f7f7]  shadow-sm w-48 text-xs space-y-2 p-3 rounded-md mb-3 ">
+      {replyingToMessage && (
+        <div className="absolute left-0 z-50 flex flex-col font-nunito  bottom-full bg-[#f7f7f7]  shadow-sm w-48 text-xs space-y-2 p-3 rounded-md mb-3 ">
           <span className="flex items-center justify-between">
             <span className="flex items-center font-semibold">
               <FaReply size={13} className="mr-2  " />
               Replying
             </span>
             <RxCross2
-              onClick={() => setReplyingMessage(false)}
+              onClick={() => setReplyingToMessage(false)}
               className="cursor-pointer"
             />
           </span>
-          <span>{replyingMessage}</span>
+          <span>{replyingToMessage}</span>
         </div>
       )}
 
@@ -141,6 +143,7 @@ function MessageInputBox({ setReplyingMessage, replyingMessage }) {
           className="w-full h-full opacity-0 absolute   "
           onChange={() => handleFileUpload("photo-message", "photo-upload")}
           id="photo-message"
+          disabled={selectedChat.type === "group" && !selectedChat.info.active}
         />
 
         <MdInsertPhoto
@@ -156,6 +159,7 @@ function MessageInputBox({ setReplyingMessage, replyingMessage }) {
           className="w-full h-full opacity-0 absolute  "
           onChange={() => handleFileUpload("file-message", "file-upload")}
           id="file-message"
+          disabled={selectedChat.type === "group" && !selectedChat.info.active}
         />
 
         <SiFiles

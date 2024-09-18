@@ -17,16 +17,23 @@ const useSocket = () => {
     setLastMessage,
     lastMessage,
     unreadMessages,
+    setMessages,
+    replyingToMessage
   } = useContext(GlobalState);
 
   const selectedChatRef = useRef(selectedChat);
   const lastMessageRef = useRef(lastMessage);
+  const replyingToMessageRef = useRef(replyingToMessage);
   useEffect(() => {
     selectedChatRef.current = selectedChat;
   }, [selectedChat]);
   useEffect(() => {
     lastMessageRef.current = lastMessage;
   }, [lastMessage]);
+  useEffect(() => {
+    console.log(replyingToMessage);
+    replyingToMessageRef.current = replyingToMessage;
+  }, [replyingToMessage]);
 
   useEffect(() => {
     if (currentUser && !socket) {
@@ -50,7 +57,7 @@ const useSocket = () => {
       socket.on("connect", () => {
         console.log("Connected to the server with id : ", socket.id);
 
-        socket.on("new-message", ({ contactId, message }) => {
+        socket.on("new-message", ({ contactId, message, replyingToMessage, format }) => {
           console.log("new-message received");
           setLastMessage(
             handleLastMessageUpdation(
@@ -67,25 +74,39 @@ const useSocket = () => {
               contactId,
               receiver: currentUser._id,
             });
-            console.log("unread-message emitted");
             setUnreadMessages((prev) => {
               const existingIndex = prev.findIndex(
                 (item) => item.from === contactId
               );
               if (existingIndex !== -1) {
                 const updatedUnreadMessages = [...prev];
-
-                console.log(
-                  "updatedUnreadMessages",
-                  prev
-                );
                 updatedUnreadMessages[existingIndex].count += 1;
                 return updatedUnreadMessages;
               } else {
                 return [...prev, { from: contactId, count: 1 }];
               }
             });
-          } else setFetchMessages(true);
+          } else {
+            setMessages((prev) => [
+              ...prev,
+              {
+                message,
+                sender: selectedChatRef.current.info._id,
+                receiver: currentUser._id,
+                timestamp: Date.now(),
+                replyingToMessage,
+                format
+              },
+            ]);
+
+          };
+        });
+
+        socket.on("delete-message", ({ messageId, chatId }) => {
+          console.log(chatId, selectedChatRef.current?.info._id, messageId);
+          if (selectedChatRef.current?.info._id === chatId) {
+            handleDeleteMessage(socket,messageId, setMessages);
+          }
         });
 
         socket.on("added-to-group", ({ userName, groupId, groupName }) => {

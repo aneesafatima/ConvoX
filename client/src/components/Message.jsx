@@ -1,17 +1,24 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { MdDelete } from "react-icons/md";
 import { RiShareForwardFill } from "react-icons/ri";
 import { GoDownload } from "react-icons/go";
 import { getFormattedDate } from "../utils/helpers";
 import { GlobalState } from "../context/GlobalState";
 import axios from "axios";
-import { getFileIcon } from "../utils/helpers";
+import { getFileIcon, handleDeleteMessage } from "../utils/helpers";
 
-function Message({ message, i, setReplyingMessage }) {
-  const { currentUser, selectedChat, groupMembers, messages, setMessages } =
-    useContext(GlobalState);
+function Message({ message, i }) {
+  const {
+    socket,
+    currentUser,
+    selectedChat,
+    groupMembers,
+    messages,
+    setMessages,
+    setReplyingToMessage,
+  } = useContext(GlobalState);
 
-  const handleDeleteMessage = async (messageId) => {
+  const deleteMessage = async (messageId) => {
     try {
       const res = await axios.patch(
         `${import.meta.env.VITE_URL}/api/messages/delete-message/${messageId}`,
@@ -19,19 +26,21 @@ function Message({ message, i, setReplyingMessage }) {
         { withCredentials: true }
       );
       if (res.data?.status === "success") {
-        const deletedMessageIndex = messages.findIndex(
-          (msg) => msg._id === messageId
+        handleDeleteMessage(
+          socket,
+          messageId,
+          setMessages,
+          currentUser,
+          selectedChat
         );
-        const newMessages = [...messages];
-        newMessages[deletedMessageIndex].message = "This message was deleted";
-        newMessages[deletedMessageIndex].deleted = "true";
-
-        setMessages(newMessages);
       }
     } catch (err) {
       console.log(err);
     }
   };
+  // useEffect(() => {
+  //   console.log(messages), [messages];
+  // });
   return (
     <li
       className={`text-sm flex flex-col relative ${
@@ -91,7 +100,7 @@ function Message({ message, i, setReplyingMessage }) {
               size={10}
               className="absolute z-40 left-full mx-1 top-1/2 -translate-y-1/2 cursor-pointer hover:opacity-100 "
               onClick={() =>
-                setReplyingMessage(
+                setReplyingToMessage(
                   message.format === "photo"
                     ? "photo"
                     : message.format === "file"
@@ -121,7 +130,7 @@ function Message({ message, i, setReplyingMessage }) {
           <MdDelete
             color="#b2b2b2"
             className=" cursor-pointer"
-            onClick={() => handleDeleteMessage(message._id)}
+            onClick={() => deleteMessage(message.timestamp)}
           />
         )}
       </span>

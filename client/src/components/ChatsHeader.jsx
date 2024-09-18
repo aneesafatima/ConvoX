@@ -5,21 +5,22 @@ import { MdDeleteForever } from "react-icons/md";
 import { IoMdInformationCircle } from "react-icons/io";
 import { GlobalState } from "../context/GlobalState";
 import { useChatHandlers } from "../utils/useChatHandlers";
+import { IoChevronBackOutline } from "react-icons/io5";
 import { useContext } from "react";
-function ChatsHeader({setShowFilesMessages}) {
+function ChatsHeader({ setShowFilesMessages }) {
   const { handleGroupExit, handleDeleteChats, handleUserRemovalFromChats } =
     useChatHandlers(); //called on every render abd uses this component's lifecycle
 
-  const {
-    selectedChat,
-    setShowGroupSettings,
-    currentUser,
-  } = useContext(GlobalState);
+  const { selectedChat, setShowGroupSettings, currentUser, setSelectedChat } =
+    useContext(GlobalState);
   return (
     <div className="flex justify-between items-center">
-      <h2 className="text-2xl font-roboto font-semibold text-[#333333] ">
-        Chats with {selectedChat.info.name}
-      </h2>
+      <span className="flex items-center space-x-3">
+        <IoChevronBackOutline size={20} className="cursor-pointer" onClick={() => setSelectedChat(null)} />
+        <h2 className="text-2xl font-roboto font-semibold text-[#333333] ">
+          Chats with {selectedChat.info.name}
+        </h2>
+      </span>
       <div className="flex items-center space-x-1">
         {selectedChat.type === "group" ? (
           <span className="flex items-center space-x-1 ">
@@ -75,7 +76,6 @@ function ChatsHeader({setShowFilesMessages}) {
           onClick={() => setShowFilesMessages((prev) => !prev)}
         />
       </div>
-    
     </div>
   );
 }

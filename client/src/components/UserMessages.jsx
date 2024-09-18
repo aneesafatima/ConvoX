@@ -12,6 +12,7 @@ import { showAlert } from "../utils/showAlert";
 import { getFormattedDate } from "../utils/helpers";
 
 function UserMessages({ contacts }) {
+  console.log(contacts);
   const {
     setShowUsers,
     currentUser,
@@ -60,7 +61,7 @@ function UserMessages({ contacts }) {
       className={`border-r-2 h-svh overflow-auto scrollbar relative rounded-e-lg pt-3 flex flex-col p-2 pb-5 `}
     >
       <button
-        className="w-full sm:w-[50%] text-xs  px-1 py-2 flex justify-center items-center  rounded-lg bg-[#2c2c2c] hover:bg-black text-white font-lato"
+        className="w-full xs:w-[20%] lg:w-[50%] text-xs  px-1 py-2 flex justify-center items-center  rounded-lg bg-[#2c2c2c] hover:bg-black text-white font-lato"
         onClick={() => {
           setFetchUsers(true);
           setShowUsers(true);

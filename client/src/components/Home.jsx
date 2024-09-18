@@ -6,10 +6,7 @@ import useSocket from "../utils/useSocket";
 import useFetchData from "../utils/useFetchData";
 
 function Home() {
-  //unread messages bug + add some more refactoring
-  //fix the unreadmessage 
-  //add jwt error hnadling in err middleware
-  //update styling
+
   const {
     giveAccess,
     selectedChat,
@@ -19,7 +16,7 @@ function Home() {
     showUsers
   } = useContext(GlobalState);
 
-  const [contacts, setContacts] = useState([]);
+  const [contacts, setContacts] = useState();
 
 
   useFetchData(setContacts, contacts);
@@ -41,8 +38,8 @@ function Home() {
     !fetch && (
       <div className="w-screen flex " id="home">
         <div
-          className={`w-svw xs:w-[300px] ${
-            selectedChat && window.innerWidth <= 540 ? "hidden" : null
+          className={`w-svw lg:w-[300px] ${
+            selectedChat && window.innerWidth <= 768 ? "hidden" : null
           }`}
         >
           <UserMessages contacts={contacts} />

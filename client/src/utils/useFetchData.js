@@ -13,6 +13,7 @@ const useFetchData = (setContacts, contacts) => {
     setFetchUserChats,
     setLastMessage,
     lastMessage,
+    giveAccess,
   } = useContext(GlobalState);
 
   useEffect(() => {
@@ -28,14 +29,15 @@ const useFetchData = (setContacts, contacts) => {
           setUnreadMessages(res.data.user.unreadMessages);
         }
       } catch (err) {
-        setShowErr({ status: true, message: err.message });
+        setFetch(false);
+        setShowErr({ status: true, message: err.response?.data.message });
       }
     }
     fetchData();
   }, []);
 
   useEffect(() => {
-    if (fetchUserChats) {
+    if (fetchUserChats && giveAccess) {
       (async () => {
         const res = await axios.get(
           `${import.meta.env.VITE_URL}/api/users/userContacts`,
@@ -53,13 +55,12 @@ const useFetchData = (setContacts, contacts) => {
           if (response.data) {
             setLastMessage(response.data.lastMessages);
           }
-
           setContacts(res.data.contactUsers);
           setFetchUserChats(false);
         }
       })();
     }
-  }, [fetchUserChats]);
+  }, [fetchUserChats, giveAccess]);
 
   useEffect(() => {
     if (lastMessage?.length > 0) {
@@ -75,4 +76,3 @@ const useFetchData = (setContacts, contacts) => {
 };
 
 export default useFetchData;
-

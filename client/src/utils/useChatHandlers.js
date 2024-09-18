@@ -38,6 +38,7 @@ export const useChatHandlers = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        console.log("got selected chat", selectedChat);
         const res = await axios.get(
           `${import.meta.env.VITE_URL}/api/messages/${selectedChat.type}/${
             selectedChat.info._id
@@ -49,11 +50,11 @@ export const useChatHandlers = () => {
           setFetchMessages(false);
 
           if (
-            currentUser.unreadMessages.find(
+            unreadMessages.find(
               (msg) => msg.from === selectedChat.info._id
-            ) &&
-            !fetchMessages
+            )
           ) {
+            console.log("entered reading message state")
             const response = await axios.patch(
               `${import.meta.env.VITE_URL}/api/messages/read-unread-messages`,
               {
@@ -74,7 +75,6 @@ export const useChatHandlers = () => {
                 setUnreadMessages((prev) => {
                   const newArray = [...prev];
                   newArray.splice(index, 1);
-                  console.log(newArray);
                   return newArray;
                 });
               }
@@ -86,9 +86,11 @@ export const useChatHandlers = () => {
       }
     };
 
-    if (selectedChat || fetchMessages) fetchData();
-  }, [selectedChat, fetchMessages]);
-
+    if (selectedChat) fetchData();
+  }, [selectedChat]);
+  useEffect(() => {
+    console.log("unreadMessages", unreadMessages), [unreadMessages];
+  });
   const handleGroupExit = useCallback(
     async (userId, groupId) => {
       const res = await axios.delete(
