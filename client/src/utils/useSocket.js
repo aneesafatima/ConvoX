@@ -2,6 +2,7 @@ import { useEffect, useContext, useRef } from "react";
 import { io } from "socket.io-client";
 import { GlobalState } from "../context/GlobalState";
 import { showAlert } from "../utils/showAlert";
+import useMessage from "./useMessage";
 import { handleLastMessageUpdation } from "./helpers";
 
 const useSocket = () => {
@@ -16,10 +17,10 @@ const useSocket = () => {
     selectedChat,
     setLastMessage,
     lastMessage,
-    unreadMessages,
     setMessages,
-    replyingToMessage
+    replyingToMessage,
   } = useContext(GlobalState);
+  const { handleDeleteMessage } = useMessage();
 
   const selectedChatRef = useRef(selectedChat);
   const lastMessageRef = useRef(lastMessage);
@@ -31,7 +32,6 @@ const useSocket = () => {
     lastMessageRef.current = lastMessage;
   }, [lastMessage]);
   useEffect(() => {
-    console.log(replyingToMessage);
     replyingToMessageRef.current = replyingToMessage;
   }, [replyingToMessage]);
 
@@ -48,64 +48,64 @@ const useSocket = () => {
     }
   }, [currentUser]);
 
-  useEffect(() => {console.log("UseEffect");
-    console.log(unreadMessages)}, [unreadMessages]);
-
   useEffect(() => {
     if (socket) {
-   
       socket.on("connect", () => {
         console.log("Connected to the server with id : ", socket.id);
 
-        socket.on("new-message", ({ contactId, message, replyingToMessage, format }) => {
-          console.log("new-message received");
+        socket.on("new-message", (message) => {
+         
           setLastMessage(
             handleLastMessageUpdation(
               lastMessageRef.current,
-              contactId,
-              message
+              message.groupId ? message.groupId : message.sender,
+              message.message
             )
           );
           if (
             !selectedChatRef.current ||
-            selectedChatRef.current.info._id !== contactId
+            selectedChatRef.current.info._id !== (message.groupId
+              ? message.groupId
+              : message.sender)
           ) {
             socket.emit("unread-message", {
-              contactId,
+              contactId: message.groupId ? message.groupId : message.sender,
               receiver: currentUser._id,
             });
             setUnreadMessages((prev) => {
               const existingIndex = prev.findIndex(
-                (item) => item.from === contactId
+                (item) =>
+                  item.from ===
+                  (message.groupId ? message.groupId : message.sender)
               );
-              if (existingIndex !== -1) {
+              if (existingIndex !== -1) { 
                 const updatedUnreadMessages = [...prev];
                 updatedUnreadMessages[existingIndex].count += 1;
-                return updatedUnreadMessages;
+                return updatedUnreadMessages
               } else {
-                return [...prev, { from: contactId, count: 1 }];
+                return [
+                  ...prev,
+                  {
+                    from: message.groupId ? message.groupId : message.sender,
+                    count: 1,
+                  },
+                ];
               }
             });
           } else {
-            setMessages((prev) => [
-              ...prev,
-              {
-                message,
-                sender: selectedChatRef.current.info._id,
-                receiver: currentUser._id,
-                timestamp: Date.now(),
-                replyingToMessage,
-                format
-              },
-            ]);
-
-          };
+            setMessages((prev) => [...prev, message]);
+          }
         });
-
-        socket.on("delete-message", ({ messageId, chatId }) => {
-          console.log(chatId, selectedChatRef.current?.info._id, messageId);
-          if (selectedChatRef.current?.info._id === chatId) {
-            handleDeleteMessage(socket,messageId, setMessages);
+        socket.on("message-sent", (message) => {
+          setMessages((prev) => [...prev, message]);
+        });
+        socket.on("delete-message", ({ messageId, selectedChatId }) => {
+          if(!selectedChatRef.current) setFetchUserChats(true)
+          else if(selectedChatRef.current?.info._id === selectedChatId){
+            console.log("deleting message from the receiver")
+            console.log("messageId", messageId)
+            console.log("selectedChatId", selectedChatId)
+            handleDeleteMessage(messageId);
           }
         });
 

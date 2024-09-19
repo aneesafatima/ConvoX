@@ -31,20 +31,20 @@ const server = http.createServer(app);
 //ERROR HANDLING
 
 // This will catch any uncaught exceptions from anywhere in your app
-// process.on("uncaughtException", (err) => {
-//   console.log("UNCAUGHT EXCEPTION! 💥 Shutting down...");
-//   console.error(err.name, err.message);
-//   process.exit(1);
-// });
-// // This will catch any unhandled promise rejections from anywhere in your app
-// process.on("unhandledRejection", (err) => {
-//   console.log("UNHANDLED REJECTION! 💥 Shutting down...");
-//   console.error(err.name, err.message);
-//   // Attempt to close server gracefully before exiting
-//   server.close(() => {
-//     process.exit(1);
-//   });
-// });
+process.on("uncaughtException", (err) => {
+  console.log("UNCAUGHT EXCEPTION! 💥 Shutting down...");
+  console.error(err.name, err.message);
+  process.exit(1);
+});
+// This will catch any unhandled promise rejections from anywhere in your app
+process.on("unhandledRejection", (err) => {
+  console.log("UNHANDLED REJECTION! 💥 Shutting down...");
+  console.error(err.name, err.message);
+  // Attempt to close server gracefully before exiting
+  server.close(() => {
+    process.exit(1);
+  });
+});
 
 // Middleware setup
 // Set Security HTTP Headers using Helmet

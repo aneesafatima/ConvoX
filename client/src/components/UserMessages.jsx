@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { GlobalState } from "../context/GlobalState";
 import { RiPencilFill } from "react-icons/ri";
 import { Notification } from ".";
@@ -12,7 +12,6 @@ import { showAlert } from "../utils/showAlert";
 import { getFormattedDate } from "../utils/helpers";
 
 function UserMessages({ contacts }) {
-  console.log(contacts);
   const {
     setShowUsers,
     currentUser,
@@ -27,6 +26,10 @@ function UserMessages({ contacts }) {
   const [imageUrl, setImageUrl] = useState(currentUser?.photo);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+  useEffect(() => {
+    console.log("useEffect")
+    console.log(contacts, lastMessage)
+  }, [contacts])
 
   const handleLogOut = async () => {
     const res = await axios.get(

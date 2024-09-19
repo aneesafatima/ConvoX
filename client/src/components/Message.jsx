@@ -5,18 +5,19 @@ import { GoDownload } from "react-icons/go";
 import { getFormattedDate } from "../utils/helpers";
 import { GlobalState } from "../context/GlobalState";
 import axios from "axios";
-import { getFileIcon, handleDeleteMessage } from "../utils/helpers";
+import { getFileIcon } from "../utils/helpers";
+import useMessage from "../utils/useMessage";
 
 function Message({ message, i }) {
   const {
-    socket,
     currentUser,
     selectedChat,
     groupMembers,
     messages,
-    setMessages,
     setReplyingToMessage,
   } = useContext(GlobalState);
+
+  const { handleDeleteMessage } = useMessage();
 
   const deleteMessage = async (messageId) => {
     try {
@@ -26,24 +27,15 @@ function Message({ message, i }) {
         { withCredentials: true }
       );
       if (res.data?.status === "success") {
-        handleDeleteMessage(
-          socket,
-          messageId,
-          setMessages,
-          currentUser,
-          selectedChat
-        );
+        handleDeleteMessage(messageId, selectedChat);
       }
     } catch (err) {
       console.log(err);
     }
   };
-  // useEffect(() => {
-  //   console.log(messages), [messages];
-  // });
   return (
     <li
-      className={`text-sm flex flex-col relative ${
+      className={`text-sm flex   flex-col relative ${
         message.sender === currentUser._id ? "self-end" : "self-start "
       } `}
       id="message"
@@ -54,67 +46,68 @@ function Message({ message, i }) {
           {message.replyingToMessage}
         </span>
       )}{" "}
-      {message.format === "photo" && !message.deleted ? (
-        <img
-          src={`${import.meta.env.VITE_URL}/public/img/chats/${
-            message.message
-          }`}
-          alt="photo"
-          className="h-32 sm:h-60"
-          loading="lazy"
-        />
-      ) : message.format === "file" && !message.deleted ? (
-        <div className="flex items-center">
-          <span>
-            <span className="text-[8px] font-nunito font-semibold text-wrap block max-w-24">
-              {message.message.substring(0, message.message.lastIndexOf("-"))}
+      
+      <span className="relative w-fit mb-2">
+        {message.format === "photo" && !message.deleted ? (
+          <img
+            src={`${import.meta.env.VITE_URL}/public/img/chats/${
+              message.message
+            }`}
+            alt="photo"
+            className="h-32 sm:h-60"
+            loading="lazy"
+          />
+        ) : message.format === "file" && !message.deleted ? (
+          <div className="flex items-center">
+            <span>
+              <span className="text-[8px] font-nunito font-semibold text-wrap block max-w-24">
+                {message.message.substring(0, message.message.lastIndexOf("-"))}
+              </span>
+              <a
+                href={`${import.meta.env.VITE_URL}/public/file-uploads/${
+                  message.message
+                }`}
+                downlaod
+                target="_blank"
+              >
+                <GoDownload />
+              </a>
             </span>
-            <a
-              href={`${import.meta.env.VITE_URL}/public/file-uploads/${
-                message.message
-              }`}
-              downlaod
-              target="_blank"
-            >
-              <GoDownload />
-            </a>
-          </span>
 
-          {getFileIcon(
-            message.message.substring(message.message.indexOf(".") + 1)
-          )}
-        </div>
-      ) : (
-        <span
-          className={` z-30 relative
+            {getFileIcon(
+              message.message.substring(message.message.indexOf(".") + 1)
+            )}
+          </div>
+        ) : (
+          <span
+            className={` z-30
                         ${message.deleted ? "text-gray-500" : "text-[#333333]"}
                         ${
                           message.sender !== currentUser._id
                             ? "bg-[#E8F5E9] self-start rounded-bl-none"
                             : "bg-[#E0F7FA] self-end rounded-br-none"
                         } p-1 px-2 py-2 sm:p-3 text-xs sm:text-sm rounded-lg`}
-        >
-          {message.message}
-          {!message.deleted && message.sender !== currentUser._id && (
-            <RiShareForwardFill
-              size={10}
-              className="absolute z-40 left-full mx-1 top-1/2 -translate-y-1/2 cursor-pointer hover:opacity-100 "
-              onClick={() =>
-                setReplyingToMessage(
-                  message.format === "photo"
-                    ? "photo"
-                    : message.format === "file"
-                    ? message.message.substring(
-                        0,
-                        message.message.lastIndexOf("-")
-                      )
-                    : message.message
-                )
-              }
-            />
-          )}
-        </span>
+          >
+            {message.message}
+          </span>
+        )}
+         {!message.deleted && message.sender !== currentUser._id && (
+        <RiShareForwardFill
+          size={10}
+          className="absolute z-40 left-full  mx-1 top-1/2 -translate-y-1/2 cursor-pointer hover:opacity-100 "
+          onClick={() =>
+            setReplyingToMessage(
+              message.format === "photo"
+                ? "photo"
+                : message.format === "file"
+                ? message.message.substring(0, message.message.lastIndexOf("-"))
+                : message.message
+            )
+          }
+        />
       )}
+      </span>
+     
       <span className="text-[10px] mt-[2px] pl-2 text-[#414141] font-nunito font-semibold flex justify-between items-center">
         <span>
           {message.sender !== currentUser._id
@@ -130,7 +123,7 @@ function Message({ message, i }) {
           <MdDelete
             color="#b2b2b2"
             className=" cursor-pointer"
-            onClick={() => deleteMessage(message.timestamp)}
+            onClick={() => deleteMessage(message._id)}
           />
         )}
       </span>

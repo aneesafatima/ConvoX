@@ -1,6 +1,7 @@
 import { useEffect, useContext } from "react";
 import axios from "axios";
 import { GlobalState } from "../context/GlobalState";
+import { RiCoinsLine } from "react-icons/ri";
 
 const useFetchData = (setContacts, contacts) => {
   const {
@@ -46,6 +47,7 @@ const useFetchData = (setContacts, contacts) => {
           }
         );
         if (res.data?.status === "success") {
+          console.log("fetching chats again")
           const response = await axios.get(
             `${import.meta.env.VITE_URL}/api/messages/last-messages`,
             {
@@ -55,6 +57,7 @@ const useFetchData = (setContacts, contacts) => {
           if (response.data) {
             setLastMessage(response.data.lastMessages);
           }
+          // console.log(response.data.lastMessages)
           setContacts(res.data.contactUsers);
           setFetchUserChats(false);
         }
@@ -63,6 +66,7 @@ const useFetchData = (setContacts, contacts) => {
   }, [fetchUserChats, giveAccess]);
 
   useEffect(() => {
+    console.log("last messages", lastMessage)
     if (lastMessage?.length > 0) {
       const sortedLastMessages = lastMessage.sort(
         (a, b) => new Date(b.timestamp) - new Date(a.timestamp)

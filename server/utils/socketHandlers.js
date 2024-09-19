@@ -20,13 +20,13 @@ const handleIoConnection = (io) => {
     connectedUsers.push({ userId, socketId: socket.id });
 
     socket.on("unread-message", ({ contactId, receiver }) => {
-      console.log("active but tab not opened");
       unreadMessages(contactId, receiver);
     });
 
     socket.on("send-message", async (data) => {
+      let message;
       if (data.type === "individual") {
-        await Message.create({
+        message = await Message.create({
           sender: userId,
           receiver: data.to,
           message: data.message,
@@ -34,19 +34,16 @@ const handleIoConnection = (io) => {
           replyingToMessage: data.replyingToMessage,
         });
 
+        socket.emit("message-sent", message);
+
         const receiver = connectedUsers.find((user) => user.userId === data.to);
         if (receiver) {
-          socket.to(receiver.socketId).emit("new-message", {
-            contactId: userId,
-            message: data.message,
-            replyingToMessage: data.replyingToMessage,
-            format: data.format,
-          });
+          socket.to(receiver.socketId).emit("new-message", message);
         } else {
           unreadMessages(userId, data.to);
         }
       } else if (data.type === "group") {
-        await Message.create({
+        message = await Message.create({
           sender: userId,
           groupId: data.to,
           message: data.message,
@@ -68,22 +65,26 @@ const handleIoConnection = (io) => {
         disconnectedUsers?.forEach(async (user) => {
           unreadMessages(data.to, user._id);
         });
-
-        socket.to(data.to).emit("new-message", {
-          contactId: data.to,
-          message: data.format !== "text" ? data.format : data.message,
-        });
+        socket.emit("message-sent", message);
+        socket.to(data.to).emit("new-message", message);
       }
     });
 
-    socket.on("delete-message", ({ id, chatId, userId }) => {
-      const receiverSocketId = connectedUsers.find(
-        (user) => user.userId === userId
-      )?.socketId;
-      console.log(receiverSocketId);
-      if (receiverSocketId)
-        socket.to(receiverSocketId).emit("delete-message", { id, chatId });
-    });
+    socket.on(
+      "delete-message",
+      ({ messageId, selectedChatId, userId, type }) => {
+        let receiverSocketId;
+        if (type !== "group") {
+          receiverSocketId = connectedUsers.find(
+            (user) => user.userId === userId
+          )?.socketId;
+        } else receiverSocketId = selectedChatId;
+        if (receiverSocketId)
+          socket
+            .to(receiverSocketId)
+            .emit("delete-message", { messageId, selectedChatId });
+      }
+    );
 
     socket.on(
       "added-new-user",

@@ -38,7 +38,6 @@ exports.getUserContacts = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.user._id)
     .populate([{ path: "contacts" }, { path: "groupIds" }])
     .select("-passwordConfirm");
-  console.log(user);
   res.status(200).json({
     status: "success",
     contactUsers: user.contacts

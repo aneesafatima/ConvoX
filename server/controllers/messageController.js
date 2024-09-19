@@ -81,7 +81,7 @@ exports.resizeUploadedPhoto = catchAsync(async (req, res, next) => {
 });
 exports.deleteMessage = catchAsync(async (req, res, next) => {
   const { messageId } = req.params;
-  await Message.findOneAndUpdate({timestamp: messageId}, {
+  await Message.findByIdAndUpdate(messageId, {
     message: "This message was deleted",
     deleted: true,
   });

@@ -2,103 +2,21 @@ import React, { useContext, useEffect, useState } from "react";
 import { RxCross2 } from "react-icons/rx";
 import { IoSend } from "react-icons/io5";
 import { MdInsertPhoto } from "react-icons/md";
-
 import { FaReply } from "react-icons/fa6";
 import { SiFiles } from "react-icons/si";
 import { GlobalState } from "../context/GlobalState";
-import axios from "axios";
-import { handleLastMessageUpdation } from "../utils/helpers";
+import useMessage from "../utils/useMessage";
 
 function MessageInputBox() {
   const {
     selectedChat,
-    socket,
-    setMessages,
-    currentUser,
-    setFetchMessages,
-    lastMessage,
-    setLastMessage,
     setReplyingToMessage,
     replyingToMessage,
   } = useContext(GlobalState);
   const [input, setInput] = useState("");
+const { handleFileUpload, handeSendingMessage } = useMessage(input, setInput);
 
-  const handleFileUpload = async (id, name) => {
-    const file = document.getElementById(id).files[0];
-    const form = new FormData();
-    form.append(name, file);
-    try {
-      const res = await axios({
-        url: `${import.meta.env.VITE_URL}/api/messages/${
-          name === "photo-upload" ? "send-photo-message" : "file-upload"
-        }`,
-        method: "POST",
-        data: form,
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        withCredentials: true,
-      });
-      if (res.data?.status === "success") {
-        socket.emit("send-message", {
-          message: res.data.file,
-          to: selectedChat.info._id,
-          type: selectedChat.type,
-          format: name === "photo-upload" ? "photo" : "file",
-          replyingToMessage,
-        });
-        setMessages((prev) => [
-          ...prev,
-          {
-            message: res.data.file,
-            sender: currentUser._id,
-            receiver: selectedChat.info._id,
-            timestamp: Date.now(),
-            format: name === "photo-upload" ? "photo" : "file",
-            replyingToMessage,
-          },
-        ]);
-        setFetchMessages(true);
-        setReplyingToMessage(undefined);
-        setLastMessage(
-          handleLastMessageUpdation(
-            lastMessage,
-            selectedChat.info._id,
-            name === "photo-upload" ? "photo" : "file"
-          )
-        );
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  const handeSendingMessage = () => {
-    if (input !== "") {
-      socket.emit("send-message", {
-        message: input,
-        to: selectedChat.info._id,
-        type: selectedChat.type,
-        format: "text",
-        replyingToMessage,
-      });
-      setMessages((prev) => [
-        ...prev,
-        {
-          message: input,
-          sender: currentUser._id,
-          receiver: selectedChat.info._id,
-          timestamp: Date.now(),
-          format: "text",
-          replyingToMessage,
-        },
-      ]);
-      if (replyingToMessage) setReplyingToMessage(undefined);
-      setInput("");
-      setLastMessage(
-        handleLastMessageUpdation(lastMessage, selectedChat.info._id, input)
-      );
-    }
-  };
+
   return (
     <div className="sticky bottom-0 m-auto  w-fit h-10  flex items-center mb-2 justify-center ">
       {replyingToMessage && (
