@@ -43,8 +43,8 @@ const useMessage = (input, setInput) => {
   };
 
   //FOR FILE UPLOAD
-  const handleFileUpload = async (e,id, name) => {
-    e.stopPropagation(); 
+  const handleFileUpload = async (e, id, name) => {
+    e.stopPropagation();
     const file = document.getElementById(id).files[0];
     const form = new FormData();
     form.append(name, file);
@@ -86,7 +86,7 @@ const useMessage = (input, setInput) => {
   const handeSendingMessage = () => {
     if (input !== "") {
       socket.emit("send-message", {
-        message: input,
+        message: input.trim(),
         to: selectedChat.info._id,
         type: selectedChat.type,
         format: "text",
@@ -95,7 +95,11 @@ const useMessage = (input, setInput) => {
       if (replyingToMessage) setReplyingToMessage(undefined);
       setInput("");
       setLastMessage(
-        handleLastMessageUpdation(lastMessage, selectedChat.info._id, input)
+        handleLastMessageUpdation(
+          lastMessage,
+          selectedChat.info._id,
+          input.trim()
+        )
       );
     }
   };

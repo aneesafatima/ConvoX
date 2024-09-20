@@ -46,7 +46,7 @@ const { handleFileUpload, handeSendingMessage } = useMessage(input, setInput);
         id="message"
         disabled={selectedChat.type === "group" && !selectedChat.info.active}
         value={input}
-        onChange={(e) => setInput(e.target.value.trim())}
+        onChange={(e) => setInput(e.target.value)}
       />
       <IoSend
         onClick={handeSendingMessage}

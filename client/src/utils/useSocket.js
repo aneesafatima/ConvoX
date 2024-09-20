@@ -54,39 +54,38 @@ const useSocket = () => {
        
 
         socket.on("new-message", (message) => {
-         
+          const contactId = message.groupId ? message.groupId : message.sender;
           setLastMessage(
             handleLastMessageUpdation(
               lastMessageRef.current,
               message.groupId ? message.groupId : message.sender,
-              message.message
+              message.format !== "text" ? message.format : message.message
             )
           );
           if (
             !selectedChatRef.current ||
-            selectedChatRef.current.info._id !== (message.groupId
-              ? message.groupId
-              : message.sender)
+            selectedChatRef.current.info._id !==
+            contactId
           ) {
             socket.emit("unread-message", {
-              contactId: message.groupId ? message.groupId : message.sender,
+              contactId,
               receiver: currentUser._id,
             });
             setUnreadMessages((prev) => {
               const existingIndex = prev.findIndex(
                 (item) =>
                   item.from ===
-                  (message.groupId ? message.groupId : message.sender)
+                contactId
               );
-              if (existingIndex !== -1) { 
+              if (existingIndex !== -1) {
                 const updatedUnreadMessages = [...prev];
                 updatedUnreadMessages[existingIndex].count += 1;
-                return updatedUnreadMessages
+                return updatedUnreadMessages;
               } else {
                 return [
                   ...prev,
                   {
-                    from: message.groupId ? message.groupId : message.sender,
+                    from: contactId,
                     count: 1,
                   },
                 ];
@@ -100,8 +99,8 @@ const useSocket = () => {
           setMessages((prev) => [...prev, message]);
         });
         socket.on("delete-message", ({ messageId, selectedChatId }) => {
-          if(!selectedChatRef.current) setFetchUserChats(true)
-          else if(selectedChatRef.current?.info._id === selectedChatId){
+          if (!selectedChatRef.current) setFetchUserChats(true);
+          else if (selectedChatRef.current?.info._id === selectedChatId) {
             handleDeleteMessage(messageId);
           }
         });
