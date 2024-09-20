@@ -23,6 +23,7 @@ function UserMessages({ contacts }) {
     setGroupMembers,
     lastMessage,
   } = useContext(GlobalState);
+  useEffect(() => {console.log(contacts)}, [contacts]);
   const [imageUrl, setImageUrl] = useState(currentUser?.photo);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
