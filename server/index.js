@@ -110,12 +110,10 @@ mongoose
   .connect(DB, {})
   .then(() => {
     console.log("Mongodb connected");
-
-    if (process.env.NODE_ENV === "development") {
       server.listen(process.env.PORT, () => {
         console.log(`Server is listening on port ${process.env.PORT}`);
-      }); //remove this condition checking in if for testing in production mode
-    }
+      }); 
+    
   })
   .catch((err) => {
     console.error("DATABASE CONNECTION ERROR:", err);
