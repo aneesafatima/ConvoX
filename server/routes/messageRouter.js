@@ -1,12 +1,10 @@
 const express = require("express");
 const multer = require("multer");
-const uuid = require("uuid");
-const ErrorHandler = require("../utils/errorHandler");
+const ErrorHandler = require("../utils/ErrorHandler");
 const { protect } = require("../controllers/authController");
 const {
   getMessagesForContact,
   deleteChatMessages,
-
   deleteMessage,
   readUnreadMessages,
   sendPhotoAsChat,
@@ -35,7 +33,6 @@ const multerFilter = (req, file, cb) => {
     "mp3",
     "pdf",
   ];
-  console.log(file.mimetype);
   if (allowedTypes.includes(file.mimetype.split("/")[1])) {
     cb(null, true);
   } else {
