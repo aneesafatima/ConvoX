@@ -13,7 +13,6 @@ function Message({ message, i }) {
     currentUser,
     selectedChat,
     groupMembers,
-    messages,
     setReplyingToMessage,
   } = useContext(GlobalState);
 
@@ -59,7 +58,7 @@ function Message({ message, i }) {
           />
         ) : message.format === "file" && !message.deleted ? (
           <div className="flex items-center">
-            <span>
+            <span className="self-end">
               <span className="text-[8px] font-nunito font-semibold text-wrap block max-w-24">
                 {message.message.substring(0, message.message.lastIndexOf("-"))}
               </span>

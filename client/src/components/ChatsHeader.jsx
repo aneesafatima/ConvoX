@@ -11,12 +11,25 @@ function ChatsHeader({ setShowFilesMessages }) {
   const { handleGroupExit, handleDeleteChats, handleUserRemovalFromChats } =
     useChatHandlers(); //called on every render abd uses this component's lifecycle
 
-  const { selectedChat, setShowGroupSettings, currentUser, setSelectedChat } =
-    useContext(GlobalState);
+  const {
+    selectedChat,
+    setShowGroupSettings,
+    currentUser,
+    setSelectedChat,
+    setMessages,
+  } = useContext(GlobalState);
   return (
     <div className="flex justify-between items-center">
       <span className="flex items-center space-x-3">
-        <IoChevronBackOutline size={20} className="cursor-pointer" onClick={() => setSelectedChat(null)} />
+        <IoChevronBackOutline
+          size={20}
+          className="cursor-pointer"
+          onClick={() => {
+            setSelectedChat(null);
+            setShowFilesMessages(false);
+            setMessages();
+          }}
+        />
         <h2 className="text-xl sm:text-2xl font-roboto font-semibold text-[#333333] ">
           Chats with {selectedChat.info.name}
         </h2>
