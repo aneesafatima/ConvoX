@@ -74,7 +74,7 @@ app.use(hpp());
 
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Frontend URL
+    origin: [process.env.FRONTEND_URL, "http://localhost:5173"], // Frontend URL
     methods: ["GET", "POST"], // Allowed methods
     credentials: true, // Allow credentials such as cookies
   },
@@ -83,7 +83,7 @@ const io = new Server(server, {
 app.use(
   cors(
     {
-      origin: ["http://localhost:5173"], // Your frontend origin
+      origin: [process.env.FRONTEND_URL, "http://localhost:5173"], // Your frontend origin
       credentials: true,
     } // Allows credentials (cookies) to be sent
   )
