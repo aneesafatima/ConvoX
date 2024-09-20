@@ -3,13 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  {
-    "scripts": {
-      "start": "node index.js",
-      "start:dev": "nodemon index.js",
-      "start:prod": "cross-env NODE_ENV=production node index.js"
-    }
-  }
+  "scripts": {
+    "start": "node index.js",
+    "build": "echo 'No build step required'",
+    "start:dev": "nodemon index.js",
+    "start:prod": "cross-env NODE_ENV=production node index.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
