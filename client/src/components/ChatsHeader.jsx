@@ -17,7 +17,7 @@ function ChatsHeader({ setShowFilesMessages }) {
     <div className="flex justify-between items-center">
       <span className="flex items-center space-x-3">
         <IoChevronBackOutline size={20} className="cursor-pointer" onClick={() => setSelectedChat(null)} />
-        <h2 className="text-2xl font-roboto font-semibold text-[#333333] ">
+        <h2 className="text-xl sm:text-2xl font-roboto font-semibold text-[#333333] ">
           Chats with {selectedChat.info.name}
         </h2>
       </span>

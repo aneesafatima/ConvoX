@@ -59,7 +59,7 @@ const { handleFileUpload, handeSendingMessage } = useMessage(input, setInput);
           accept="image/*"
           name="photo-upload"
           className="w-full h-full opacity-0 absolute   "
-          onChange={() => handleFileUpload("photo-message", "photo-upload")}
+          onChange={(e) => handleFileUpload(e,"photo-message", "photo-upload")}
           id="photo-message"
           disabled={selectedChat.type === "group" && !selectedChat.info.active}
         />
@@ -75,7 +75,7 @@ const { handleFileUpload, handeSendingMessage } = useMessage(input, setInput);
           accept=".doc,.docx,.pdf,.mp4,.mp3"
           name="file-upload"
           className="w-full h-full opacity-0 absolute  "
-          onChange={() => handleFileUpload("file-message", "file-upload")}
+          onChange={(e) => handleFileUpload(e,"file-message", "file-upload")}
           id="file-message"
           disabled={selectedChat.type === "group" && !selectedChat.info.active}
         />

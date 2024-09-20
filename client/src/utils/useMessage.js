@@ -43,7 +43,8 @@ const useMessage = (input, setInput) => {
   };
 
   //FOR FILE UPLOAD
-  const handleFileUpload = async (id, name) => {
+  const handleFileUpload = async (e,id, name) => {
+    e.stopPropagation(); 
     const file = document.getElementById(id).files[0];
     const form = new FormData();
     form.append(name, file);

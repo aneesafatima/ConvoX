@@ -31,7 +31,7 @@ function Chats() {
 
         <div className="border rounded-lg w-full h-[90%] flex flex-col pb-12 pt-4  relative">
           <ul
-            className="p-4 px-10 space-y-6 flex flex-col text-sm font-nunito font-medium h-full overflow-auto"
+            className="p-4 px-5 space-y-6 flex flex-col text-sm font-nunito font-medium h-full overflow-auto"
             id="scroll-container"
           >
             {messages?.map((message, i) =>
