@@ -5,7 +5,6 @@ const User = require("../models/userModel");
 
 const handleIoConnection = (io) => {
   io.on("connection", async (socket) => {
-    console.log("Connected to the server with id : ", socket.id);
     socket.broadcast.emit("new-connection");
 
     const userId = socket.handshake.query.userId; //user's mongo db id

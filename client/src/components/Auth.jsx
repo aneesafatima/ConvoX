@@ -48,7 +48,6 @@ function auth() {
 
       if (res.data?.status === "success") {
         setShowLoader(false);
-        seTGiveAccess(true);
         setShowErr(false);
         navigate("/home", { replace: true });
        

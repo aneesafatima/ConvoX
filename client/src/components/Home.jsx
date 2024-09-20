@@ -6,18 +6,17 @@ import useSocket from "../utils/useSocket";
 import useFetchData from "../utils/useFetchData";
 
 function Home() {
-//refactor
+  //refactor
   const {
     giveAccess,
     selectedChat,
     fetch,
     showErr,
     showGroupSettings,
-    showUsers
+    showUsers,
   } = useContext(GlobalState);
 
   const [contacts, setContacts] = useState();
-
 
   useFetchData(setContacts, contacts);
   useSocket();
@@ -44,7 +43,7 @@ function Home() {
         >
           <UserMessages contacts={contacts} />
         </div>
-       {showUsers &&  <SelectUser contacts={contacts} />} 
+        {showUsers && <SelectUser contacts={contacts} />}
         <Chats />
         {showGroupSettings && <GroupSettings />}
       </div>

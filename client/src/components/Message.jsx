@@ -112,7 +112,7 @@ function Message({ message, i }) {
         <span>
           {message.sender !== currentUser._id
             ? message.isGroupMessage
-              ? groupMembers?.find((user) => user._id === message.sender).name
+              ? groupMembers?.find((user) => user._id === message.sender)?.name
               : selectedChat.info.name
             : null}{" "}
           <span className="mx-1 text-[#b2b2b2] text-[8px] ">

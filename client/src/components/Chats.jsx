@@ -23,13 +23,13 @@ function Chats() {
       <div className="flex font-lato flex-col space-y-5 pt-3 px-5  flex-grow relative  w-svw xs:w-fit ">
         {!messages && (
           <div
-            class="main-loader absolute top-1/2 -translate-y-1/2 left-1/2
+            className="main-loader absolute top-1/2 -translate-y-1/2 left-1/2
           -translate-x-1/2"
           ></div>
         )}
         <ChatsHeader setShowFilesMessages={setShowFilesMessages} />
 
-        <div className="border rounded-lg w-full h-[90%] flex flex-col pb-12 relative">
+        <div className="border rounded-lg w-full h-[90%] flex flex-col pb-12 pt-4  relative">
           <ul
             className="p-4 px-10 space-y-6 flex flex-col text-sm font-nunito font-medium h-full overflow-auto"
             id="scroll-container"

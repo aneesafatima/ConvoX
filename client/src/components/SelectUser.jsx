@@ -60,7 +60,7 @@ function SelectUser({ contacts }) {
     <div className="bg-[#f7f7f7] shadow-md absolute overflow-auto scrollbar z-20 w-[300px] h-[350px]  xs:w-[400px] xs:h-[400px]  rounded-lg -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 pb-3 xs:py-4 px-5 xs:px-10 space-y-4">
       {!userArray && (
         <div
-          class="main-loader absolute top-1/2 -translate-y-1/2 left-1/2
+          className="main-loader absolute top-1/2 -translate-y-1/2 left-1/2
 -translate-x-1/2"
         ></div>
       )}

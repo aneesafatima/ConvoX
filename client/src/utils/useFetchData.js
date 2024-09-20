@@ -19,6 +19,7 @@ const useFetchData = (setContacts, contacts) => {
 
   useEffect(() => {
     async function fetchData() {
+      setFetch(true)
       try {
         const res = await axios.get(`${import.meta.env.VITE_URL}/api/home`, {
           withCredentials: true,
@@ -47,7 +48,6 @@ const useFetchData = (setContacts, contacts) => {
           }
         );
         if (res.data?.status === "success") {
-          console.log("fetching chats again")
           const response = await axios.get(
             `${import.meta.env.VITE_URL}/api/messages/last-messages`,
             {

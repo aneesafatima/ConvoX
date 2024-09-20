@@ -51,7 +51,7 @@ const useSocket = () => {
   useEffect(() => {
     if (socket) {
       socket.on("connect", () => {
-        console.log("Connected to the server with id : ", socket.id);
+       
 
         socket.on("new-message", (message) => {
          
@@ -102,9 +102,6 @@ const useSocket = () => {
         socket.on("delete-message", ({ messageId, selectedChatId }) => {
           if(!selectedChatRef.current) setFetchUserChats(true)
           else if(selectedChatRef.current?.info._id === selectedChatId){
-            console.log("deleting message from the receiver")
-            console.log("messageId", messageId)
-            console.log("selectedChatId", selectedChatId)
             handleDeleteMessage(messageId);
           }
         });
@@ -146,7 +143,6 @@ const useSocket = () => {
       });
 
       return () => {
-        console.log("User disconnected: ", socket.id);
         socket.disconnect();
       };
     }

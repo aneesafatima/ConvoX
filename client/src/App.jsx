@@ -9,6 +9,8 @@ function App() {
   const location = useLocation();
   const { giveAccess, fetch } = useContext(GlobalState);
 
+ 
+
   if (!giveAccess && location.pathname === "/home" && !fetch)
     return (
       <NotFound
