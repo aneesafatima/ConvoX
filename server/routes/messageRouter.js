@@ -1,6 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const ErrorHandler = require("../utils/ErrorHandler");
+const uuid = require("uuid");
 const { protect } = require("../controllers/authController");
 const {
   getMessagesForContact,
@@ -19,7 +20,6 @@ const storage = multer.diskStorage({
     cb(null, "public/file-uploads");
   },
   filename: (req, file, cb) => {
-    console.log(file)
     const ext = file.mimetype.split("/")[1];
     cb(null, `${file.originalname.split(".")[0]}-${uuid.v1().replace(/-/g, "")}.${ext}`);
   },
