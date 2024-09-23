@@ -1,6 +1,6 @@
-# Convo-X - A Real-time Chat Application
+# convoX - A Real-time Chat Application
 
-**Convo-X** is a real-time chat application built with the MERN stack (MongoDB, Express, React, Node.js) and Tailwind CSS. It allows users to communicate seamlessly in real-time through an intuitive interface, designed for a smooth experience across both web and mobile devices.
+**convoX** is a real-time chat application built with the MERN stack (MongoDB, Express, React, Node.js) and Tailwind CSS. It allows users to communicate seamlessly in real-time through an intuitive interface, designed for a smooth experience across both web and mobile devices.
 
 ## 🚀 Features
 
@@ -63,10 +63,31 @@ Contributions are always welcome! If you have suggestions or would like to help 
 
 ## 📁 Environment Setup
 
-### Frontend
+- **client**: A sample environment file is located in the `client` folder. It includes placeholders for environment variables used by the React application.
+- **server**: A sample environment file is located in the `server` folder. It includes placeholders for environment variables used by the Node.js/Express application.
+
+Please make sure to replace the placeholders in these `.env.sample` files with your actual values in the `.env` files to run the application successfully.
+
+## 📁 Running the Project
+
+### Client
 1. Navigate to the `client` directory.
-2. Create a `.env` file based on the `.env.sample` provided.
-3. Fill in the required environment variables.
-4. Install dependencies:
+2. Create a `.env` file from the `.env.sample` file provided.
+3. Replace the placeholders in the `.env` file with your actual values.
+4. Install the required dependencies by running:
    ```bash
    npm install
+5. Start the development server by running
+   ```bash
+   npm run dev
+
+### Server 
+1. Navigate to the `server` directory.
+2. Create a `.env` file from the `.env.sample` file provided.
+3. Replace the placeholders in the `.env` file with your actual values.
+4. Install the required dependencies by running:
+   ```bash
+   npm install
+5. Start the development server by running
+   ```bash
+   npm run start:dev
