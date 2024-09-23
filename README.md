@@ -52,8 +52,14 @@ The development process began with identifying core features like real-time mess
 
 The frontend was developed using **React** and **Tailwind CSS** to create a clean, responsive, and user-friendly interface. Key challenges included implementing efficient real-time communication and managing global state across different components, which was essential for ensuring a seamless chat experience. A special focus was placed on making the app scalable and user-friendly on both desktop and mobile.
 
-## 🐛 Known Bugs
-_To be filled later._
+## 🐛 Bugs & Future Improvements
+While **convoX** functions well, it's far from perfect. As with any chat application, there are always features and improvements that can enhance the user experience. Some known areas that could be improved or added include:
+
+- Occasional delay in real-time updates, especially when dealing with large media files.
+- More advanced notification options, like custom sounds or muting specific conversations.
+- Features such as voice messages, video chats, and richer media sharing are not yet implemented but could significantly improve the user experience.
+
+Contributions are always welcome! If you have suggestions or would like to help make **convoX** better, feel free to open an issue or submit a pull request on the repository. Your feedback and support are appreciated in making this project even better. 
 
 ## 📁 Environment Setup
 
