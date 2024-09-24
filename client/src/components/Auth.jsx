@@ -10,7 +10,7 @@ import { CiLock } from "react-icons/ci";
 import { PiPasswordLight } from "react-icons/pi";
 import { FaRocketchat } from "react-icons/fa6";
 import { GlobalState } from "../context/GlobalState";
-import {CookieAlert} from ".";
+import { CookieAlert } from ".";
 
 function auth() {
   const {
@@ -49,9 +49,8 @@ function auth() {
       if (res.data?.status === "success") {
         setShowLoader(false);
         setShowErr(false);
-        seTGiveAccess(true)
+        seTGiveAccess(true);
         navigate("/home", { replace: true });
-       
       }
     } catch (err) {
       setErrMessage(err.response?.data.message);
@@ -178,18 +177,18 @@ function auth() {
             )}
           </button>
         </form>
-        <div className="flex items-center mt-5">
-          <div className="block border-b-[1px] w-full border-[#e2e2e2]"></div>
-          <div
-            className=" font-lato w-fit text-nowrap mx-1 text-[#8f8f8f] cursor-pointer hover:underline text-[8px] sm:text-xs "
-            onClick={changeAuthStatus}
-          >
-            {authStatus === "signup" && !showLoader
-              ? "Have an account"
-              : "Create Account"}
+        {!showLoader && (
+          <div className="flex items-center mt-5">
+            <div className="block border-b-[1px] w-full border-[#e2e2e2]"></div>
+            <div
+              className=" font-lato w-fit text-nowrap mx-1 text-[#8f8f8f] cursor-pointer hover:underline text-[8px] sm:text-xs "
+              onClick={changeAuthStatus}
+            >
+              {authStatus === "signup" ? "Have an account" : "Create Account"}
+            </div>
+            <div className="block border-b-[1px] w-full border-[#e2e2e2]"></div>
           </div>
-          <div className="block border-b-[1px] w-full border-[#e2e2e2]"></div>
-        </div>
+        )}
       </div>
 
       {showCookieAlert && (
