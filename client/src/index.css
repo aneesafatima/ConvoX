@@ -127,25 +127,35 @@
 
 
 .main-loader {
-  width: 40px; /* Same width as the previous loader */
-  height: 40px; /* Same height as the previous loader */
-  border: 3px solid #FFF; /* Thinner border for a smaller loader */
-  border-bottom-color: transparent; /* Creates the rotating effect */
-  border-radius: 50%; /* Makes it circular */
-  display: inline-block;
-  box-sizing: border-box;
-  animation: rotation 1s linear infinite; /* Continuous rotation */
+  width: 40px;
+  aspect-ratio: 1;
+  display: grid;
 }
 
-@keyframes rotation {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+.main-loader::before,
+.main-loader::after {    
+  content:"";
+  grid-area: 1/1;
+  --c:no-repeat radial-gradient(farthest-side, #25b09b 92%, #0000);
+  background: 
+    var(--c) 50%  0, 
+    var(--c) 50%  100%, 
+    var(--c) 100% 50%, 
+    var(--c) 0    50%;
+  background-size: 10px 10px; 
+  animation: l12 1s infinite;
 }
 
+.main-loader::before {
+  margin: 3px; 
+  filter: hue-rotate(45deg);
+  background-size: 7px 7px;
+  animation-timing-function: linear;
+}
+
+@keyframes l12 { 
+  100% { transform: rotate(.5turn); }
+}
 
 .chats-loader {
   width: 24px; /* Reduced width */
