@@ -19,6 +19,7 @@ const useSocket = () => {
     lastMessage,
     setMessages,
     replyingToMessage,
+    setShowLoader
   } = useContext(GlobalState);
   const { handleDeleteMessage } = useMessage();
 
@@ -96,6 +97,7 @@ const useSocket = () => {
           }
         });
         socket.on("message-sent", (message) => {
+          setShowLoader(false);
           setMessages((prev) => [...prev, message]);
         });
         socket.on("delete-message", ({ messageId, selectedChatId }) => {

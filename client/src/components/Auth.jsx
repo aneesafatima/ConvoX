@@ -183,13 +183,17 @@ function auth() {
             className=" font-lato w-fit text-nowrap mx-1 text-[#8f8f8f] cursor-pointer hover:underline text-[8px] sm:text-xs "
             onClick={changeAuthStatus}
           >
-            {authStatus === "signup" ? "Have an account" : "Create Account"}
+            {authStatus === "signup" && !showLoader
+              ? "Have an account"
+              : "Create Account"}
           </div>
           <div className="block border-b-[1px] w-full border-[#e2e2e2]"></div>
         </div>
       </div>
 
-      {showCookieAlert && <CookieAlert setShowCookieAlert={setShowCookieAlert}/>}
+      {showCookieAlert && (
+        <CookieAlert setShowCookieAlert={setShowCookieAlert} />
+      )}
     </div>
   );
 }

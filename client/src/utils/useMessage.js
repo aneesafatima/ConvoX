@@ -14,11 +14,11 @@ const useMessage = (input, setInput) => {
     setLastMessage,
     setFetchUserChats,
     lastMessage,
+    setShowLoader,
   } = useContext(GlobalState);
 
   //FOR DELETE MESSAGE
   const handleDeleteMessage = (messageId, selectedChat) => {
-    console.log("deleting messages", messageId, selectedChat);
     setMessages((prev) => {
       const deletedMessageIndex = prev.findIndex(
         (msg) => msg._id === messageId
@@ -45,6 +45,7 @@ const useMessage = (input, setInput) => {
   //FOR FILE UPLOAD
   const handleFileUpload = async (e, id, name) => {
     e.stopPropagation();
+    setShowLoader({status: true, feature: "sending-message"});
     const file = document.getElementById(id).files[0];
     const form = new FormData();
     form.append(name, file);
@@ -84,6 +85,7 @@ const useMessage = (input, setInput) => {
 
   //FOR SENDING MESSAGE
   const handeSendingMessage = () => {
+    setShowLoader({status: true, feature: "sending-message"});
     if (input !== "") {
       socket.emit("send-message", {
         message: input.trim(),

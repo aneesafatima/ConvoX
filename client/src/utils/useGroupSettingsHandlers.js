@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useContext, useCallback } from "react";
+import {useContext, useCallback } from "react";
 import { GlobalState } from "../context/GlobalState";
 import { showAlert } from "./showAlert";
 

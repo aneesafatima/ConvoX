@@ -7,6 +7,7 @@ import { GlobalState } from "../context/GlobalState";
 import { useChatHandlers } from "../utils/useChatHandlers";
 import { IoChevronBackOutline } from "react-icons/io5";
 import { useContext } from "react";
+import {ReactTooltip } from ".";
 function ChatsHeader({ setShowFilesMessages }) {
   const { handleGroupExit, handleDeleteChats, handleUserRemovalFromChats } =
     useChatHandlers(); //called on every render abd uses this component's lifecycle
@@ -35,7 +36,7 @@ function ChatsHeader({ setShowFilesMessages }) {
         </h2>
       </span>
       <div className="flex items-center space-x-1">
-        {selectedChat.type === "group" ? (
+        {selectedChat.type === "group" && selectedChat.info.active && (
           <span className="flex items-center space-x-1 ">
             <IoMdSettings
               size={20}
@@ -56,9 +57,8 @@ function ChatsHeader({ setShowFilesMessages }) {
               }
             />
           </span>
-        ) : (
-          <span className="flex items-center space-x-1">
-            <HiUserRemove
+        ) }
+         <HiUserRemove
               size={20}
               className="text-[#333333]  cursor-pointer outline-none border-none"
               data-tooltip-id="remove-contact"
@@ -70,6 +70,8 @@ function ChatsHeader({ setShowFilesMessages }) {
                 )
               }
             />
+        {selectedChat.type === "individual" && (
+          <span className="flex items-center space-x-1">
             <MdDeleteForever
               size={20}
               className="text-[#333333]   cursor-pointer outline-none border-none"
@@ -82,13 +84,38 @@ function ChatsHeader({ setShowFilesMessages }) {
 
         <IoMdInformationCircle
           color="#333333"
-          className="cursor-pointer"
+          className="cursor-pointer outline-none border-0"
           data-tooltip-id="view-files"
           data-tooltip-content="View Files"
           size={18}
           onClick={() => setShowFilesMessages((prev) => !prev)}
         />
       </div>
+      <ReactTooltip
+          className="tooltip z-30"
+          id="exit-group"
+          style={{ backgroundColor: "#333333 " }}
+        />
+        <ReactTooltip
+          className="tooltip z-30"
+          id="settings-of-group"
+          style={{ backgroundColor: "#333333 " }}
+        />
+        <ReactTooltip
+          className="tooltip z-30"
+          id="delete-chats"
+          style={{ backgroundColor: "#333333 " }}
+        />
+        <ReactTooltip
+          className="tooltip z-30"
+          id="remove-contact"
+          style={{ backgroundColor: "#333333 " }}
+        />
+        <ReactTooltip
+          className="tooltip z-30"
+          id="view-files"
+          style={{ backgroundColor: "#333333 " }}
+        />
     </div>
   );
 }

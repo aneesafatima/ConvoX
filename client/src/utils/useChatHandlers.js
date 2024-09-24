@@ -6,7 +6,6 @@ import { showAlert } from "./showAlert";
 export const useChatHandlers = () => {
   const {
     setMessages,
-    fetchMessages,
     setFetchMessages,
     setFetchUserChats,
     setSelectedChat,
@@ -145,8 +144,8 @@ export const useChatHandlers = () => {
       withCredentials: true,
     });
     if (res.data.status === "success") {
-      document.querySelector(".alert")?.remove();
       showAlert("Contact Removed Successfully", "home");
+    
       setFetchUserChats(true);
       setSelectedChat(null);
     }

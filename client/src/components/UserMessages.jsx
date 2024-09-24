@@ -6,10 +6,9 @@ import { TbLogout } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import { FileUpload } from "primereact/fileupload";
 import { ReactTooltip } from ".";
-
 import axios from "axios";
-import { showAlert } from "../utils/showAlert";
-import { getFormattedDate } from "../utils/helpers";
+import {handleImageUpload,getFormattedDate } from "../utils/helpers";
+import {showAlert  } from "../utils/showAlert";
 
 function UserMessages({ contacts }) {
   const {
@@ -23,14 +22,10 @@ function UserMessages({ contacts }) {
     setGroupMembers,
     lastMessage,
   } = useContext(GlobalState);
-  useEffect(() => {console.log(contacts)}, [contacts]);
+
   const [imageUrl, setImageUrl] = useState(currentUser?.photo);
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-  useEffect(() => {
-    console.log("useEffect");
-    console.log(contacts, lastMessage);
-  }, [contacts]);
 
   const handleLogOut = async () => {
     const res = await axios.get(
@@ -45,9 +40,7 @@ function UserMessages({ contacts }) {
       }, 1000);
     }
   };
-  const handleImageUpload = (res) => {
-    setImageUrl(JSON.parse(res.xhr.response).imageUrl);
-  };
+
   const lastMessageDetails = (contact) => {
     const details = lastMessage?.find((el) => el.contactId === contact._id);
     if (details === undefined) return {};
@@ -95,7 +88,8 @@ function UserMessages({ contacts }) {
               accept="image/*"
               className="absolute bottom-0 right-0  text-center"
               id="photo-upload"
-              onUpload={handleImageUpload}
+              onUpload={(res) => handleImageUpload(res, setImageUrl)}
+              onBeforeSend ={() => showAlert("Uploading image", "home")}
             />
           </div>
           <span>{currentUser?.name}</span>

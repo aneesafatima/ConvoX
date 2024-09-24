@@ -4,6 +4,7 @@ import {
   BsFileEarmarkWordFill,
 } from "react-icons/bs";
 import { FaFileAudio, FaFileVideo } from "react-icons/fa6";
+import { showAlert } from "./showAlert";
 
 export const getFormattedDate = (date) => {
   if (!date) return;
@@ -55,4 +56,9 @@ export const handleLastMessageUpdation = (lastMessage, contactId, message) => {
       ? [...lastMessage, { contactId, message, timestamp: Date.now() }]
       : [{ contactId, message, timestamp: Date.now() }];
   }
+};
+
+export const handleImageUpload = (res, imgSetter) => {
+  imgSetter(JSON.parse(res.xhr.response).imageUrl);
+  showAlert("Profile picture updated", "home");
 };

@@ -49,31 +49,6 @@ function Chats() {
           />
         </div>
         {showFilesMessages && <ShowFiles />}
-        <ReactTooltip
-          className="tooltip"
-          id="exit-group"
-          style={{ backgroundColor: "#333333 " }}
-        />
-        <ReactTooltip
-          className="tooltip"
-          id="settings-of-group"
-          style={{ backgroundColor: "#333333 " }}
-        />
-        <ReactTooltip
-          className="tooltip"
-          id="delete-chats"
-          style={{ backgroundColor: "#333333 " }}
-        />
-        <ReactTooltip
-          className="tooltip"
-          id="remove-contact"
-          style={{ backgroundColor: "#333333 " }}
-        />
-        <ReactTooltip
-          className="tooltip"
-          id="view-files"
-          style={{ backgroundColor: "#333333 " }}
-        />
       </div>
     )
   );

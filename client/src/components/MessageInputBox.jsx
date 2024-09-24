@@ -8,19 +8,21 @@ import { GlobalState } from "../context/GlobalState";
 import useMessage from "../utils/useMessage";
 
 function MessageInputBox() {
-  const {
-    selectedChat,
-    setReplyingToMessage,
-    replyingToMessage,
-  } = useContext(GlobalState);
+  const { selectedChat, setReplyingToMessage, replyingToMessage, showLoader } =
+    useContext(GlobalState);
   const [input, setInput] = useState("");
-const { handleFileUpload, handeSendingMessage } = useMessage(input, setInput);
-
+  const { handleFileUpload, handeSendingMessage } = useMessage(input, setInput);
+  if (selectedChat.type === "group" && !selectedChat.info.active)
+    return (
+      <div className="sticky bottom-0 m-auto font-nunito text-sm w-full text-center  ">
+        This group has been deleted by admin
+      </div>
+    );
 
   return (
     <div className="sticky bottom-0 m-auto  w-fit h-10  flex items-center mb-2 justify-center ">
       {replyingToMessage && (
-        <div className="absolute left-0 z-50 flex flex-col font-nunito  bottom-full bg-[#f7f7f7]  shadow-sm w-48 text-xs space-y-2 p-3 rounded-md mb-3 ">
+        <div className="absolute left-0 z-50 flex flex-col font-nunito  bottom-full   shadow-sm w-48 text-xs space-y-2 p-3 rounded-md mb-3 ">
           <span className="flex items-center justify-between">
             <span className="flex items-center font-semibold">
               <FaReply size={13} className="mr-2  " />
@@ -44,22 +46,31 @@ const { handleFileUpload, handeSendingMessage } = useMessage(input, setInput);
             : null
         }`}
         id="message"
-        disabled={selectedChat.type === "group" && !selectedChat.info.active}
         value={input}
         onChange={(e) => setInput(e.target.value)}
       />
-      <IoSend
-        onClick={handeSendingMessage}
-        className="cursor-pointer mx-1"
-        color={input === "" ? "#333333" : "#3b82f6"}
-      />
+      {showLoader.feature === "sending-message" ? (
+        <span
+          className="loader"
+          style={{ borderColor: "#333333", margin: "0 5px" }}
+        ></span>
+      ) : (
+        <IoSend
+          onClick={handeSendingMessage}
+          className={`${
+            input === "" ? "pointer-events-none" : "cursor-pointer"
+          } mx-1`}
+          color={input === "" ? "#333333" : "#3b82f6"}
+        />
+      )}
+
       <div className=" w-5 h-6 relative cursor-pointer">
         <input
           type="file"
           accept="image/*"
           name="photo-upload"
           className="w-full h-full opacity-0 absolute   "
-          onChange={(e) => handleFileUpload(e,"photo-message", "photo-upload")}
+          onChange={(e) => handleFileUpload(e, "photo-message", "photo-upload")}
           id="photo-message"
           disabled={selectedChat.type === "group" && !selectedChat.info.active}
         />
@@ -75,7 +86,7 @@ const { handleFileUpload, handeSendingMessage } = useMessage(input, setInput);
           accept=".doc,.docx,.pdf,.mp4,.mp3"
           name="file-upload"
           className="w-full h-full opacity-0 absolute  "
-          onChange={(e) => handleFileUpload(e,"file-message", "file-upload")}
+          onChange={(e) => handleFileUpload(e, "file-message", "file-upload")}
           id="file-message"
           disabled={selectedChat.type === "group" && !selectedChat.info.active}
         />

@@ -8,6 +8,8 @@ import { IoCheckboxSharp } from "react-icons/io5";
 import { useGroupSettingsHandlers } from "../utils/useGroupSettingsHandlers";
 import { ReactTooltip } from ".";
 import { FileUpload } from "primereact/fileupload";
+import {  handleImageUpload } from "../utils/helpers";
+import { showAlert } from "../utils/showAlert";
 function GroupSettings() {
   const {
     setShowGroupSettings,
@@ -21,10 +23,6 @@ function GroupSettings() {
   const [groupImageUrl, setGroupImageUrl] = useState(selectedChat?.info.photo);
   const { handleRemoveGroupMember, handleGroupDelete, handleGroupNameChange } =
     useGroupSettingsHandlers(groupName);
-
-  const handleImageUpload = (res) => {
-    setGroupImageUrl(JSON.parse(res.xhr.response).imageUrl);
-  };
   useEffect(() => {
     if (selectedChat?.type === "group")
       setGroupImageUrl(selectedChat.info.photo);
@@ -57,7 +55,8 @@ function GroupSettings() {
               accept="image/*"
               className="absolute bottom-0 right-0  text-center"
               id="photo-upload"
-              onUpload={handleImageUpload}
+              onUpload={(res) => handleImageUpload(res, setGroupImageUrl)}
+              onBeforeSend ={() => showAlert("Uploading image", "home")}
             />
           </div>
           <div className="flex flex-col ">

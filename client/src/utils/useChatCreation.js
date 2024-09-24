@@ -69,8 +69,6 @@ const chatCreation = (contacts) => {
         });
         setFetchUserChats(true);
 
-        document.querySelector(".alert").remove();
-
         showAlert("User added successfully", "home");
       }
     }
