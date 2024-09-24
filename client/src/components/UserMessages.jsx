@@ -120,7 +120,7 @@ function UserMessages({ contacts }) {
           <ul className="space-x-0">
             {contacts?.map(
               (contact, i) =>
-                contact.name.includes(searchTerm) && (
+                contact?.name.includes(searchTerm) && (
                   <li
                     className="text-xs flex items-center justify-between px-2  font-semibold cursor-pointer hover:bg-[#eaeaea] py-1 rounded-lg "
                     onClick={() => {

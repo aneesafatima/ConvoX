@@ -57,7 +57,6 @@ const useFetchData = (setContacts, contacts) => {
           if (response.data) {
             setLastMessage(response.data.lastMessages);
           }
-          // console.log(response.data.lastMessages)
           setContacts(res.data.contactUsers);
           setFetchUserChats(false);
         }
@@ -66,13 +65,12 @@ const useFetchData = (setContacts, contacts) => {
   }, [fetchUserChats, giveAccess]);
 
   useEffect(() => {
-    console.log("last messages", lastMessage)
     if (lastMessage?.length > 0) {
       const sortedLastMessages = lastMessage.sort(
         (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
       );
       const orderedContacts = sortedLastMessages.map((item) =>
-        contacts.find((contact) => contact._id === item.contactId)
+        contacts?.find((contact) => contact._id === item.contactId)
       );
       setContacts(orderedContacts);
     }

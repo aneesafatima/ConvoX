@@ -9,12 +9,8 @@ import { getFileIcon } from "../utils/helpers";
 import useMessage from "../utils/useMessage";
 
 function Message({ message, i }) {
-  const {
-    currentUser,
-    selectedChat,
-    groupMembers,
-    setReplyingToMessage,
-  } = useContext(GlobalState);
+  const { currentUser, selectedChat, groupMembers, setReplyingToMessage } =
+    useContext(GlobalState);
 
   const { handleDeleteMessage } = useMessage();
 
@@ -41,11 +37,14 @@ function Message({ message, i }) {
       key={i}
     >
       {message.replyingToMessage && (
-        <span className="font-nunito self-end w-fit p-1 px-2 py-2 sm:p-3 translate-y-1 z-10 text-xs sm:text-sm rounded-lg bg-[#e2e2e2] text-[#535353]">
+        <span
+          className={`font-nunito  ${
+            message.sender === currentUser._id ? "self-end" : "self-start "
+          }  w-fit p-1 px-2 py-2 sm:p-3 translate-y-1 z-10 text-xs sm:text-sm rounded-lg bg-[#e2e2e2] text-[#535353]`}
+        >
           {message.replyingToMessage}
         </span>
       )}{" "}
-      
       <span className="relative w-fit mb-2">
         {message.format === "photo" && !message.deleted ? (
           <img
@@ -90,23 +89,25 @@ function Message({ message, i }) {
             {message.message}
           </span>
         )}
-         {!message.deleted && message.sender !== currentUser._id && (
-        <RiShareForwardFill
-          size={10}
-          className="absolute z-40 left-full  mx-1 top-1/2 -translate-y-1/2 cursor-pointer hover:opacity-100 "
-          onClick={() =>
-            setReplyingToMessage(
-              message.format === "photo"
-                ? "photo"
-                : message.format === "file"
-                ? message.message.substring(0, message.message.lastIndexOf("-"))
-                : message.message
-            )
-          }
-        />
-      )}
+        {!message.deleted && message.sender !== currentUser._id && (
+          <RiShareForwardFill
+            size={10}
+            className="absolute z-40 left-full  mx-1 top-1/2 -translate-y-1/2 cursor-pointer hover:opacity-100 "
+            onClick={() =>
+              setReplyingToMessage(
+                message.format === "photo"
+                  ? "photo"
+                  : message.format === "file"
+                  ? message.message.substring(
+                      0,
+                      message.message.lastIndexOf("-")
+                    )
+                  : message.message
+              )
+            }
+          />
+        )}
       </span>
-     
       <span className="text-[10px] mt-[2px] pl-2 text-[#414141] font-nunito font-semibold flex justify-between items-center">
         <span>
           {message.sender !== currentUser._id
