@@ -55,7 +55,6 @@ app.use(
   })
 );
 
-
 // Data Sanitization against NoSQL Injection attacks
 app.use(mongoSanitize());
 
@@ -103,13 +102,10 @@ mongoose
   .connect(DB, {})
   .then(() => {
     console.log("Mongodb connected");
-    if(process.env.NODE_ENV === "development"){
-      server.listen(process.env.PORT, () => {
-        console.log(`Server is listening on port ${process.env.PORT}`);
-      }); 
-    }
-    
-    
+
+    server.listen(process.env.PORT || 5000, () => {
+      console.log(`Server is listening on port ${process.env.PORT}`);
+    });
   })
   .catch((err) => {
     console.error("DATABASE CONNECTION ERROR:", err);
