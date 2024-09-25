@@ -62,7 +62,6 @@ const useMessage = (input, setInput) => {
         withCredentials: true,
       });
       if (res.data?.status === "success") {
-        console.log(res)
         socket.emit("send-message", {
           message: res.data.file,
           to: selectedChat.info._id,
