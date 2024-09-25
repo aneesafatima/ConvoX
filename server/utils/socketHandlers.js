@@ -24,6 +24,7 @@ const handleIoConnection = (io) => {
 
     socket.on("send-message", async (data) => {
       let message;
+      console.log(data)
       if (data.type === "individual") {
         message = await Message.create({
           sender: userId,
