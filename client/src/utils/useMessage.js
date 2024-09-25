@@ -77,6 +77,7 @@ const useMessage = (input, setInput) => {
             name === "photo-upload" ? "photo" : "file"
           )
         );
+        setShowLoader(false)
       }
     } catch (err) {
       console.log(err);

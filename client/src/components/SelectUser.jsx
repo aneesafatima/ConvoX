@@ -140,7 +140,12 @@ function SelectUser({ contacts }) {
                 key={i}
               >
                 <span className="flex text-xs">
-                  <FaUserCircle size={35} className="mr-3" />
+                <img
+                        src={`${import.meta.env.VITE_URL}/public/img/profiles/${
+                          user.photo
+                        }`}
+                        className="mr-1 w-[46px] h-[46px] rounded-full"
+                      />
                   <span className="flex flex-col">
                     <span className="">{user.name}</span>
                     <span className="text-[9px] font-normal">{user.email}</span>

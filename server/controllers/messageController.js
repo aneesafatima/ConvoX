@@ -73,7 +73,7 @@ exports.sendPhotoAsChat = upload.single("photo-upload");
 exports.resizeUploadedPhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
   req.file.filename = `chat-${req.user._id}-${Date.now()}.jpeg`;
-  sharpResizing(`chats`, req);
+  sharpResizing('chats', req);
   res.status(200).json({
     status: "success",
     file: req.file.filename,
