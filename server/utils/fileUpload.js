@@ -31,7 +31,7 @@ exports.resizePhoto = catchAsync(async (req, res, next) => {
     type === "user"
       ? `user-${id}-${Date.now()}.jpeg`
       : `group-${id}-${Date.now()}.jpeg`;
-  sharpResizing(`profiles`, req);
+   await sharpResizing(`profiles`, req);
 
   if (type === "user") {
     doc = await User.findByIdAndUpdate(id, {

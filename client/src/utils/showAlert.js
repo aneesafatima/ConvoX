@@ -6,5 +6,5 @@ export const showAlert = (message, id) => {
   }</div>`;
   container.insertAdjacentHTML("afterbegin", alert);
   const alertEl = container.querySelector(".alert");
-  setTimeout(() => alertEl.remove(), 3000);
+  setTimeout(() => alertEl.remove(), 4000);
 };
