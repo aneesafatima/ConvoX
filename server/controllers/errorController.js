@@ -9,7 +9,7 @@ const errorProd = (err, res) => {
 
   res.status(500).json({
     status: "Something went very wrong!",
-    message: err
+    message: "Please try again later",
   });
 };
 

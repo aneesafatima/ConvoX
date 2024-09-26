@@ -80,6 +80,7 @@ const useMessage = (input, setInput) => {
         setShowLoader(false)
       }
     } catch (err) {
+      setShowLoader(false)
       console.log(err);
     }
   };
