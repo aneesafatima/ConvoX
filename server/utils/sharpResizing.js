@@ -5,6 +5,5 @@ const sharpResizing = async (location,req) => {
     .toFormat("jpeg")
     .jpeg({ quality: 90 })
     .toFile(`public/img/${location}/${req.file.filename}`);
-    console.log(req.file.filename)
 }
 module.exports = sharpResizing;
