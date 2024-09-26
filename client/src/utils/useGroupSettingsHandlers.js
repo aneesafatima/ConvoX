@@ -1,5 +1,5 @@
 import axios from "axios";
-import {useContext, useCallback } from "react";
+import { useContext, useCallback } from "react";
 import { GlobalState } from "../context/GlobalState";
 import { showAlert } from "./showAlert";
 
@@ -30,9 +30,9 @@ export const useGroupSettingsHandlers = (groupName) => {
           groupName: group.name,
           userId,
         });
-        setGroupMembers((prev) => [
-          ...prev.filter((member) => member._id !== userId),
-        ]);
+        setGroupMembers((prev) =>
+          prev.filter((member) => member._id !== userId)
+        );
       }
     } catch (err) {
       showAlert(err.response?.data.message, "home");
@@ -63,7 +63,7 @@ export const useGroupSettingsHandlers = (groupName) => {
       .catch((err) => {
         showAlert(err.response?.data.message, "home");
       });
-  },[selectedChat]);
+  }, [selectedChat]);
 
   const handleGroupNameChange = useCallback(async () => {
     try {

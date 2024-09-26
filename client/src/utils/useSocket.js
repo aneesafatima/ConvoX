@@ -19,7 +19,7 @@ const useSocket = () => {
     lastMessage,
     setMessages,
     replyingToMessage,
-    setShowLoader
+    setShowLoader,
   } = useContext(GlobalState);
   const { handleDeleteMessage } = useMessage();
 
@@ -52,8 +52,6 @@ const useSocket = () => {
   useEffect(() => {
     if (socket) {
       socket.on("connect", () => {
-       
-
         socket.on("new-message", (message) => {
           const contactId = message.groupId ? message.groupId : message.sender;
           setLastMessage(
@@ -65,8 +63,7 @@ const useSocket = () => {
           );
           if (
             !selectedChatRef.current ||
-            selectedChatRef.current.info._id !==
-            contactId
+            selectedChatRef.current.info._id !== contactId
           ) {
             socket.emit("unread-message", {
               contactId,
@@ -74,9 +71,7 @@ const useSocket = () => {
             });
             setUnreadMessages((prev) => {
               const existingIndex = prev.findIndex(
-                (item) =>
-                  item.from ===
-                contactId
+                (item) => item.from === contactId
               );
               if (existingIndex !== -1) {
                 const updatedUnreadMessages = [...prev];
@@ -118,11 +113,14 @@ const useSocket = () => {
           setFetchUserChats(true);
         });
 
-        socket.on("removed-from-group", (groupName) => {
+        socket.on("removed-from-group", ({ groupName, groupId }) => {
           showAlert(
             `You have been removed from the group ${groupName}`,
             "home"
           );
+          if (selectedChatRef.current?.info._id === groupId)
+            setSelectedChat(null);
+          setFetchUserChats(true);
         });
 
         socket.on("group-name-updated", () => {

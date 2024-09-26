@@ -8,9 +8,9 @@ import { useChatHandlers } from "../utils/useChatHandlers";
 import { IoChevronBackOutline } from "react-icons/io5";
 import { useContext } from "react";
 import {ReactTooltip } from ".";
-function ChatsHeader({ setShowFilesMessages }) {
+function ChatsHeader({ setShowFilesMessages, setContacts }) {
   const { handleGroupExit, handleDeleteChats, handleUserRemovalFromChats } =
-    useChatHandlers(); //called on every render abd uses this component's lifecycle
+    useChatHandlers(setContacts); //called on every render abd uses this component's lifecycle
 
   const {
     selectedChat,

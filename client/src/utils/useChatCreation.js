@@ -28,13 +28,19 @@ const chatCreation = (contacts) => {
         return groupArray;
       });
     } else {
-      if (contacts?.find((contact) => contact._id === selectedUser._id))
-        return showAlert("User already added", "home");
-      setShowUsers(false);
-      if (contacts?.includes(selectedUser._id)) {
+      if (
+        showUsers?.type === "addingGroupMembers" &&
+        groupMembers?.find((member) => member._id === selectedUser._id)
+      ) {
         showAlert("User already added", "home");
         return;
-      }
+      } else if (
+        showUsers?.type !== "addingGroupMembers" &&
+        contacts?.find((contact) => contact._id === selectedUser._id)
+      )
+        return showAlert("User already added", "home");
+
+      setShowUsers(false);
       showAlert("Adding user...", "home");
       const res = await axios.patch(
         `${import.meta.env.VITE_URL}/api/users/${

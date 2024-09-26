@@ -1,7 +1,6 @@
 import { useEffect, useContext } from "react";
 import axios from "axios";
 import { GlobalState } from "../context/GlobalState";
-import { RiCoinsLine } from "react-icons/ri";
 
 const useFetchData = (setContacts, contacts) => {
   const {
@@ -25,6 +24,7 @@ const useFetchData = (setContacts, contacts) => {
           withCredentials: true,
         });
         if (res.data?.status === "success") {
+          setFetchUserChats(true)
           setCurrentUser(res.data.user);
           setFetch(false);
           seTGiveAccess(true);

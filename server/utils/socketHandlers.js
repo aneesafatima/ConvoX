@@ -146,7 +146,7 @@ const handleIoConnection = (io) => {
         const socketInstance = io.sockets.sockets.get(user?.socketId);
         if (socketInstance) {
           socketInstance.leave(groupId);
-          socketInstance.emit("removed-from-group", groupName);
+          socketInstance.emit("removed-from-group", {groupName, groupId});
         } else {
           await Notification.create({
             message: `You were removed from ${groupName} group`,

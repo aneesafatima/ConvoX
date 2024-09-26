@@ -3,11 +3,9 @@ import { GlobalState } from "../context/GlobalState";
 import { Message, MessageInputBox, ShowFiles, ChatsHeader, ReactTooltip } from ".";
 
 
-function Chats() {
-  const { selectedChat, messages, currentUser,replyingToMessage, setReplyingToMessage } =
+function Chats({setContacts}) {
+  const { selectedChat, messages, currentUser} =
     useContext(GlobalState);
-
-  
   const [showFilesMessages, setShowFilesMessages] = useState(false);
 
   useEffect(() => {
@@ -27,7 +25,7 @@ function Chats() {
           -translate-x-1/2"
           ></div>
         )}
-        <ChatsHeader setShowFilesMessages={setShowFilesMessages} />
+        <ChatsHeader setShowFilesMessages={setShowFilesMessages}  setContacts={setContacts}/>
 
         <div className="border rounded-lg w-full h-[90%] flex flex-col pb-12 pt-4  relative">
           <ul

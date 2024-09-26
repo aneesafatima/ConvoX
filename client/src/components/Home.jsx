@@ -44,7 +44,7 @@ function Home() {
           <UserMessages contacts={contacts} />
         </div>
         {showUsers && <SelectUser contacts={contacts} />}
-        <Chats />
+        <Chats setContacts={setContacts} />
         {showGroupSettings && <GroupSettings />}
       </div>
     )

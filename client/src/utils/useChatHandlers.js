@@ -3,7 +3,7 @@ import { useEffect, useContext, useCallback } from "react";
 import { GlobalState } from "../context/GlobalState";
 import { showAlert } from "./showAlert";
 
-export const useChatHandlers = () => {
+export const useChatHandlers = (setContacts) => {
   const {
     setMessages,
     setFetchMessages,
@@ -14,7 +14,7 @@ export const useChatHandlers = () => {
     setGroupMembers,
     selectedChat,
     currentUser,
-    messages,
+    messages
   } = useContext(GlobalState);
 
   useEffect(() => {
@@ -145,8 +145,7 @@ export const useChatHandlers = () => {
     });
     if (res.data.status === "success") {
       showAlert("Contact Removed Successfully", "home");
-    
-      setFetchUserChats(true);
+      setContacts(prev => prev?.filter(contact => contact._id !== id));
       setSelectedChat(null);
     }
   }, []);

@@ -12,7 +12,7 @@ export function GlobalProvider({ children }) {
   const [passwordDetails, setPasswordDetails] = useState({});
   const [showLoader, setShowLoader] = useState(false);
   const [showErr, setShowErr] = useState(false);
-  const [fetchUserChats, setFetchUserChats] = useState(true);
+  const [fetchUserChats, setFetchUserChats] = useState(false);
   const [allUsers, setAllUsers] = useState();
   const [userContacts, setUserContacts] = useState();
   const [selectedChat, setSelectedChat] = useState();
