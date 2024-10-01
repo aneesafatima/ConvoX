@@ -45,7 +45,7 @@ const useMessage = (input, setInput) => {
   //FOR FILE UPLOAD
   const handleFileUpload = async (e, id, name) => {
     e.stopPropagation();
-    setShowLoader({status: true, feature: "sending-message"});
+    setShowLoader({ status: true, feature: "sending-message" });
     const file = document.getElementById(id).files[0];
     const form = new FormData();
     form.append(name, file);
@@ -62,8 +62,13 @@ const useMessage = (input, setInput) => {
         withCredentials: true,
       });
       if (res.data?.status === "success") {
+        let message = res.data.file;
+        if (res.data.file.includes(".vnd.openxmlformats")) {
+          message = message.substring(0, message.lastIndexOf("-"));
+        }
+
         socket.emit("send-message", {
-          message: res.data.file,
+          message,
           to: selectedChat.info._id,
           type: selectedChat.type,
           format: name === "photo-upload" ? "photo" : "file",
@@ -77,17 +82,17 @@ const useMessage = (input, setInput) => {
             name === "photo-upload" ? "photo" : "file"
           )
         );
-        setShowLoader(false)
+        setShowLoader(false);
       }
     } catch (err) {
-      setShowLoader(false)
+      setShowLoader(false);
       console.log(err);
     }
   };
 
   //FOR SENDING MESSAGE
   const handeSendingMessage = () => {
-    setShowLoader({status: true, feature: "sending-message"});
+    setShowLoader({ status: true, feature: "sending-message" });
     if (input !== "") {
       socket.emit("send-message", {
         message: input.trim(),

@@ -18,7 +18,7 @@ function Chats({setContacts}) {
 
   return (
     selectedChat && (
-      <div className="flex font-lato flex-col space-y-5 pt-3 px-5  flex-grow relative  w-svw xs:w-fit ">
+      <div className="flex font-lato flex-col space-y-5 pt-3 px-5  flex-grow relative  w-svw xs:w-fit overflow-x-hidden">
         {!messages && (
           <div
             className="main-loader absolute top-1/2 -translate-y-1/2 left-1/2
@@ -29,7 +29,7 @@ function Chats({setContacts}) {
 
         <div className="border rounded-lg w-full h-[90%] flex flex-col pb-12 pt-4  relative">
           <ul
-            className="p-4 px-5 space-y-6 flex flex-col text-sm font-nunito font-medium h-full overflow-auto"
+            className="p-4 px-5 space-y-6 flex flex-col text-sm font-nunito font-medium h-full overflow-y-auto overflow-x-hidden"
             id="scroll-container"
           >
             {messages?.map((message, i) =>

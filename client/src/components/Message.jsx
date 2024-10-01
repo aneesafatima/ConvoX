@@ -11,7 +11,7 @@ import useMessage from "../utils/useMessage";
 function Message({ message, i }) {
   const { currentUser, selectedChat, groupMembers, setReplyingToMessage } =
     useContext(GlobalState);
-
+console.log(message)
   const { handleDeleteMessage } = useMessage();
 
   const deleteMessage = async (messageId) => {
@@ -56,9 +56,9 @@ function Message({ message, i }) {
             loading="lazy"
           />
         ) : message.format === "file" && !message.deleted ? (
-          <div className="flex items-center">
+          <div className="flex items-center h-fit">
             <span className="self-end">
-              <span className="text-[8px] font-nunito font-semibold text-wrap block max-w-24">
+              <span className="text-[8px] font-nunito font-semibold break-words block max-w-24 bg-yellow-100 ">
                 {message.message.substring(0, message.message.lastIndexOf("-"))}
               </span>
               <a
@@ -92,7 +92,7 @@ function Message({ message, i }) {
         {!message.deleted && message.sender !== currentUser._id && (
           <RiShareForwardFill
             size={10}
-            className="absolute z-40 left-full  mx-1 top-1/2 -translate-y-1/2 cursor-pointer hover:opacity-100 "
+            className="absolute z-30 left-full  mx-1 top-1/2 -translate-y-1/2 cursor-pointer hover:opacity-100 "
             onClick={() =>
               setReplyingToMessage(
                 message.format === "photo"

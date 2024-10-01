@@ -26,7 +26,7 @@ export const getFileIcon = (fileType) => {
         size: 70,
         color: "#E94F4F",
       });
-    case "vnd.openxmlformats-officedocument.wordprocessingml.document":
+    case "vnd.openxmlformats":
       return React.createElement(BsFileEarmarkWordFill, {
         size: 70,
         color: "#2B579A",
@@ -41,8 +41,6 @@ export const getFileIcon = (fileType) => {
 };
 
 export const handleLastMessageUpdation = (lastMessage, contactId, message) => {
-  console.log("updating last message!!!!")
-  console.log("message", message)
   const updatedLastMessage = [...lastMessage];
   const existingIndex = updatedLastMessage.findIndex(
     (el) => el.contactId === contactId
