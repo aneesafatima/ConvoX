@@ -3,11 +3,37 @@ const ErrorHandler = require("../utils/ErrorHandler");
 const multer = require("multer");
 const User = require("../models/userModel");
 const Group = require("../models/groupModel");
-const fs = require("fs");
-const path = require("path");
-const sharpResizing = require("./sharpResizing");
+const dotenv = require("dotenv");
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+dotenv.config({ path: "./.env" });
 
-const multerStrorage = multer.memoryStorage();
+//cloudinary config 
+
+console.log(process.env.CLOUDINARY_NAME, process.env.CLOUDINARY_API_KEY, process.env.CLOUDINARY_API_SECRET)
+  cloudinary.config({ 
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY, 
+    api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// Set up Cloudinary storage for Multer
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'profiles', // Folder in Cloudinary where the images will be stored
+    public_id : (req) => {
+      const {type,id} = req.params
+     return type === "user"
+      ? `user-${id}-${Date.now()}`
+          : `group-${id}-${Date.now()}`;
+    },
+    format: 'jpeg', 
+    transformation: [{ width: 600, height: 600, crop: 'limit' }], // Optional image transformation
+  },
+});
+
+// const multerStrorage = multer.memoryStorage();
 const multerFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image")) {
     cb(null, true);
@@ -19,20 +45,13 @@ const multerFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({ storage: multerStrorage, fileFilter: multerFilter });
+const upload = multer({ storage, fileFilter: multerFilter });
 
 exports.uploadProfilePicture = upload.single("profile-picture");
 
 exports.resizePhoto = catchAsync(async (req, res, next) => {
-  let doc;
   if (!req.file) return next();
   const { id, type } = req.params;
-  req.file.filename =
-    type === "user"
-      ? `user-${id}-${Date.now()}.jpeg`
-      : `group-${id}-${Date.now()}.jpeg`;
-   await sharpResizing(`profiles`, req);
-
   if (type === "user") {
     doc = await User.findByIdAndUpdate(id, {
       photo: req.file.filename,
@@ -41,15 +60,6 @@ exports.resizePhoto = catchAsync(async (req, res, next) => {
     doc = await Group.findByIdAndUpdate(id, {
       photo: req.file.filename,
     });
-  }
-
-  const photo = path.join(__dirname, `../public/img/profiles/${doc.photo}`);
-  if (
-    fs.existsSync(photo) &&
-    doc.photo !== "default-user.jpeg" &&
-    doc.photo !== "default-group.png"
-  ) {
-    fs.unlinkSync(photo);
   }
   res.status(200).json({
     status: "success",

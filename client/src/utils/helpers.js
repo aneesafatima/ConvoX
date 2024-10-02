@@ -57,6 +57,7 @@ export const handleLastMessageUpdation = (lastMessage, contactId, message) => {
 };
 
 export const handleImageUpload = (res, imgSetter) => {
-  imgSetter(JSON.parse(res.xhr.response).imageUrl);
+  console.log(JSON.parse(res.xhr.response).imageUrl)
+  imgSetter(JSON.parse(res.xhr.response).imageUrl + ".jpeg");
   showAlert("Profile picture updated", "home");
 };

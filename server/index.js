@@ -12,13 +12,11 @@ const messageRouter = require("./routes/messageRouter");
 const notificationRouter = require("./routes/notificationRouter");
 const errorController = require("./controllers/errorController");
 const helmet = require("helmet");
-const rateLimit = require("express-rate-limit");
 const mongoSanitize = require("express-mongo-sanitize");
 const xss = require("xss-clean");
 const hpp = require("hpp");
 const path = require("path");
 const handleIoConnection = require("./utils/socketHandlers");
-
 const groupRouter = require("./routes/groupRouter");
 dotenv.config({ path: "./.env" });
 

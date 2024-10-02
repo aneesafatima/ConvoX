@@ -7,7 +7,7 @@ const groupSchema = new mongoose.Schema({
   },
   photo: {
     type: String,
-    default: "default-group.png",
+    default: "default-group",
   },
   name: {
     type: String,

@@ -58,7 +58,7 @@ console.log(message)
         ) : message.format === "file" && !message.deleted ? (
           <div className="flex items-center h-fit">
             <span className="self-end">
-              <span className="text-[8px] font-nunito font-semibold break-words block max-w-24 bg-yellow-100 ">
+              <span className="text-[8px] font-nunito font-semibold break-words block max-w-24">
                 {message.message.substring(0, message.message.lastIndexOf("-"))}
               </span>
               <a

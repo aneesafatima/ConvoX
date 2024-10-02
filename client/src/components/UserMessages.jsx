@@ -7,8 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { FileUpload } from "primereact/fileupload";
 import { ReactTooltip } from ".";
 import axios from "axios";
-import {handleImageUpload,getFormattedDate } from "../utils/helpers";
-import {showAlert  } from "../utils/showAlert";
+import { handleImageUpload, getFormattedDate } from "../utils/helpers";
+import { showAlert } from "../utils/showAlert";
 
 function UserMessages({ contacts }) {
   const {
@@ -23,10 +23,12 @@ function UserMessages({ contacts }) {
     lastMessage,
   } = useContext(GlobalState);
 
-  const [imageUrl, setImageUrl] = useState(currentUser?.photo);
+  const [imageUrl, setImageUrl] = useState(currentUser?.photo + ".jpeg");
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-
+  useEffect(() => {
+    console.log("image", `${import.meta.env.VITE_CLOUDINARY_LINK}/${imageUrl}`);
+  }, [imageUrl]);
   const handleLogOut = async () => {
     const res = await axios.get(
       `${import.meta.env.VITE_URL}/api/users/logout`,
@@ -72,9 +74,7 @@ function UserMessages({ contacts }) {
         <span className="flex items-center space-x-2">
           <div className="w-14 h-14 xs:w-12 xs:h-12  my-3 relative rounded-full ml-1">
             <img
-              src={`${
-                import.meta.env.VITE_URL
-              }/public/img/profiles/${imageUrl}`}
+              src={`${import.meta.env.VITE_CLOUDINARY_URL}/${imageUrl}`}
               alt="user profile photo"
               className=" rounded-full"
             />
@@ -89,7 +89,7 @@ function UserMessages({ contacts }) {
               className="absolute bottom-0 right-0  text-center"
               id="photo-upload"
               onUpload={(res) => handleImageUpload(res, setImageUrl)}
-              onBeforeSend ={() => showAlert("Uploading image", "home")}
+              onBeforeSend={() => showAlert("Uploading image", "home")}
             />
           </div>
           <span>{currentUser?.name}</span>
@@ -135,7 +135,7 @@ function UserMessages({ contacts }) {
                   >
                     <span className="flex items-center w-full">
                       <img
-                        src={`${import.meta.env.VITE_URL}/public/img/profiles/${
+                        src={`${import.meta.env.VITE_CLOUDINARY_URL}/${
                           contact.photo
                         }`}
                         className="mr-1 w-[46px] h-[46px] rounded-full"
