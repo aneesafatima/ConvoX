@@ -26,9 +26,7 @@ function UserMessages({ contacts }) {
   const [imageUrl, setImageUrl] = useState(currentUser?.photo + ".jpeg");
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
-  useEffect(() => {
-    console.log("image", `${import.meta.env.VITE_CLOUDINARY_LINK}/${imageUrl}`);
-  }, [imageUrl]);
+
   const handleLogOut = async () => {
     const res = await axios.get(
       `${import.meta.env.VITE_URL}/api/users/logout`,
@@ -74,7 +72,7 @@ function UserMessages({ contacts }) {
         <span className="flex items-center space-x-2">
           <div className="w-14 h-14 xs:w-12 xs:h-12  my-3 relative rounded-full ml-1">
             <img
-              src={`${import.meta.env.VITE_CLOUDINARY_URL}/${imageUrl}`}
+              src={`${import.meta.env.VITE_CLOUDINARY_PROFILES_URL}/${imageUrl}`}
               alt="user profile photo"
               className=" rounded-full"
             />
@@ -135,7 +133,7 @@ function UserMessages({ contacts }) {
                   >
                     <span className="flex items-center w-full">
                       <img
-                        src={`${import.meta.env.VITE_CLOUDINARY_URL}/${
+                        src={`${import.meta.env.VITE_CLOUDINARY_PROFILES_URL}/${
                           contact.photo
                         }`}
                         className="mr-1 w-[46px] h-[46px] rounded-full"

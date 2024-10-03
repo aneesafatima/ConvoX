@@ -57,7 +57,11 @@ export const handleLastMessageUpdation = (lastMessage, contactId, message) => {
 };
 
 export const handleImageUpload = (res, imgSetter) => {
-  console.log(JSON.parse(res.xhr.response).imageUrl)
   imgSetter(JSON.parse(res.xhr.response).imageUrl + ".jpeg");
   showAlert("Profile picture updated", "home");
 };
+
+export const getCloudinaryUrl = (resourceType, publicId) => {
+  return `https://res.cloudinary.com/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/${resourceType}/upload/v1727867209/chats/${publicId}`;
+};
+

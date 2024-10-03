@@ -16,6 +16,7 @@ function Chats({setContacts}) {
     }, 100);
   }, [selectedChat, messages]);
 
+  console.log(messages)
   return (
     selectedChat && (
       <div className="flex font-lato flex-col space-y-5 pt-3 px-5  flex-grow relative  w-svw xs:w-fit overflow-x-hidden">

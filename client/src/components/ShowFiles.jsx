@@ -1,11 +1,11 @@
 import React, { useContext, useState } from "react";
 import { GlobalState } from "../context/GlobalState";
-import { getFileIcon } from "../utils/helpers";
+import { getCloudinaryUrl, getFileIcon } from "../utils/helpers";
 import { GoDownload } from "react-icons/go";
 function showFiles() {
   const { messages } = useContext(GlobalState);
   const [category, setCategory] = useState("photo");
-  const fileMessages = messages.filter(
+  const fileMessages = messages?.filter(
     (msg) => msg.format === category && !msg.deleted
   );
 
@@ -53,9 +53,10 @@ function showFiles() {
                       </span>
 
                       <a
-                        href={`${
-                          import.meta.env.VITE_URL
-                        }/public/file-uploads/${msg.message}`}
+                        href={getCloudinaryUrl(
+                          msg.message.endsWith(".mp4") ? "video" : "raw",
+                          msg.message.substring(0, msg.message.indexOf("."))
+                        )}
                         downlaod
                         target="_blank"
                       >
@@ -64,9 +65,7 @@ function showFiles() {
                     </div>
                   ) : (
                     <img
-                      src={`${import.meta.env.VITE_URL}/public/img/chats/${
-                        msg.message
-                      }`}
+                      src={getCloudinaryUrl("image", msg.message)}
                       alt="photo"
                       className="w-32 h-32"
                       loading="lazy"

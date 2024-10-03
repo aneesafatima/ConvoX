@@ -44,6 +44,7 @@ const useMessage = (input, setInput) => {
 
   //FOR FILE UPLOAD
   const handleFileUpload = async (e, id, name) => {
+    console.log(id, name)
     e.stopPropagation();
     setShowLoader({ status: true, feature: "sending-message" });
     const file = document.getElementById(id).files[0];
@@ -51,8 +52,8 @@ const useMessage = (input, setInput) => {
     form.append(name, file);
     try {
       const res = await axios({
-        url: `${import.meta.env.VITE_URL}/api/messages/${
-          name === "photo-upload" ? "send-photo-message" : "file-upload"
+        url: `${import.meta.env.VITE_URL}/api/messages/file-upload/${
+          name === "photo-upload" ? "image" : "file"
         }`,
         method: "POST",
         data: form,
@@ -62,6 +63,7 @@ const useMessage = (input, setInput) => {
         withCredentials: true,
       });
       if (res.data?.status === "success") {
+        console.log(res.data.file)
         let message = res.data.file;
         if (res.data.file.includes(".vnd.openxmlformats")) {
           message = message.substring(0, message.lastIndexOf("-"));

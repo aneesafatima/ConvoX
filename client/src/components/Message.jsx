@@ -5,13 +5,12 @@ import { GoDownload } from "react-icons/go";
 import { getFormattedDate } from "../utils/helpers";
 import { GlobalState } from "../context/GlobalState";
 import axios from "axios";
-import { getFileIcon } from "../utils/helpers";
+import { getFileIcon, getCloudinaryUrl } from "../utils/helpers";
 import useMessage from "../utils/useMessage";
 
 function Message({ message, i }) {
   const { currentUser, selectedChat, groupMembers, setReplyingToMessage } =
     useContext(GlobalState);
-console.log(message)
   const { handleDeleteMessage } = useMessage();
 
   const deleteMessage = async (messageId) => {
@@ -48,9 +47,7 @@ console.log(message)
       <span className="relative w-fit mb-2">
         {message.format === "photo" && !message.deleted ? (
           <img
-            src={`${import.meta.env.VITE_URL}/public/img/chats/${
-              message.message
-            }`}
+            src={getCloudinaryUrl("image", message.message)}
             alt="photo"
             className="h-32 sm:h-60"
             loading="lazy"
@@ -62,9 +59,7 @@ console.log(message)
                 {message.message.substring(0, message.message.lastIndexOf("-"))}
               </span>
               <a
-                href={`${import.meta.env.VITE_URL}/public/file-uploads/${
-                  message.message
-                }`}
+               href={getCloudinaryUrl(message.message.endsWith(".mp4") ? "video" : "raw", message.message.substring(0,message.message.indexOf(".")))}
                 downlaod
                 target="_blank"
               >

@@ -40,7 +40,7 @@ function GroupSettings() {
           <div className="w-14 h-14 xs:w-12 xs:h-12  my-3 relative rounded-full ml-1">
             <img
               src={`${
-                import.meta.env.VITE_CLOUDINARY_URL
+                import.meta.env.VITE_CLOUDINARY_PROFILES_URL
               }/${groupImageUrl}`}
               alt="user profile photo"
               className=" rounded-full"
