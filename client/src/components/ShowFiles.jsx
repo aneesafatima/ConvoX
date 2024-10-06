@@ -44,7 +44,7 @@ function showFiles() {
                 <li className=" m-1">
                   {category === "file" ? (
                     <div className="flex items-center justify-between">
-                      <span className="text-xs flex items-center w-full text-wrap">
+                      <span className="text-xs flex items-center w-full break-words">
                         {getFileIcon(
                           msg.message.substring(msg.message.indexOf(".") + 1)
                         )}
@@ -67,7 +67,7 @@ function showFiles() {
                     <img
                       src={getCloudinaryUrl("image", msg.message)}
                       alt="photo"
-                      className="w-32 h-32"
+                      className="w-32 h-32 object-cover"
                       loading="lazy"
                     />
                   )}

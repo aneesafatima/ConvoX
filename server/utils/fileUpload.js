@@ -108,8 +108,6 @@ const chatStorage = new CloudinaryStorage({
   params: (req, file) => {
     const { type } = req.params;
     const mimeType = file.mimetype.split("/")[0];
-    console.log(file);
-    console.log(mimeType);
     req.ext =
       mimeType === "image" || mimeType === "video"
         ? ""

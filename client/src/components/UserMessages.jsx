@@ -74,7 +74,7 @@ function UserMessages({ contacts }) {
             <img
               src={`${import.meta.env.VITE_CLOUDINARY_PROFILES_URL}/${imageUrl}`}
               alt="user profile photo"
-              className=" rounded-full"
+              className="overflow-clip rounded-full w-full h-full"
             />
             <FileUpload
               mode="basic"
@@ -136,7 +136,7 @@ function UserMessages({ contacts }) {
                         src={`${import.meta.env.VITE_CLOUDINARY_PROFILES_URL}/${
                           contact.photo
                         }`}
-                        className="mr-1 w-[46px] h-[46px] rounded-full"
+                        className="mr-1 w-[46px] h-[46px] rounded-full overflow-clip"
                       />
                       <span className="flex flex-col w-full">
                         {contact?.name}

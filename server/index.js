@@ -37,7 +37,7 @@ process.on("uncaughtException", (err) => {
 // This will catch any unhandled promise rejections from anywhere in your app
 process.on("unhandledRejection", (err) => {
   console.log("UNHANDLED REJECTION! 💥 Shutting down...");
-  console.error(err.name, err.message);
+  console.error(err);
   // Attempt to close server gracefully before exiting
   server.close(() => {
     process.exit(1);

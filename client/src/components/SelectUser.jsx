@@ -144,7 +144,7 @@ function SelectUser({ contacts }) {
                         src={`${import.meta.env.VITE_CLOUDINARY_PROFILES_URL}/${
                           user.photo
                         }`}
-                        className="mr-1 w-[46px] h-[46px] rounded-full"
+                        className="mr-1 w-[46px] h-[46px] rounded-full object-cover"
                       />
                   <span className="flex flex-col">
                     <span className="">{user.name}</span>
