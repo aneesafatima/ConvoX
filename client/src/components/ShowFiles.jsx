@@ -44,12 +44,19 @@ function showFiles() {
                 <li className=" m-1">
                   {category === "file" ? (
                     <div className="flex items-center justify-between">
-                      <span className="text-xs flex items-center w-full break-words">
-                        {getFileIcon(
-                          msg.message.substring(msg.message.indexOf(".") + 1)
-                        )}
+                      <span className="text-xs flex items-center w-full break-words overflow-hidden">
+                        <span>
+                          {getFileIcon(
+                            msg.message.substring(msg.message.indexOf(".") + 1)
+                          )}
+                        </span>
 
-                        {msg.message.substring(0, msg.message.lastIndexOf("-"))}
+                        <span className="break-words">
+                          {msg.message.substring(
+                            0,
+                            msg.message.lastIndexOf("-")
+                          )}
+                        </span>
                       </span>
 
                       <a

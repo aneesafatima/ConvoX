@@ -10,7 +10,7 @@ import { useContext } from "react";
 import {ReactTooltip } from ".";
 function ChatsHeader({ setShowFilesMessages, setContacts }) {
   const { handleGroupExit, handleDeleteChats, handleUserRemovalFromChats } =
-    useChatHandlers(setContacts); //called on every render abd uses this component's lifecycle
+    useChatHandlers(setContacts); //called on every render and uses this component's lifecycle
 
   const {
     selectedChat,

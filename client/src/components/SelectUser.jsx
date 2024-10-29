@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
-import { FaUserCircle } from "react-icons/fa";
 import { MdOutlineGroups } from "react-icons/md";
 import { IoCheckmarkDoneCircle } from "react-icons/io5";
 import { RxCross1 } from "react-icons/rx";
@@ -82,6 +81,7 @@ function SelectUser({ contacts }) {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           {isGroup ? (
+            // < type="submit" onSubmit={(e) => e.preventDefault()}>
             <IoCheckmarkDoneCircle
               size={22}
               color="white"
@@ -104,6 +104,9 @@ function SelectUser({ contacts }) {
               className="w-[60%] h-8 rounded-lg bg-white block text-sm font-lato px-3 outline-none border-0"
               placeholder="group name"
               id="group-name"
+              required
+              title="A group name is required"
+
             />
             <input
               type="text"

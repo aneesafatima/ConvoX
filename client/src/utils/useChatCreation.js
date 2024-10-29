@@ -81,7 +81,7 @@ const chatCreation = (contacts) => {
   };
 
   const handleGroupCreation = async () => {
-    if (groupMembers.length > 1) {
+    if (groupMembers?.length > 1) {
       setGroupMembers((prev) => [...prev, currentUser]);
 
       try {
@@ -112,7 +112,7 @@ const chatCreation = (contacts) => {
           setIsGroup(false);
         }
       } catch (err) {
-        showAlert("Group creation failed", "home");
+        showAlert(err.response.data.message, "home");
       }
     } else showAlert("Group must have atleast 2 members", "home");
   };

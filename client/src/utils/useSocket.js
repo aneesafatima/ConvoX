@@ -22,7 +22,6 @@ const useSocket = () => {
     setShowLoader,
   } = useContext(GlobalState);
   const { handleDeleteMessage } = useMessage();
-
   const selectedChatRef = useRef(selectedChat);
   const lastMessageRef = useRef(lastMessage);
   const replyingToMessageRef = useRef(replyingToMessage);

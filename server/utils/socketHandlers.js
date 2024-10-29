@@ -103,6 +103,9 @@ const handleIoConnection = (io) => {
           socket.to(selectedUser.socketId).emit("added-as-contact", userName);
         else if (groupId) {
           socket.to(groupId).emit("added-new-grp-member", groupId);
+          socket
+            .to(selectedUser.socketId)
+            .emit("added-to-group", { userName, groupId, groupName });
         }
       }
     );
@@ -146,7 +149,7 @@ const handleIoConnection = (io) => {
         const socketInstance = io.sockets.sockets.get(user?.socketId);
         if (socketInstance) {
           socketInstance.leave(groupId);
-          socketInstance.emit("removed-from-group", {groupName, groupId});
+          socketInstance.emit("removed-from-group", { groupName, groupId });
         } else {
           await Notification.create({
             message: `You were removed from ${groupName} group`,
